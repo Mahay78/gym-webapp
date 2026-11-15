@@ -1,0 +1,17 @@
+{
+  "name": "FitnessCut — Entrenamiento para perder grasa",
+  "short_name": "FitnessCut",
+  "description": "Planes de entrenamiento en máquinas, calculadoras y seguimiento para perder grasa.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#ff6b35",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

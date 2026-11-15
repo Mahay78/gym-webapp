@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitnessCut — Entrenamiento para perder grasa</title>
+  <meta name="theme-color" content="#ff6b35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FitnessCut">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🔥</span>
+      <span class="brand-name">FitnessCut</span>
+    </div>
+    <div class="topbar-right">
+      <nav class="nav" id="nav">
+        <button class="nav-link active" data-section="inicio">Inicio</button>
+        <button class="nav-link" data-section="planes">Planes</button>
+        <button class="nav-link" data-section="paquetes">📦 Paquetes IA</button>
+        <button class="nav-link" data-section="escaner">📷 Escáner IA</button>
+        <button class="nav-link" data-section="calculadoras">Calculadoras</button>
+        <button class="nav-link" data-section="progreso">Progreso</button>
+        <button class="nav-link" data-section="diario">Diario</button>
+        <button class="nav-link" data-section="guia">Guía</button>
+      </nav>
+      <button class="nav-link" id="btn-tema" title="Cambiar tema" aria-label="Cambiar tema claro u oscuro">🌙</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ============ INICIO ============ -->
+    <section id="inicio" class="section active">
+      <div class="hero card">
+        <h1>Quema grasa <span class="accent">con método</span>, no con milagros</h1>
+        <p>El déficit calórico es la base. El entrenamiento con pesas protege tu músculo. La constancia lo hace todo posible. Aquí tienes tu plan completo.</p>
+        <button class="btn" data-goto="calculadoras">Calcular mis calorías →</button>
+      </div>
+
+      <div class="stats-row" id="home-stats"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>📅 Resumen semanal</h3>
+          <div id="resumen-semanal"></div>
+        </div>
+        <div class="card">
+          <h3>🏋️ Hoy toca</h3>
+          <div id="hoy-toca"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 Racha y asistencia</h3>
+        <div id="entrenos-card"></div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>🏋️ Entrena con máquinas</h3>
+          <p>3–5 sesiones semanales con máquinas y poleas. Evita perder músculo mientras pierdes grasa.</p>
+        </div>
+        <div class="card">
+          <h3>🍽️ Come en déficit</h3>
+          <p>Entre 300 y 500 kcal por debajo de tu mantenimiento. Perderás ~0,5 kg/semana.</p>
+        </div>
+        <div class="card">
+          <h3>😴 Duerme y anda</h3>
+          <p>7–8 h de sueño y 8.000–10.000 pasos diarios aceleran los resultados.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PLANES ============ -->
+    <section id="planes" class="section">
+      <div class="planes-header">
+        <div>
+          <h2>Planes de entrenamiento</h2>
+          <p class="subtitle">Rutinas científicas enfocadas en sobrecarga progresiva, retención muscular y control de fatiga (RIR).</p>
+        </div>
+        <div class="plan-header-actions">
+          <button class="btn-small" id="btn-modo-entreno" title="Mantener pantalla encendida y vista enfocada de gimnasio">⚡ Entreno: <span id="modo-entreno-status">OFF</span></button>
+          <button class="btn-small" id="btn-toggle-audio-coach" title="Activar/desactivar entrenador y avisos por voz">🔊 Coach: <span id="coach-status-text">OFF</span></button>
+          <button class="btn" id="btn-toggle-asistente">✨ Crear plan a medida</button>
+          <button class="btn-small" id="btn-toggle-guia-rir">📘 Guía RIR</button>
+          <button class="btn-small" data-goto="paquetes">📦 Paquetes IA</button>
+          <button class="btn-small" data-goto="escaner">📷 Escáner IA</button>
+        </div>
+      </div>
+
+      <!-- Panel Asistente Plan a Medida -->
+      <div id="panel-asistente" class="card panel-collapsible" style="display: none;">
+        <div class="card-head">
+          <h3>✨ Generador de rutina a medida</h3>
+          <button class="btn-small" id="btn-cerrar-asistente" aria-label="Cerrar asistente">✕</button>
+        </div>
+        <p class="subtitle">Personaliza tu rutina según tu disponibilidad, experiencia y material de tu gimnasio:</p>
+        <div class="form-grid">
+          <label>Días de entrenamiento por semana
+            <select id="gen-dias">
+              <option value="3">3 días (Full Body / Cuerpo completo)</option>
+              <option value="4" selected>4 días (Torso / Pierna Frecuencia 2)</option>
+              <option value="5">5 días (Hipertrofia & Definición)</option>
+              <option value="2">2 días (Mantenimiento express)</option>
+            </select>
+          </label>
+          <label>Nivel de experiencia
+            <select id="gen-nivel">
+              <option value="principiante">Principiante (&lt; 1 año)</option>
+              <option value="intermedio" selected>Intermedio (1–3 años)</option>
+              <option value="avanzado">Avanzado (&gt; 3 años)</option>
+            </select>
+          </label>
+          <label>Equipamiento disponible
+            <select id="gen-equipo">
+              <option value="maquinas" selected>Solo máquinas y poleas (Gym comercial)</option>
+              <option value="hibrido">Híbrido (Máquinas + Mancuernas y peso libre)</option>
+            </select>
+          </label>
+          <label>Objetivo prioritario
+            <select id="gen-objetivo">
+              <option value="grasa" selected>Perder grasa conservando músculo (Déficit)</option>
+              <option value="hipertrofia">Ganar músculo y definir (Recomposición)</option>
+              <option value="fuerza">Fuerza y densidad muscular</option>
+            </select>
+          </label>
+        </div>
+        <div class="btn-row" style="margin-top: 14px;">
+          <button class="btn" id="btn-generar-plan">⚡ Generar y activar mi plan a medida</button>
+        </div>
+      </div>
+
+      <!-- Panel Guía RIR y Calentamiento -->
+      <div id="panel-guia-rir" class="card panel-collapsible" style="display: none;">
+        <div class="card-head">
+          <h3>📘 Guía de esfuerzo (RIR) y calentamiento científico</h3>
+          <button class="btn-small" id="btn-cerrar-guia-rir" aria-label="Cerrar guía">✕</button>
+        </div>
+        <div class="grid-2">
+          <div>
+            <h4>🎯 Escala RIR (Reps en Recámara)</h4>
+            <p>El RIR mide la cercanía al fallo técnico en cada serie efectiva:</p>
+            <ul class="guia-list">
+              <li><strong>RIR 3:</strong> Podrías sacar 3 reps más. Calentamiento y aproximaciones.</li>
+              <li><strong>RIR 2:</strong> Podrías sacar 2 reps más. Óptimo estímulo con mínima fatiga sistémica. Ideal para la mayoría de series.</li>
+              <li><strong>RIR 1:</strong> Podrías sacar 1 rep más con técnica estricta. Intensidad perfecta para proteger músculo en déficit calórico.</li>
+              <li><strong>RIR 0:</strong> Fallo técnico (no puedes completar otra rep estricta). Reservar solo para la última serie en máquinas seguras.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>🔥 Protocolo de aproximación antes de series efectivas</h4>
+            <p>Antes de cargar el peso de trabajo en tu primer ejercicio pesado:</p>
+            <ol class="guia-list">
+              <li><strong>Activación:</strong> 50% de tu carga × 8–10 reps (calentamiento articular, sin fatiga). Descansa 60 s.</li>
+              <li><strong>Aclimatación:</strong> 75% de tu carga × 4–5 reps (activación neural). Descansa 90 s.</li>
+              <li><strong>Potenciación:</strong> 90% de tu carga × 1–2 reps (preparación del sistema nervioso). Descansa 2 min.</li>
+              <li><strong>Series efectivas:</strong> Ejecuta las series marcadas y anota kilos y repeticiones.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⏱ Temporizador de descanso</h3>
+        <div class="timer-row">
+          <button class="tab" data-timer="60">60 s</button>
+          <button class="tab" data-timer="90">90 s</button>
+          <button class="tab" data-timer="120">120 s</button>
+          <button class="tab" data-timer="180">180 s</button>
+          <input type="number" id="timer-custom" min="10" max="600" placeholder="personalizado (s)" aria-label="Segundos personalizados">
+          <button class="btn-small" id="btn-timer-stop">⏹ Detener</button>
+        </div>
+        <div id="timer-display" class="timer-display" role="timer" aria-live="polite">00:00</div>
+      </div>
+
+      <div class="tabs" id="plan-tabs">
+        <button class="tab active" data-plan="3dias">Full Body · 3 días</button>
+        <button class="tab" data-plan="4dias">Torso/Pierna · 4 días</button>
+        <button class="tab" data-plan="ppl">Push / Pull / Legs · 3–6 días</button>
+        <button class="tab" data-plan="5dias">Hipertrófico · 5 días</button>
+        <button class="tab" data-plan="pesolibre">Peso Libre + Máquinas · 4 días</button>
+      </div>
+      <div id="plan-content" class="plan-content"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>📊 Histórico de cargas</h3>
+        </div>
+        <div class="form-grid">
+          <label>Ejercicio
+            <select id="hist-ejercicio"></select>
+          </label>
+        </div>
+        <div id="hist-resumen" class="results"></div>
+        <div id="hist-chart"></div>
+        <div id="hist-tabla"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>📈 Volumen semanal</h3>
+        </div>
+        <div id="volumen-chart" class="volumen"></div>
+      </div>
+
+      <div class="card">
+        <h3>✎ Editor de planes</h3>
+        <div class="form-grid">
+          <label>Plan
+            <select id="edit-plan"></select>
+          </label>
+          <label>Día
+            <select id="edit-dia"></select>
+          </label>
+        </div>
+        <div id="edit-ejercicios"></div>
+        <div class="btn-row">
+          <button class="btn-small" id="btn-edit-add">＋ Añadir ejercicio</button>
+          <button class="btn" id="btn-edit-guardar">💾 Guardar cambios</button>
+          <button class="btn-small" id="btn-edit-reset">↺ Restaurar planes originales</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ESCÁNER IA ============ -->
+    <section id="escaner" class="section">
+      <div class="planes-header">
+        <div>
+          <h2>📷 Visión IA: Escáner y Corrección Técnica</h2>
+          <p class="subtitle">Escanea y ajusta cualquier máquina del gimnasio o grábate en vídeo para que la IA biomecánica evalúe y corrija tu técnica serie a serie.</p>
+        </div>
+        <button class="btn-small" id="btn-toggle-apikey">🔑 Configurar Gemini API (Gratis)</button>
+      </div>
+
+      <!-- Configuración API Key (desplegable) -->
+      <div id="panel-apikey" class="card" style="display: none;">
+        <div class="card-head">
+          <h3>🔑 Conectar Google Gemini Vision (Opcional)</h3>
+          <button class="btn-small" id="btn-cerrar-apikey">✕</button>
+        </div>
+        <p class="subtitle">Para que la IA analice las fotos y vídeos directamente con visión multimodal de Gemini 2.5 Flash, introduce tu API Key gratuita de Google AI Studio (100% gratuita y sin tarjeta):</p>
+        <div class="form-grid">
+          <label>Google Gemini API Key
+            <input type="password" id="input-gemini-key" placeholder="AIzaSy..." autocomplete="off">
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="btn-guardar-apikey">Guardar API Key en este dispositivo</button>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn-small">Obtener API Key gratis en Google AI Studio ↗</a>
+        </div>
+        <small class="muted" style="display:block;margin-top:8px;">🔒 La clave se almacena exclusivamente en tu móvil (LocalStorage). También dispones de análisis inteligente biomecánico integrado sin necesidad de clave.</small>
+      </div>
+
+      <!-- Sub-navegación de Visión IA -->
+      <div class="tabs pkg-subtabs" id="vision-tabs">
+        <button class="tab active" data-visiontab="maquinas">🔍 Escáner de Máquinas</button>
+        <button class="tab" data-visiontab="formcheck">📹 Corrección de Técnica en Vídeo</button>
+      </div>
+
+      <!-- Vista 1: Escáner de Máquinas -->
+      <div id="vision-view-maquinas" class="vision-view active">
+        <div class="card">
+          <h3>Capturar o seleccionar máquina</h3>
+          <p class="subtitle">Haz una foto a la máquina con la cámara de tu móvil o busca por nombre:</p>
+
+          <div class="ai-capture-row">
+            <label class="btn btn-camera" for="ai-cam-input" style="cursor: pointer;">
+              📸 Fotografiar máquina con la cámara
+              <input type="file" id="ai-cam-input" accept="image/*" capture="environment" style="display:none;">
+            </label>
+            <label class="btn-small btn-gallery" for="ai-gallery-input" style="cursor: pointer; padding: 10px 14px;">
+              🖼 Elegir de la galería
+              <input type="file" id="ai-gallery-input" accept="image/*" style="display:none;">
+            </label>
+          </div>
+
+          <div id="ai-preview-wrap" style="display: none; margin-top: 14px;">
+            <div class="ai-preview-box">
+              <img id="ai-preview-img" alt="Foto de la máquina" src="">
+              <button class="btn-small" id="btn-quitar-foto" title="Quitar foto" style="margin-top: 6px;">✕ Quitar foto</button>
+            </div>
+            <button class="btn" id="btn-analizar-foto" style="margin-top: 10px;">🤖 Analizar esta máquina con IA →</button>
+          </div>
+
+          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <label>O selecciona/busca directamente la máquina:
+              <input type="search" id="ai-search-input" placeholder="Buscar: Prensa, Polea, Jalón, Pec deck, Hack, Hip thrust...">
+            </label>
+            <div class="ai-chips-row" id="ai-quick-chips">
+              <button class="tab" data-chip="Prensa de piernas">Prensa</button>
+              <button class="tab" data-chip="Sentadilla en máquina Hack">Hack Squat</button>
+              <button class="tab" data-chip="Press de pecho en máquina">Press de pecho</button>
+              <button class="tab" data-chip="Jalón al pecho en polea">Jalón al pecho</button>
+              <button class="tab" data-chip="Remo sentado en máquina">Remo máquina</button>
+              <button class="tab" data-chip="Pec deck (aperturas en máquina)">Pec Deck</button>
+              <button class="tab" data-chip="Extensión de tríceps en polea con cuerda">Polea tríceps</button>
+              <button class="tab" data-chip="Curl femoral sentado">Curl femoral</button>
+              <button class="tab" data-chip="Extensión de cuádriceps">Extensión cuádriceps</button>
+              <button class="tab" data-chip="Hip thrust en máquina">Hip Thrust</button>
+              <button class="tab" data-chip="Elevaciones laterales en polea">Elevaciones laterales</button>
+              <button class="tab" data-chip="Peso muerto rumano con barra Smith">Smith / Multipower</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spinner de carga -->
+        <div id="ai-loading" class="card ai-loading" style="display: none; text-align: center; padding: 28px;">
+          <div class="spinner"></div>
+          <h4 style="margin-top: 12px; color: var(--accent);">Analizando máquina con IA...</h4>
+          <p class="muted">Detectando biomecánica, ajustes de asiento y preparando la adaptación a tu plan de hoy.</p>
+        </div>
+
+        <!-- Tarjeta de Resultado de la IA -->
+        <div id="ai-result-card" class="card" style="display: none;">
+          <div id="ai-result-content"></div>
+        </div>
+      </div>
+
+      <!-- Vista 2: Corrección de Técnica en Vídeo con Visión IA -->
+      <div id="vision-view-formcheck" class="vision-view" style="display: none;">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>📹 Corrección de Técnica en Vídeo con Visión IA</h3>
+              <p class="subtitle" style="margin:2px 0 0;">Grábate realizando una serie (5 a 15 seg). La IA extraerá los fotogramas clave y evaluará ángulos articulares, estabilidad pélvica, trayectoria y profundidad.</p>
+            </div>
+            <span class="pkg-badge">Biomecánica IA</span>
+          </div>
+
+          <!-- Selector de Ejercicio a Analizar -->
+          <div class="form-grid" style="margin:14px 0 10px;">
+            <label>Ejercicio que vas a realizar:
+              <select id="formcheck-ejercicio-select">
+                <option value="Sentadilla (barra / hack / goblet)">Sentadilla (Barra, Hack o Goblet)</option>
+                <option value="Prensa de piernas">Prensa de piernas</option>
+                <option value="Press de pecho (banca / máquina)">Press de pecho / banca</option>
+                <option value="Peso muerto (rumano / convencional)">Peso muerto (Rumano o Convencional)</option>
+                <option value="Jalón al pecho / Dominadas">Jalón al pecho / Dominadas</option>
+                <option value="Remo con barra o máquina">Remo con barra o máquina</option>
+                <option value="Press militar de hombros">Press militar / hombros</option>
+                <option value="Elevaciones laterales">Elevaciones laterales</option>
+                <option value="Hip Thrust">Hip Thrust</option>
+                <option value="Curl de bíceps">Curl de bíceps</option>
+                <option value="Extensión de tríceps">Extensión de tríceps</option>
+                <option value="Otro ejercicio">Otro ejercicio libre</option>
+              </select>
+            </label>
+            <label>Ángulo de cámara recomendado:
+              <div style="font-size:0.82rem; color:var(--muted); padding-top:8px;" id="formcheck-angulo-tip">
+                📐 <strong>Plano sagital (lateral a 90° o 45°):</strong> Apoya el móvil a la altura de tu cadera a 2–3 metros para ver rodillas, cadera y espalda.
+              </div>
+            </label>
+            <label>Feedback en directo:
+              <select id="live-audio-mode">
+                <option value="voz">🔊 Voz completa</option>
+                <option value="pitidos">🔔 Solo pitidos</option>
+                <option value="silencio">🔇 Silencio</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- Opciones de Grabación y Tiempo Real -->
+          <div class="camera-actions" style="margin: 14px 0; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" id="btn-iniciar-live-directo" type="button" style="background: var(--green); border-color: var(--green); color: #000; font-weight: 800;">
+              ⚡ Entrenador En Directo (Pose & Reps 30 FPS)
+            </button>
+            <button class="btn btn-camera" id="btn-iniciar-camara-live" type="button">
+              📹 Grabar Serie (Análisis Profundo IA)
+            </button>
+            <label class="btn-secondary btn-gallery" style="cursor: pointer;">
+              📁 Subir vídeo
+              <input type="file" id="formcheck-video-input" accept="video/*" capture="user" style="display:none;">
+            </label>
+          </div>
+
+          <!-- Visor de Grabación y Análisis en Vivo -->
+          <div id="formcheck-live-wrap" style="display: none; background: #000; border-radius: 14px; overflow: hidden; position: relative; margin-bottom: 16px; border: 2px solid var(--border);">
+            <video id="formcheck-video-live" autoplay playsinline muted style="width: 100%; max-height: 440px; object-fit: cover; display: block;"></video>
+            
+            <!-- Canvas para dibujo de esqueleto y ángulos en tiempo real -->
+            <canvas id="formcheck-canvas-live" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></canvas>
+
+            <!-- HUD En Vivo: Repeticiones, Ángulo y Alertas Biomecánicas -->
+            <div id="live-hud-overlay" style="position: absolute; top: 12px; left: 12px; right: 12px; display: none; justify-content: space-between; align-items: flex-start; z-index: 6; pointer-events: none;">
+              <!-- Contador de Repeticiones gigante -->
+              <div class="live-hud-repbox">
+                <div class="live-hud-repnum" id="live-hud-reps">0</div>
+                <div class="live-hud-replbl">REPETICIONES</div>
+                <div class="live-hud-rombar-wrap">
+                  <div class="live-hud-rombar" id="live-hud-rombar" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <!-- Estado y Cue en tiempo real -->
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                <div class="live-hud-calib" id="live-hud-calib">📏 Calibrando encuadre...</div>
+                <div class="live-hud-cue" id="live-hud-cue">🟢 Detectando postura...</div>
+                <div class="live-hud-angle" id="live-hud-angle">Ángulo: --°</div>
+              </div>
+            </div>
+
+            <!-- Overlay de cuenta atrás -->
+            <div id="formcheck-countdown" style="display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.65); color: #fff; font-size: 5rem; font-weight: 900; align-items: center; justify-content: center; z-index: 10;">
+              3
+            </div>
+
+            <!-- Barra de estado durante grabación -->
+            <div id="formcheck-rec-bar" style="display: none; position: absolute; top: 12px; left: 12px; right: 12px; justify-content: space-between; align-items: center; z-index: 5;">
+              <span class="semaforo-badge semaforo-rojo" style="font-size: 0.85rem; padding: 4px 12px;">
+                🔴 REC <span id="formcheck-rec-timer">00:00</span>
+              </span>
+              <button class="btn-xs" id="btn-cambiar-camara" type="button" title="Cambiar cámara frontal/trasera">🔄 Girar cámara</button>
+            </div>
+
+            <!-- Controles de la cámara en vivo -->
+            <div style="position: absolute; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 12px; z-index: 7;">
+              <button class="btn" id="btn-empezar-grabar" type="button" style="background: #ef4444; border-color: #ef4444; color: #fff; font-weight: 700;">
+                🔴 Iniciar Grabación (3s)
+              </button>
+              <button class="btn" id="btn-parar-grabar" type="button" style="display: none; background: #fbbf24; border-color: #fbbf24; color: #000; font-weight: 700;">
+                ⏹ Parar y Extraer Fotogramas
+              </button>
+              <button class="btn" id="btn-finalizar-live" type="button" style="display: none; background: var(--green); border-color: var(--green); color: #000; font-weight: 800;">
+                ⏹ Finalizar Serie en Vivo
+              </button>
+              <button class="btn-small" id="btn-cerrar-camara-live" type="button" style="background: rgba(0,0,0,0.7); color: #fff;">
+                ✕ Cerrar
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumen de Serie En Directo -->
+          <div id="live-resumen-card" class="card" style="display: none; background: var(--bg-input); border-radius: 12px; padding: 16px; margin: 16px 0; border: 1px solid var(--border);">
+            <div class="card-head">
+              <h4 style="margin: 0; color: var(--accent);">⚡ Resumen de tu Serie En Directo</h4>
+              <span class="pkg-badge" id="live-resumen-ejercicio">Sentadilla</span>
+            </div>
+            <div class="auditoria-grid" style="margin: 12px 0;">
+              <div class="card" style="margin: 0; background: var(--bg-card); text-align: center;">
+                <div class="result-label">Puntuación Técnica</div>
+                <div class="result-value" id="live-resumen-score" style="color: var(--green); font-size: 1.8rem;">--</div>
+              </div>
+              <div class="card" style="margin: 0; background: var(--bg-card); text-align: center;">
+                <div class="result-label">Reps Válidas</div>
+                <div class="result-value" id="live-resumen-validas" style="color: var(--green); font-size: 1.8rem;">0</div>
+              </div>
+              <div class="card" style="margin: 0; background: var(--bg-card); text-align: center;">
+                <div class="result-label">Reps Incompletas</div>
+                <div class="result-value" id="live-resumen-incompletas" style="color: #ff7b7b; font-size: 1.8rem;">0</div>
+              </div>
+              <div class="card" style="margin: 0; background: var(--bg-card); text-align: center;">
+                <div class="result-label">Tiempo bajo tensión</div>
+                <div class="result-value" id="live-resumen-tut" style="color: var(--accent); font-size: 1.8rem;">0s</div>
+              </div>
+            </div>
+            <div id="live-resumen-feedback" style="font-size: 0.88rem; color: var(--text); margin-bottom: 14px;"></div>
+            <div id="live-resumen-errores" class="live-errores-wrap" style="display: none; margin-bottom: 14px;"></div>
+            <div class="btn-row">
+              <button class="btn" id="btn-anotar-reps-live" type="button">💾 Anotar reps en mi sesión de hoy →</button>
+            </div>
+          </div>
+
+          <!-- Previsualización de Fotogramas Extraídos -->
+          <div id="formcheck-preview-wrap" style="display: none; margin: 16px 0;">
+            <h4 style="margin-bottom: 6px;">🎞️ Fotogramas Clave Detectados (Secuencia del movimiento)</h4>
+            <p class="muted" style="font-size: 0.82rem; margin-bottom: 10px;">La IA analiza estos 5 momentos críticos de tu repetición (Setup, Descenso, Punto Crítico, Impulso y Bloqueo):</p>
+            
+            <div id="formcheck-frames-strip" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin;">
+            </div>
+
+            <div class="btn-row" style="margin-top: 14px;">
+              <button class="btn" id="btn-analizar-tecnica-ia" type="button">
+                🤖 Corregir técnica con Visión IA →
+              </button>
+            </div>
+          </div>
+
+          <!-- Indicador de Carga IA -->
+          <div id="formcheck-loading" class="card ai-loading" style="display: none; text-align: center; padding: 26px;">
+            <div class="spinner"></div>
+            <h4 style="margin-top: 12px; color: var(--accent);">Analizando biomecánica con Visión IA...</h4>
+            <p class="muted">Midiendo ángulos articulares, estabilidad pélvica, trayectoria de la carga y rango de movimiento.</p>
+          </div>
+
+          <!-- Resultado del Análisis Técnico -->
+          <div id="formcheck-resultado" style="display: none; margin-top: 16px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PAQUETES IA ============ -->
+    <section id="paquetes" class="section">
+      <div class="planes-header">
+        <div>
+          <h2>📦 Paquetes de Entrenamiento con IA</h2>
+          <p class="subtitle">Genera cualquier rutina con lenguaje natural, elige paquetes especializados, audita tu sobrecarga o adapta tu rutina a cualquier gimnasio.</p>
+        </div>
+      </div>
+
+      <!-- Sub-navegación de Paquetes -->
+      <div class="tabs pkg-subtabs" id="pkg-tabs">
+        <button class="tab active" data-pkgtab="prompt">✨ Generador con Prompt</button>
+        <button class="tab" data-pkgtab="catalogo">📦 Catálogo de Paquetes</button>
+        <button class="tab" data-pkgtab="auditoria">🧠 Auditoría & Deload</button>
+        <button class="tab" data-pkgtab="converter">🔄 Adaptador de Gimnasio</button>
+      </div>
+
+      <!-- 1. Generador Libre con Prompt IA -->
+      <div id="pkg-view-prompt" class="pkg-view active">
+        <div class="card">
+          <h3>✨ Pídele a la IA el paquete exacto que necesitas</h3>
+          <p class="subtitle">Describe tus días disponibles, objetivos, molestias articulares o máquinas de tu gimnasio:</p>
+          <div class="form-grid" style="grid-template-columns: 1fr;">
+            <label>Describe tu entrenamiento ideal:
+              <textarea id="pkg-prompt-text" rows="3" placeholder="Ej: Tengo 45 min, entreno 4 días por semana. Tengo una molestia en el hombro y quiero perder grasa manteniendo glúteo y pierna con máquinas y poleas."></textarea>
+            </label>
+          </div>
+          <div class="ai-chips-row" id="pkg-prompt-chips" style="margin-bottom: 14px;">
+            <button class="tab" data-promptchip="4 días, 45 min por sesión, enfoque quema de grasa sin dolor lumbar en máquinas">🔥 Quema grasa 45 min</button>
+            <button class="tab" data-promptchip="3 días Full Body, enfoque hombro 3D y dorsal ancho en V con poleas y mancuernas">💪 Torso estético en V</button>
+            <button class="tab" data-promptchip="4 días con enfoque exclusivo en glúteo, isquiotibiales y abdomen sin sentadilla libre">🍑 Glúteos & Piernas</button>
+            <button class="tab" data-promptchip="3 días, proteger articulaciones, cero dolor de hombro y rodilla, 100% poleas suaves">🛡 Cero dolor articular</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-generar-prompt-pkg">✨ Generar paquete con IA →</button>
+          </div>
+        </div>
+
+        <div id="pkg-prompt-loading" class="card ai-loading" style="display: none; text-align: center; padding: 28px;">
+          <div class="spinner"></div>
+          <h4 style="margin-top: 12px; color: var(--accent);">Diseñando paquete con IA...</h4>
+          <p class="muted">Estructurando días, balance biomecánico, series, RIR y descansos óptimos.</p>
+        </div>
+
+        <div id="pkg-prompt-result" class="card" style="display: none;"></div>
+      </div>
+
+      <!-- 2. Catálogo de Paquetes Especializados -->
+      <div id="pkg-view-catalogo" class="pkg-view" style="display: none;">
+        <div class="grid-2" id="pkg-catalogo-grid"></div>
+      </div>
+
+      <!-- 3. Auditoría IA de Rendimiento y Sobrecarga -->
+      <div id="pkg-view-auditoria" class="pkg-view" style="display: none;">
+        <div class="card">
+          <div class="card-head">
+            <h3>🧠 Auditoría IA de Rendimiento y Sobrecarga Progresiva</h3>
+            <button class="btn-small" id="btn-refrescar-auditoria">🔄 Actualizar análisis</button>
+          </div>
+          <p class="subtitle">La IA examina tus cargas guardadas, frecuencia de entrenamiento y balance muscular para detectar estancamiento o sobreentrenamiento:</p>
+          <div id="auditoria-content"></div>
+        </div>
+      </div>
+
+      <!-- 4. Adaptador de Gimnasio (Gym Converter) -->
+      <div id="pkg-view-converter" class="pkg-view" style="display: none;">
+        <div class="card">
+          <h3>🔄 Adaptador de Paquetes a tu Gimnasio Actual</h3>
+          <p class="subtitle">¿Estás en otro gimnasio o faltan máquinas? La IA sustituye automáticamente los ejercicios no disponibles por sus equivalentes biomecánicos óptimos:</p>
+          <div class="form-grid">
+            <label>Plan a recalibrar
+              <select id="conv-plan-select"></select>
+            </label>
+            <label>Máquinas que NO tiene tu gimnasio actual (selecciona una o varias):
+              <select id="conv-maquina-select" multiple size="4">
+                <option value="Sentadilla en máquina Hack">Sentadilla en máquina Hack</option>
+                <option value="Prensa de piernas">Prensa de piernas a 45°</option>
+                <option value="Curl femoral sentado">Curl femoral sentado</option>
+                <option value="Hip thrust en máquina">Hip thrust en máquina</option>
+                <option value="Pec deck (aperturas en máquina)">Pec Deck / Contractor</option>
+                <option value="Peso muerto rumano con barra Smith">Multipower / Smith</option>
+                <option value="Fondos en máquina asistida">Máquina de fondos asistida</option>
+              </select>
+            </label>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-recalibrar-plan">🔄 Recalibrar y convertir paquete →</button>
+          </div>
+          <div id="conv-resultado" style="margin-top: 16px; display: none;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CALCULADORAS ============ -->
+    <section id="calculadoras" class="section">
+      <h2>Calculadoras</h2>
+
+      <div class="card">
+        <h3>🎯 Calorías diarias (TDEE) y déficit</h3>
+        <div class="form-grid">
+          <label>Sexo
+            <select id="cal-sexo">
+              <option value="h">Hombre</option>
+              <option value="m">Mujer</option>
+            </select>
+          </label>
+          <label>Edad (años)
+            <input type="number" id="cal-edad" min="14" max="90" value="25">
+          </label>
+          <label>Peso (kg)
+            <input type="number" id="cal-peso" min="35" max="250" value="80">
+          </label>
+          <label>Altura (cm)
+            <input type="number" id="cal-altura" min="130" max="230" value="175">
+          </label>
+          <label>Actividad
+            <select id="cal-actividad">
+              <option value="1.2">Sedentario (poco o nada de ejercicio)</option>
+              <option value="1.375">Ligero (1–3 días/semana)</option>
+              <option value="1.55" selected>Moderado (3–5 días/semana)</option>
+              <option value="1.725">Alto (6–7 días/semana)</option>
+              <option value="1.9">Muy alto (trabajo físico + entrenar)</option>
+            </select>
+          </label>
+          <label>Objetivo
+            <select id="cal-deficit">
+              <option value="0">Mantener peso</option>
+              <option value="15" selected>Déficit suave (−15%)</option>
+              <option value="25">Déficit moderado (−25%)</option>
+            </select>
+          </label>
+        </div>
+        <div class="results" id="cal-results"></div>
+      </div>
+
+      <div class="card">
+        <h3>🥗 Macros según tu objetivo</h3>
+        <p class="muted">Proteína: 2 g/kg · Grasa: 0,9 g/kg · El resto en carbohidratos.</p>
+        <button class="btn" id="btn-macros">Calcular macros con los datos de arriba</button>
+        <div class="results" id="macros-results"></div>
+      </div>
+
+      <div class="card">
+        <h3>📏 Índice de Masa Corporal (IMC)</h3>
+        <div class="form-grid">
+          <label>Peso (kg)
+            <input type="number" id="imc-peso" min="35" max="250" value="80">
+          </label>
+          <label>Altura (cm)
+            <input type="number" id="imc-altura" min="130" max="230" value="175">
+          </label>
+        </div>
+        <div class="results" id="imc-results"></div>
+      </div>
+    </section>
+
+    <!-- ============ PROGRESO ============ -->
+    <section id="progreso" class="section">
+      <h2>Seguimiento de progreso</h2>
+      <div class="card">
+        <h3>➕ Nuevo registro</h3>
+        <div class="form-grid">
+          <label>Fecha
+            <input type="date" id="reg-fecha">
+          </label>
+          <label>Peso (kg)
+            <input type="number" step="0.1" id="reg-peso" min="30" max="300" placeholder="Ej. 79.5">
+          </label>
+          <label>Cintura (cm) <span class="muted">opcional</span>
+            <input type="number" step="0.5" id="reg-cintura" min="40" max="200" placeholder="Ej. 85">
+          </label>
+        </div>
+        <button class="btn" id="btn-guardar-registro">Guardar registro</button>
+      </div>
+
+      <div class="card">
+        <h3>🎯 Objetivo de peso</h3>
+        <div class="form-grid">
+          <label>Peso objetivo (kg)
+            <input type="number" step="0.1" id="meta-peso" min="30" max="300" placeholder="Ej. 74">
+          </label>
+          <label>Fecha límite <span class="muted">opcional</span>
+            <input type="date" id="meta-fecha">
+          </label>
+        </div>
+        <button class="btn" id="btn-meta">Guardar objetivo</button>
+        <div id="meta-info"></div>
+      </div>
+
+      <div class="card">
+        <h3>📈 Evolución del peso</h3>
+        <div id="chart"></div>
+      </div>
+
+      <div class="card">
+        <h3>📐 Evolución de la cintura</h3>
+        <div id="chart-cintura"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>🗂️ Historial</h3>
+          <button class="btn-small" id="btn-exportar">⬇ Exportar CSV</button>
+        </div>
+        <div id="historial"></div>
+      </div>
+
+      <div class="card">
+        <h3>📷 Fotos de progreso</h3>
+        <p class="muted">Se guardan comprimidas en tu navegador, no se suben a ningún servidor.</p>
+        <label class="btn btn-file" for="foto-input">📷 Añadir foto<input type="file" id="foto-input" accept="image/*" hidden></label>
+        <div id="fotos-galeria" class="galeria"></div>
+
+        <h3 style="margin-top:22px">🔍 Comparador antes / después</h3>
+        <div class="form-grid">
+          <label>Fecha A
+            <select id="foto-comp-a"></select>
+          </label>
+          <label>Fecha B
+            <select id="foto-comp-b"></select>
+          </label>
+        </div>
+        <div id="foto-comp" class="comp-grid"></div>
+      </div>
+
+      <div class="card">
+        <h3>💾 Backup de datos</h3>
+        <p class="muted">Descarga un archivo con todos tus registros (peso, diario, cargas, entrenos, fotos y objetivo) para no perderlos si borras el historial del navegador.</p>
+        <div class="btn-row">
+          <button class="btn" id="btn-backup-export">⬇ Descargar backup</button>
+          <label class="btn btn-file" for="backup-import">⬆ Importar backup<input type="file" id="backup-import" accept="application/json,.json" hidden></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DIARIO ============ -->
+    <section id="diario" class="section">
+      <h2>Diario de pasos y calorías</h2>
+      <div class="card">
+        <h3>➕ Registro del día</h3>
+        <div class="form-grid">
+          <label>Fecha
+            <input type="date" id="dia-fecha">
+          </label>
+          <label>Pasos
+            <input type="number" id="dia-pasos" min="0" max="100000" placeholder="Ej. 8500">
+          </label>
+          <label>Calorías consumidas (kcal)
+            <input type="number" id="dia-kcal" min="0" max="10000" placeholder="Ej. 2100">
+          </label>
+        </div>
+        <button class="btn" id="btn-guardar-dia">Guardar día</button>
+        <p class="muted" style="margin-top:10px">Si el día ya existe, los campos que rellenes se actualizan.</p>
+      </div>
+
+      <!-- Escáner Nutricional con IA (Food Vision) -->
+      <div class="card" id="card-food-vision">
+        <div class="card-head">
+          <div>
+            <h3>📸 Escáner Nutricional con IA (Food Vision)</h3>
+            <p class="subtitle" style="margin:2px 0 0;">Haz una foto a tu plato: la IA detecta ingredientes, calorías y macronutrientes (proteínas, carbos y grasas).</p>
+          </div>
+          <span class="pkg-badge">Gemini IA</span>
+        </div>
+
+        <div class="camera-actions" style="margin: 14px 0;">
+          <label class="btn btn-camera">
+            📷 Foto al plato
+            <input type="file" id="foto-comida-camara" accept="image/*" capture="environment" style="display:none;">
+          </label>
+          <label class="btn-secondary btn-gallery">
+            📁 Galería
+            <input type="file" id="foto-comida-galeria" accept="image/*" style="display:none;">
+          </label>
+          <button type="button" class="btn-small" id="btn-food-presets-toggle" style="margin-left:auto;">🥗 Platos fitness habituales</button>
+        </div>
+
+        <div id="food-presets-panel" style="display: none; background: var(--bg-input); border-radius: 10px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border);">
+          <div style="font-size: 0.84rem; font-weight: 700; color: var(--text); margin-bottom: 8px;">Elige o carga un plato de ejemplo:</div>
+          <div class="ai-chips-row" id="food-presets-chips"></div>
+        </div>
+
+        <div id="foto-comida-preview-wrap" style="display: none; margin-bottom: 14px; text-align: center;">
+          <img id="foto-comida-preview" src="" alt="Plato a escanear" style="max-height: 220px; max-width: 100%; border-radius: 12px; border: 1px solid var(--border); object-fit: cover;">
+          <div style="margin-top: 10px;">
+            <button class="btn" id="btn-analizar-comida">✨ Analizar plato con IA →</button>
+          </div>
+        </div>
+
+        <div id="comida-ai-loading" class="card ai-loading" style="display: none; text-align: center; padding: 22px;">
+          <div class="spinner"></div>
+          <h4 style="margin-top: 10px; color: var(--accent);">Analizando nutrientes con IA...</h4>
+          <p class="muted">Estimando gramos de proteína, carbohidratos, grasas y calorías totales.</p>
+        </div>
+
+        <div id="comida-ai-resultado" style="display: none;"></div>
+      </div>
+
+      <div class="card">
+        <h3>🍽️ Comidas rápidas</h3>
+        <p class="muted">Añade alimentos al día y las kcal se suman automáticamente a tu registro.</p>
+        <div class="form-grid">
+          <label>Alimento
+            <input list="lista-alimentos" id="comida-nombre" placeholder="Ej. Plátano">
+            <datalist id="lista-alimentos"></datalist>
+          </label>
+          <label>Porciones
+            <input type="number" id="comida-cant" step="0.5" min="0.5" max="20" value="1">
+          </label>
+        </div>
+        <button class="btn" id="btn-add-comida">Añadir al día de hoy</button>
+        <div id="comidas-hoy" style="margin-top:16px"></div>
+      </div>
+
+      <div class="stats-row" id="diario-stats"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>🗂️ Últimos registros</h3>
+          <button class="btn-small" id="btn-exportar-diario">⬇ Exportar CSV</button>
+        </div>
+        <div id="diario-historial"></div>
+      </div>
+    </section>
+
+    <!-- ============ GUÍA ============ -->
+    <section id="guia" class="section">
+      <h2>Guía de pérdida de grasa</h2>
+      <div class="grid-2">
+        <article class="card article">
+          <h3>1 · El déficit calórico es innegociable</h3>
+          <p>Para perder grasa debes consumir menos energía de la que gastas. Un déficit de 300–500 kcal al día produce una pérdida sostenible de 0,3–0,5 kg por semana. Déficits mayores aceleran la pérdida de músculo y el hambre, y acaban en abandono.</p>
+        </article>
+        <article class="card article">
+          <h3>2 · El entrenamiento de fuerza es tu seguro anti-músculo</h3>
+          <p>En déficit, el cuerpo puede usar músculo como energía. El entrenamiento con máquinas y poleas le dice «ese músculo lo necesito». Entrena 3–5 días a la semana, prioriza las máquinas grandes (prensa, press de pecho, remo en máquina, jalón al pecho) y sigue progresando en cargas semana a semana.</p>
+        </article>
+        <article class="card article">
+          <h3>3 · La proteína, en cada comida</h3>
+          <p>Apunta a 1,8–2,2 g de proteína por kilo de peso al día (pollo, huevos, pescado, legumbres, lácteos). Te mantiene saciado, protege el músculo y además tiene el mayor efecto térmico de todos los macronutrientes.</p>
+        </article>
+        <article class="card article">
+          <h3>4 · Camina mucho: el cardio secreto</h3>
+          <p>El NEAT (actividad no asociada al ejercicio) puede suponer cientos de kcal diarias. Objetivo: 8.000–10.000 pasos. El cardio HIIT 1–2 veces por semana es un extra útil, pero caminar es la herramienta más sostenible.</p>
+        </article>
+        <article class="card article">
+          <h3>5 · Duerme 7–8 horas</h3>
+          <p>Dormir poco desregula la grelina y la leptina (hambre y saciedad), aumenta el cortisol y hace que pierdas más músculo y menos grasa en déficit. El sueño es parte del plan, no un extra.</p>
+        </article>
+        <article class="card article">
+          <h3>6 · Juzga el progreso en semanas, no en días</h3>
+          <p>El peso fluctúa 1–2 kg por agua, sodio o digestión. Pésate a diario, pero compara solo la media semanal. Mide también la cintura y las fotos mensuales: a veces el peso se para pero la composición mejora.</p>
+        </article>
+        <article class="card article">
+          <h3>7 · Mitos que debes olvidar</h3>
+          <p>❌ «Las pesas te ponen enorme» (requiere años y superávit).<br>❌ «La grasa se convierte en músculo» (son tejidos distintos).<br>❌ «Ciertos alimentos queman grasa» (ningún alimento supera la física).<br>❌ «El cardio quema más grasa que las pesas» (a largo plazo, la masa muscular gasta más).</p>
+        </article>
+        <article class="card article">
+          <h3>8 · Cuándo parar el déficit</h3>
+          <p>Si pierdes más de 1% de tu peso corporal por semana de forma sostenida, o notas caída de rendimiento, insomnio y apatía constante, sube las calorías al mantenimiento 1–2 semanas (dieta flexible) y retoma después. La dieta bien hecha también acaba: luego toca mantener.</p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>FitnessCut · Datos guardados en tu navegador · Esto es orientativo, no sustituye a un profesional sanitario.</p>
+  </footer>
+
+  <!-- Floating Mini-Timer Widget -->
+  <div id="floating-timer" class="floating-timer" style="display: none;" role="status" aria-live="polite">
+    <div class="ft-left">
+      <span class="ft-icon">⏱</span>
+      <div>
+        <div class="ft-time" id="ft-time">00:00</div>
+        <div class="ft-label">Descanso entre series</div>
+      </div>
+    </div>
+    <div class="ft-actions">
+      <button class="btn-xs" id="ft-coach-toggle" title="Activar/desactivar locución de voz">🔊 Coach</button>
+      <button class="btn-xs" id="ft-minus15" title="Restar 15 segundos">-15s</button>
+      <button class="btn-xs" id="ft-plus15" title="Sumar 15 segundos">+15s</button>
+      <button class="btn-xs" id="ft-plus30" title="Sumar 30 segundos">+30s</button>
+      <button class="btn-xs ft-btn-stop" id="ft-stop" title="Detener descanso">⏹</button>
+    </div>
+  </div>
+
+  <!-- HUD de Reconocimiento y Comandos de Voz -->
+  <div id="voice-hud" class="voice-hud" style="display: none;" role="status" aria-live="assertive">
+    <div class="voice-hud-pulse">
+      <span class="voice-hud-mic">🎙️</span>
+    </div>
+    <div class="voice-hud-info">
+      <div class="voice-hud-title" id="voice-hud-title">Escuchando...</div>
+      <div class="voice-hud-sub" id="voice-hud-sub">Di ej: <em>"60 kilos 10 repeticiones"</em> o <em>"completar serie"</em></div>
+    </div>
+    <button class="btn-xs ft-btn-stop" id="voice-hud-close" title="Cancelar dictado">✕</button>
+  </div>
+
+  <!-- Google MediaPipe Pose para visión y conteo biomecánico en tiempo real a 30-60 FPS -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>
