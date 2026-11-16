@@ -7154,6 +7154,35 @@ function initCoachChatbot() {
     input.value = "";
     procesarPreguntaCoach(val);
   });
+
+  const btnMic = $("btn-coach-chat-mic");
+  if (btnMic) {
+    btnMic.addEventListener("click", () => {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        agregarMsg("⚠️ Tu navegador no soporta dictado por voz.");
+        return;
+      }
+      const rec = new SR();
+      rec.lang = "es-ES";
+      rec.interimResults = false;
+      btnMic.style.borderColor = "var(--accent)";
+      btnMic.style.color = "var(--accent)";
+      rec.onresult = (ev) => {
+        const transcript = ev.results?.[0]?.[0]?.transcript || "";
+        if (transcript) procesarPreguntaCoach(transcript);
+      };
+      rec.onend = () => {
+        btnMic.style.borderColor = "";
+        btnMic.style.color = "";
+      };
+      rec.onerror = () => {
+        btnMic.style.borderColor = "";
+        btnMic.style.color = "";
+      };
+      try { rec.start(); } catch { /* noop */ }
+    });
+  }
 }
 
 initPaquetesIA();
