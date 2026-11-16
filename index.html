@@ -464,6 +464,7 @@
             <div id="live-resumen-errores" class="live-errores-wrap" style="display: none; margin-bottom: 14px;"></div>
             <div class="btn-row">
               <button class="btn" id="btn-anotar-reps-live" type="button">💾 Anotar reps en mi sesión de hoy →</button>
+              <button class="btn-small" id="btn-guardar-resumen-live" type="button">📋 Guardar y copiar resumen</button>
             </div>
           </div>
 
@@ -684,6 +685,11 @@
         <div id="meta-info"></div>
       </div>
 
+      <div class="card" id="ajuste-kcal-card">
+        <h3>⚖️ Ajuste inteligente y descarga</h3>
+        <div id="ajuste-kcal-info" class="muted">Registra tu peso durante al menos 2 semanas para recibir recomendaciones automáticas.</div>
+      </div>
+
       <div class="card">
         <h3>📈 Evolución del peso</h3>
         <div id="chart"></div>
@@ -692,6 +698,11 @@
       <div class="card">
         <h3>📐 Evolución de la cintura</h3>
         <div id="chart-cintura"></div>
+      </div>
+
+      <div class="card" id="pr-card">
+        <h3>🏆 Récords Personales y 1RM Estimado</h3>
+        <div id="pr-list"></div>
       </div>
 
       <div class="card">
@@ -750,6 +761,18 @@
         <p class="muted" style="margin-top:10px">Si el día ya existe, los campos que rellenes se actualizan.</p>
       </div>
 
+      <div class="card" id="agua-card">
+        <div class="card-head">
+          <h3>💧 Hidratación de hoy</h3>
+          <span class="pkg-badge" id="agua-total-badge">0 / 2500 ml</span>
+        </div>
+        <div class="progress" style="margin: 10px 0;"><div class="progress-fill" id="agua-progress-fill" style="width: 0%;"></div></div>
+        <div class="btn-row">
+          <button class="btn-small" id="btn-agua-menos" type="button">−250 ml</button>
+          <button class="btn" id="btn-agua-mas" type="button">+250 ml (1 vaso)</button>
+        </div>
+      </div>
+
       <!-- Escáner Nutricional con IA (Food Vision) -->
       <div class="card" id="card-food-vision">
         <div class="card-head">
@@ -805,7 +828,10 @@
             <input type="number" id="comida-cant" step="0.5" min="0.5" max="20" value="1">
           </label>
         </div>
-        <button class="btn" id="btn-add-comida">Añadir al día de hoy</button>
+        <div class="btn-row">
+          <button class="btn" id="btn-add-comida">Añadir al día de hoy</button>
+          <button class="btn-small" id="btn-save-food-template" type="button">⭐ Guardar plantilla frecuente</button>
+        </div>
         <div id="comidas-hoy" style="margin-top:16px"></div>
       </div>
 
@@ -893,6 +919,12 @@
       <div class="voice-hud-sub" id="voice-hud-sub">Di ej: <em>"60 kilos 10 repeticiones"</em> o <em>"completar serie"</em></div>
     </div>
     <button class="btn-xs ft-btn-stop" id="voice-hud-close" title="Cancelar dictado">✕</button>
+  </div>
+
+  <!-- Banner de actualización PWA -->
+  <div id="pwa-update-banner" class="pwa-update-banner" style="display: none;" role="status" aria-live="polite">
+    <span>🚀 Nueva versión de FitnessCut disponible</span>
+    <button class="btn-xs" id="btn-pwa-reload" type="button">Actualizar</button>
   </div>
 
   <!-- Google MediaPipe Pose para visión y conteo biomecánico en tiempo real a 30-60 FPS -->

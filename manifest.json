@@ -13,5 +13,25 @@
       "type": "image/svg+xml",
       "purpose": "any"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Entreno de hoy (Planes)",
+      "short_name": "Planes",
+      "url": "./index.html#planes",
+      "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Escáner y Pose IA",
+      "short_name": "Escáner IA",
+      "url": "./index.html#escaner",
+      "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Diario de pasos y comidas",
+      "short_name": "Diario",
+      "url": "./index.html#diario",
+      "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
   ]
 }

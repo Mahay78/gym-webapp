@@ -1546,3 +1546,50 @@ body.modo-entreno .set-chip {
   color: var(--muted);
   line-height: 1.3;
 }
+
+.pwa-update-banner {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+
+.pr-item {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.pr-item-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+}
+
+.pr-item-vals {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.pr-item-vals strong {
+  color: var(--green);
+}

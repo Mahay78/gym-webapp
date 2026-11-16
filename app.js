@@ -2377,6 +2377,7 @@ let repsEnVivo = 0;
 let repsValidas = 0;
 let repsIncompletas = 0;
 let estadoFaseLive = "arriba";
+let tempoInicioBajada = 0;
 let ultimoAudioCueTime = 0;
 let ultimoErrorSnapTime = 0;
 let capturasErroresLive = [];
@@ -2496,10 +2497,16 @@ function evaluarPoseEnVivo(landmarks, ejercicio) {
         }
         estadoFaseLive = "arriba";
       } else if (anguloActual <= 95) {
+        if (estadoFaseLive === "bajando" && tempoInicioBajada && (Date.now() - tempoInicioBajada) < 650) {
+          feedbackTexto = "⚡ Baja más controlado (tempo excéntrico)";
+          colorSemaforo = "amarillo";
+        } else {
+          feedbackTexto = "🟢 ¡Profundidad óptima! Rompe la paralela";
+        }
         estadoFaseLive = "abajo_valido";
-        feedbackTexto = "🟢 ¡Profundidad óptima! Rompe la paralela";
       } else if (anguloActual < 140 && estadoFaseLive === "arriba") {
         estadoFaseLive = "bajando";
+        tempoInicioBajada = Date.now();
         feedbackTexto = "⏳ Bajando · Llega a 90°";
       } else if (estadoFaseLive === "bajando" && anguloActual > 105) {
         feedbackTexto = "⚠️ ¡Baja un poco más para completar rep!";
@@ -2533,6 +2540,103 @@ function evaluarPoseEnVivo(landmarks, ejercicio) {
       } else if (anguloActual < 130 && estadoFaseLive === "arriba") {
         estadoFaseLive = "bajando";
         feedbackTexto = "⏳ Traccionando con los codos...";
+      }
+    }
+  } else if (ej.includes("peso muerto") || ej.includes("rumano") || ej.includes("hip thrust")) {
+    const visIzq = (landmarks[11]?.visibility || 0) + (landmarks[23]?.visibility || 0);
+    const visDer = (landmarks[12]?.visibility || 0) + (landmarks[24]?.visibility || 0);
+    const lHombro = visIzq >= visDer ? landmarks[11] : landmarks[12];
+    const lCadera = visIzq >= visDer ? landmarks[23] : landmarks[24];
+    const lRodilla = visIzq >= visDer ? landmarks[25] : landmarks[26];
+
+    if (lHombro && lCadera && lRodilla) {
+      anguloActual = calcularAngulo(lHombro, lCadera, lRodilla);
+      puntoVertice = lCadera;
+      const esHipThrust = ej.includes("hip thrust");
+      porcentajeRom = esHipThrust
+        ? Math.min(100, Math.max(0, Math.round(((anguloActual - 110) / 60) * 100)))
+        : Math.min(100, Math.max(0, Math.round(((170 - anguloActual) / 80) * 100)));
+
+      if (esHipThrust) {
+        if (anguloActual >= 165) {
+          if (estadoFaseLive === "bajando") {
+            repsEnVivo++;
+            repsValidas++;
+            notificarLive(String(repsEnVivo), false);
+            feedbackTexto = `✅ ¡Bloqueo ${repsEnVivo} completado!`;
+          }
+          estadoFaseLive = "arriba";
+        } else if (anguloActual <= 125) {
+          estadoFaseLive = "bajando";
+          feedbackTexto = "⏳ Empuja con talones y aprieta glúteo";
+        }
+      } else {
+        if (anguloActual > 162) {
+          if (estadoFaseLive === "abajo_valido") {
+            repsEnVivo++;
+            repsValidas++;
+            notificarLive(String(repsEnVivo), false);
+            feedbackTexto = `✅ ¡Repetición ${repsEnVivo} completada!`;
+          }
+          estadoFaseLive = "arriba";
+        } else if (anguloActual <= 95) {
+          estadoFaseLive = "abajo_valido";
+          feedbackTexto = "🟢 Bisagra de cadera óptima";
+        } else if (anguloActual < 145 && estadoFaseLive === "arriba") {
+          estadoFaseLive = "bajando";
+          tempoInicioBajada = Date.now();
+          feedbackTexto = "⏳ Cadera atrás, espalda neutra";
+        }
+      }
+    }
+  } else if (ej.includes("militar") || ej.includes("hombro")) {
+    const visIzq = (landmarks[11]?.visibility || 0) + (landmarks[13]?.visibility || 0);
+    const visDer = (landmarks[12]?.visibility || 0) + (landmarks[14]?.visibility || 0);
+    const lHombro = visIzq >= visDer ? landmarks[11] : landmarks[12];
+    const lCodo = visIzq >= visDer ? landmarks[13] : landmarks[14];
+    const lMuneca = visIzq >= visDer ? landmarks[15] : landmarks[16];
+
+    if (lHombro && lCodo && lMuneca) {
+      anguloActual = calcularAngulo(lHombro, lCodo, lMuneca);
+      puntoVertice = lCodo;
+      porcentajeRom = Math.min(100, Math.max(0, Math.round(((anguloActual - 70) / 90) * 100)));
+
+      if (anguloActual >= 158) {
+        if (estadoFaseLive === "abajo_valido") {
+          repsEnVivo++;
+          repsValidas++;
+          notificarLive(String(repsEnVivo), false);
+          feedbackTexto = `✅ ¡Press militar ${repsEnVivo}!`;
+        }
+        estadoFaseLive = "arriba";
+      } else if (anguloActual <= 85) {
+        estadoFaseLive = "abajo_valido";
+        feedbackTexto = "🟢 Posición inicial · Empuja vertical";
+      }
+    }
+  } else if (ej.includes("elevaciones") || ej.includes("lateral")) {
+    const visIzq = (landmarks[11]?.visibility || 0) + (landmarks[13]?.visibility || 0);
+    const visDer = (landmarks[12]?.visibility || 0) + (landmarks[14]?.visibility || 0);
+    const lCadera = visIzq >= visDer ? landmarks[23] : landmarks[24];
+    const lHombro = visIzq >= visDer ? landmarks[11] : landmarks[12];
+    const lCodo = visIzq >= visDer ? landmarks[13] : landmarks[14];
+
+    if (lCadera && lHombro && lCodo) {
+      anguloActual = calcularAngulo(lCadera, lHombro, lCodo);
+      puntoVertice = lHombro;
+      porcentajeRom = Math.min(100, Math.max(0, Math.round(((anguloActual - 15) / 75) * 100)));
+
+      if (anguloActual >= 80) {
+        estadoFaseLive = "abajo_valido";
+        feedbackTexto = "🟢 Paralelo al suelo · Controla bajada";
+      } else if (anguloActual <= 28) {
+        if (estadoFaseLive === "abajo_valido") {
+          repsEnVivo++;
+          repsValidas++;
+          notificarLive(String(repsEnVivo), false);
+          feedbackTexto = `✅ ¡Elevación ${repsEnVivo}!`;
+        }
+        estadoFaseLive = "arriba";
       }
     }
   } else if (ej.includes("press") || ej.includes("pecho") || ej.includes("banca")) {
@@ -3459,6 +3563,28 @@ function initFormCheckVision() {
         inputReps.style.borderColor = "var(--green)";
       }
       alert(`✅ ¡${repsValidas} repeticiones anotadas para tu entrenamiento!`);
+    });
+  }
+
+  const btnGuardarResumen = $("btn-guardar-resumen-live");
+  if (btnGuardarResumen) {
+    btnGuardarResumen.addEventListener("click", () => {
+      const ejercicio = $("formcheck-ejercicio-select")?.value || "Ejercicio";
+      const scoreTxt = $("live-resumen-score")?.textContent || "--";
+      const tutTxt = $("live-resumen-tut")?.textContent || "0s";
+      const logs = cargarLS("fitnesscut_vision_logs", []);
+      logs.unshift({
+        fecha: hoyISO(),
+        ejercicio,
+        score: scoreTxt,
+        validas: repsValidas,
+        incompletas: repsIncompletas,
+        tut: tutTxt
+      });
+      guardarLS("fitnesscut_vision_logs", logs.slice(0, 30));
+      const resumenTxt = `FitnessCut Escáner IA · ${ejercicio} (${hoyISO()}): Puntuación ${scoreTxt} | ${repsValidas} válidas, ${repsIncompletas} incompletas | TUT ${tutTxt}`;
+      navigator.clipboard?.writeText(resumenTxt).catch(() => {});
+      alert("✅ Resumen técnico guardado en el dispositivo y copiado al portapapeles.");
     });
   }
 
@@ -4633,11 +4759,90 @@ function renderHistorial(registros) {
   );
 }
 
+function renderAjusteInteligente(registros) {
+  const cont = $("ajuste-kcal-info");
+  if (!cont) return;
+
+  const avisos = [];
+  const meta = cargarLS(KEY.meta, null);
+  const ordenados = [...registros].sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+  if (ordenados.length >= 2) {
+    const ultimo = ordenados[ordenados.length - 1];
+    const hace14 = ordenados.find(r => {
+      const diff = (new Date(ultimo.fecha + "T12:00:00") - new Date(r.fecha + "T12:00:00")) / 86400000;
+      return diff >= 10 && diff <= 21;
+    }) || ordenados[0];
+    const dias = (new Date(ultimo.fecha + "T12:00:00") - new Date(hace14.fecha + "T12:00:00")) / 86400000;
+    const delta = ultimo.peso - hace14.peso;
+
+    if (dias >= 10 && meta && meta.peso && ultimo.peso > meta.peso && delta > -0.15) {
+      avisos.push(`⚖️ <strong>Meseta detectada (${Math.round(dias)} días):</strong> Tu peso cambió ${delta >= 0 ? "+" : ""}${delta.toFixed(1)} kg. Considera bajar <strong>120–150 kcal</strong> diarias o sumar <strong>+2.000 pasos/día</strong>.`);
+    } else if (dias >= 7 && delta < -1.2 * (dias / 7)) {
+      avisos.push(`⚠️ <strong>Ritmo muy rápido (${delta.toFixed(1)} kg en ${Math.round(dias)} días):</strong> Sube ~150 kcal o prioriza proteína para proteger masa muscular.`);
+    } else if (dias >= 7) {
+      avisos.push(`✅ <strong>Tendencia saludable:</strong> ${delta >= 0 ? "+" : ""}${delta.toFixed(1)} kg en los últimos ${Math.round(dias)} días.`);
+    }
+  }
+
+  const entrenos = cargarLS(KEY.entrenos, {});
+  const hoyMs = new Date(hoyISO() + "T12:00:00").getTime();
+  const sesiones35d = Object.keys(entrenos).filter(f => {
+    const diff = (hoyMs - new Date(f + "T12:00:00").getTime()) / 86400000;
+    return diff >= 0 && diff <= 35;
+  }).length;
+  if (sesiones35d >= 20) {
+    avisos.push(`🔋 <strong>Sugerencia de descarga (Deload):</strong> Llevas <strong>${sesiones35d} sesiones</strong> en las últimas 5 semanas. Programa 1 semana reduciendo series al 50% o bajando 10% el peso para disipar fatiga.`);
+  }
+
+  cont.innerHTML = avisos.length
+    ? avisos.map(a => `<div style="margin-bottom:8px;">${a}</div>`).join("")
+    : `<div class="muted">Registra al menos 2 pesos separados por 10+ días para recibir ajustes automáticos de calorías y descarga.</div>`;
+}
+
+function renderPRs() {
+  const cont = $("pr-list");
+  if (!cont) return;
+  const cargas = cargarCargas();
+  const items = Object.entries(cargas)
+    .filter(([, logs]) => Array.isArray(logs) && logs.length > 0)
+    .map(([nombre, logs]) => {
+      let maxPeso = 0;
+      let mejor1RM = 0;
+      logs.forEach(l => {
+        const p = parseFloat(l.peso) || 0;
+        const mReps = String(l.reps || "").match(/(\d+)/g);
+        const r = mReps ? Math.min(20, Math.max(1, parseInt(mReps[mReps.length - 1], 10))) : 8;
+        const est1RM = p > 0 ? p * (1 + r / 30) : 0;
+        if (p > maxPeso) maxPeso = p;
+        if (est1RM > mejor1RM) mejor1RM = est1RM;
+      });
+      return { nombre, maxPeso, mejor1RM: Math.round(mejor1RM * 10) / 10 };
+    })
+    .filter(x => x.maxPeso > 0)
+    .sort((a, b) => b.mejor1RM - a.mejor1RM)
+    .slice(0, 8);
+
+  if (items.length === 0) {
+    cont.innerHTML = `<div class="empty">Registra pesos en tus entrenamientos para calcular tus récords (PR) y 1RM estimado.</div>`;
+    return;
+  }
+
+  cont.innerHTML = `<div class="pr-grid">${items.map(it => `
+    <div class="pr-item">
+      <div class="pr-item-name">${escapeHtml(it.nombre)}</div>
+      <div class="pr-item-vals">Máximo: <strong>${it.maxPeso} kg</strong> · 1RM est.: <strong>${it.mejor1RM} kg</strong></div>
+    </div>
+  `).join("")}</div>`;
+}
+
 function renderProgreso() {
   const registros = cargarRegistros();
   renderChart(registros);
   renderChartCintura(registros);
   renderHistorial(registros);
+  renderAjusteInteligente(registros);
+  renderPRs();
 }
 
 /* =====================================================
@@ -4702,6 +4907,7 @@ function renderHistoricoCargas() {
     .sort((a, b) => a.localeCompare(b, "es"));
 
   const sel = $("hist-ejercicio");
+  renderPRs();
   const previo = sel.value;
   sel.innerHTML = nombres.length
     ? nombres.map(n => `<option value="${n}">${n}</option>`).join("")
@@ -5314,9 +5520,57 @@ function guardarComidas(c) {
   guardarLS(KEY.comidas, c);
 }
 
+function cargarComidasCustom() {
+  return cargarLS("fitnesscut_comidas_custom", []);
+}
+
+function todosAlimentos() {
+  return [...ALIMENTOS, ...cargarComidasCustom()];
+}
+
 function pintarDatalist() {
-  $("lista-alimentos").innerHTML = ALIMENTOS
+  $("lista-alimentos").innerHTML = todosAlimentos()
     .map(([n, k]) => `<option value="${n}">${k} kcal/porción</option>`).join("");
+}
+
+function renderAgua() {
+  const badge = $("agua-total-badge");
+  const fill = $("agua-progress-fill");
+  if (!badge || !fill) return;
+  const aguaMap = cargarLS("fitnesscut_agua", {});
+  const ml = aguaMap[hoyISO()] || 0;
+  const pct = Math.min(100, Math.round((ml / 2500) * 100));
+  badge.textContent = `${ml} / 2500 ml`;
+  fill.style.width = `${pct}%`;
+}
+
+function cambiarAgua(deltaMl) {
+  const aguaMap = cargarLS("fitnesscut_agua", {});
+  const hoy = hoyISO();
+  aguaMap[hoy] = Math.max(0, (aguaMap[hoy] || 0) + deltaMl);
+  guardarLS("fitnesscut_agua", aguaMap);
+  renderAgua();
+}
+
+if ($("btn-agua-mas")) $("btn-agua-mas").addEventListener("click", () => cambiarAgua(250));
+if ($("btn-agua-menos")) $("btn-agua-menos").addEventListener("click", () => cambiarAgua(-250));
+
+if ($("btn-save-food-template")) {
+  $("btn-save-food-template").addEventListener("click", () => {
+    const nombre = $("comida-nombre").value.trim();
+    if (!nombre) {
+      alert("Escribe el nombre del alimento o plato frecuente arriba.");
+      return;
+    }
+    const resp = prompt(`¿Cuántas kcal tiene 1 porción de «${nombre}»?`);
+    const kcal = parseFloat(resp);
+    if (!kcal || kcal <= 0) return;
+    const custom = cargarComidasCustom().filter(([n]) => n.toLowerCase() !== nombre.toLowerCase());
+    custom.push([nombre, Math.round(kcal)]);
+    guardarLS("fitnesscut_comidas_custom", custom);
+    pintarDatalist();
+    alert(`⭐ «${nombre}» (${Math.round(kcal)} kcal) guardado como plantilla frecuente.`);
+  });
 }
 
 $("btn-add-comida").addEventListener("click", () => {
@@ -5327,7 +5581,7 @@ $("btn-add-comida").addEventListener("click", () => {
     return;
   }
 
-  const encontrada = ALIMENTOS.find(([n]) => n.toLowerCase() === nombre.toLowerCase());
+  const encontrada = todosAlimentos().find(([n]) => n.toLowerCase() === nombre.toLowerCase());
   let kcalPorcion;
   if (encontrada) {
     kcalPorcion = encontrada[1];
@@ -5545,7 +5799,33 @@ function renderResumenSemanal() {
    ===================================================== */
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => { /* sin conexión al SW */ });
+    navigator.serviceWorker.register("./sw.js").then(reg => {
+      const mostrarBannerUpdate = (worker) => {
+        const banner = $("pwa-update-banner");
+        const btn = $("btn-pwa-reload");
+        if (!banner || !btn) return;
+        banner.style.display = "flex";
+        btn.onclick = () => worker.postMessage({ type: "SKIP_WAITING" });
+      };
+      if (reg.waiting) mostrarBannerUpdate(reg.waiting);
+      reg.addEventListener("updatefound", () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener("statechange", () => {
+          if (nw.state === "installed" && navigator.serviceWorker.controller) {
+            mostrarBannerUpdate(nw);
+          }
+        });
+      });
+    }).catch(() => { /* sin conexión al SW */ });
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
   });
 }
 
@@ -5565,6 +5845,7 @@ renderProgreso();
 renderMeta();
 renderFotos();
 renderDiario();
+renderAgua();
 renderComidas();
 renderHomeStats();
 renderResumenSemanal();
@@ -5572,3 +5853,10 @@ initPaquetesIA();
 actualizarEstadoAudioCoachUI();
 initFoodVision();
 initFormCheckVision();
+
+if (location.hash) {
+  const sec = location.hash.slice(1);
+  if ($(sec) && $(sec).classList.contains("section")) {
+    showSection(sec);
+  }
+}
