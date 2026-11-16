@@ -7018,10 +7018,141 @@ if ($("btn-empezar-entreno-hoy")) {
   });
 }
 
+function initCoachChatbot() {
+  const fab = $("coach-chat-fab");
+  const panel = $("coach-chat-panel");
+  const btnClose = $("btn-coach-chat-close");
+  const form = $("coach-chat-form");
+  const input = $("coach-chat-input");
+  const msgs = $("coach-chat-messages");
+  if (!fab || !panel || !form || !input || !msgs) return;
+
+  const agregarMsg = (html, tipo = "bot") => {
+    const div = document.createElement("div");
+    div.className = `coach-msg ${tipo}`;
+    div.innerHTML = html;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  };
+
+  fab.addEventListener("click", () => {
+    const abierto = panel.style.display !== "none";
+    panel.style.display = abierto ? "none" : "flex";
+    if (!abierto) input.focus();
+  });
+
+  if (btnClose) btnClose.addEventListener("click", () => { panel.style.display = "none"; });
+
+  $("coach-chat-chips")?.querySelectorAll("[data-chatq]").forEach(b => {
+    b.addEventListener("click", () => procesarPreguntaCoach(b.dataset.chatq));
+  });
+
+  async function procesarPreguntaCoach(texto) {
+    const q = (texto || "").trim();
+    if (!q) return;
+    agregarMsg(escapeHtml(q), "user");
+    const ql = q.toLowerCase();
+
+    // 1. Acciones directas en la app
+    const mTimer = ql.match(/(?:descanso|timer|temporizador).*?(\d{2,3})/);
+    if (mTimer) {
+      const seg = Math.min(600, Math.max(10, parseInt(mTimer[1], 10)));
+      iniciarTimer(seg, "Descanso (Coach)");
+      agregarMsg(`⏱ Temporizador iniciado: <strong>${seg}s</strong>.`);
+      return;
+    }
+
+    if (ql.includes("modo entreno")) {
+      showSection("planes");
+      if (!modoEntrenoActivo) toggleModoEntreno();
+      agregarMsg("⚡ Activado el <strong>Modo Entreno</strong> en Planes.");
+      return;
+    }
+
+    if (ql.includes("agua") && (ql.includes("suma") || ql.includes("añad") || ql.includes("vaso"))) {
+      cambiarAgua(250);
+      agregarMsg("💧 Sumados <strong>+250 ml</strong> de agua al registro de hoy.");
+      return;
+    }
+
+    if (ql.includes("música") || ql.includes("musica") || ql.includes("spotify") || ql.includes("youtube music")) {
+      agregarMsg(
+        `Por seguridad del navegador no puedo controlar Spotify en segundo plano, pero aquí tienes accesos directos para abrir tu música en 1 toque:<br><div class="btn-row" style="margin-top:6px;"><a class="btn-xs" href="https://open.spotify.com/search/gym%20workout" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🟢 Abrir Spotify</a><a class="btn-xs" href="https://music.youtube.com/search?q=workout+gym" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔴 YouTube Music</a></div>`
+      );
+      return;
+    }
+
+    const rutas = [
+      [/esc[aá]ner|c[aá]mara|pose|v[ií]deo/, "escaner", "Escáner IA"],
+      [/diario|comida|calor[ií]a|receta/, "diario", "Diario"],
+      [/progreso|peso|r[eé]cord|1rm/, "progreso", "Progreso"],
+      [/paquete|generar rutina/, "paquetes", "Paquetes IA"],
+      [/calculadora|macro|imc/, "calculadoras", "Calculadoras"],
+      [/gu[ií]a/, "guia", "Guía"],
+      [/plan|rutina|entreno/, "planes", "Planes"],
+    ];
+    if (/abre|abrir|ll[eé]vame|ir a|ver /.test(ql)) {
+      const hit = rutas.find(([rx]) => rx.test(ql));
+      if (hit) {
+        showSection(hit[1]);
+        agregarMsg(`📍 Abriendo <strong>${hit[2]}</strong>.`);
+        return;
+      }
+    }
+
+    // 2. Consultas de datos propios o Gemini
+    const hoy = hoyISO();
+    const plan = getPlan(planActual);
+    const diarioHoy = cargarDiario().find(d => d.fecha === hoy) || {};
+    const aguaHoy = (cargarLS("fitnesscut_agua", {})[hoy]) || 0;
+    const objKcal = objetivoKcalDiario();
+
+    if (ql.includes("toca hoy") || ql.includes("qué entreno")) {
+      const primerDia = plan?.dias?.[0];
+      agregarMsg(`🏋️ Tu plan activo es <strong>${escapeHtml(plan?.titulo || planActual)}</strong>.${primerDia ? `<br>Próxima sesión: <strong>${escapeHtml(primerDia.dia)}</strong> (${primerDia.ejercicios.length} ejercicios).` : ""}<br><button type="button" class="btn-xs" style="margin-top:6px;" onclick="document.getElementById('btn-empezar-entreno-hoy')?.click()">⚡ Ir a entrenar</button>`);
+      return;
+    }
+
+    if (ql.includes("resumen") || ql.includes("macros") || ql.includes("calorías") || ql.includes("calorias")) {
+      agregarMsg(`📊 <strong>Hoy (${fmtFecha(hoy)}):</strong><br>• Calorías: <strong>${diarioHoy.kcal || 0}</strong>${objKcal ? ` / ${objKcal} kcal` : " kcal"}<br>• Pasos: <strong>${diarioHoy.pasos || 0}</strong><br>• Agua: <strong>${aguaHoy} / 2500 ml</strong>`);
+      return;
+    }
+
+    const apiKey = localStorage.getItem(KEY.geminiApiKey) || "";
+    if (apiKey) {
+      agregarMsg("⏳ Pensando...", "bot");
+      const lastBot = msgs.lastElementChild;
+      try {
+        const ctx = construirContextoUsuarioIA();
+        const resp = await llamarGeminiTexto(
+          apiKey,
+          `Eres el Coach personal de FitnessCut. Responde en español, breve (máx 4 frases) y práctico.\nContexto del usuario:\n${ctx}`,
+          q
+        );
+        lastBot.textContent = resp;
+        return;
+      } catch {
+        lastBot.textContent = "No pude conectar con Gemini ahora. Puedes pedir: «¿Qué toca hoy?», «Descanso 90s», «Abre Escáner», «Resumen hoy» o «Música».";
+        return;
+      }
+    }
+
+    agregarMsg("Puedo ayudarte con: <strong>«¿Qué toca hoy?»</strong>, <strong>«Pon descanso de 90s»</strong>, <strong>«Resumen hoy»</strong>, <strong>«Abre Escáner»</strong> o <strong>«Música»</strong>. (Si añades tu API key de Gemini, también respondo cualquier duda de técnica o dieta).");
+  }
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const val = input.value;
+    input.value = "";
+    procesarPreguntaCoach(val);
+  });
+}
+
 initPaquetesIA();
 initFotosIDB();
 initBarcodeScanner();
 initOnboarding();
+initCoachChatbot();
 renderCoachDiario();
 actualizarEstadoAudioCoachUI();
 initFoodVision();

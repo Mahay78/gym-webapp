@@ -1050,6 +1050,30 @@
     <button class="btn-xs" id="btn-pwa-reload" type="button">Actualizar</button>
   </div>
 
+  <!-- Chatbot Coach Flotante (en todas las pantallas) -->
+  <button type="button" class="coach-chat-fab" id="coach-chat-fab" title="Abrir Coach IA" aria-label="Abrir Coach IA">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </button>
+  <div class="coach-chat-panel" id="coach-chat-panel" style="display: none;" role="dialog" aria-label="Coach IA FitnessCut">
+    <div class="coach-chat-head">
+      <strong>🤖 Coach FitnessCut</strong>
+      <button type="button" class="btn-xs" id="btn-coach-chat-close" aria-label="Cerrar chat">✕</button>
+    </div>
+    <div class="coach-chat-chips" id="coach-chat-chips">
+      <button type="button" class="btn-xs" data-chatq="¿Qué entreno me toca hoy?">🏋️ ¿Qué toca hoy?</button>
+      <button type="button" class="btn-xs" data-chatq="Pon descanso de 90s">⏱ Descanso 90s</button>
+      <button type="button" class="btn-xs" data-chatq="¿Cómo voy de calorías y agua hoy?">🍽️ Resumen hoy</button>
+      <button type="button" class="btn-xs" data-chatq="Abrir música para entrenar">🎵 Música</button>
+    </div>
+    <div class="coach-chat-messages" id="coach-chat-messages">
+      <div class="coach-msg bot">¡Hola! Soy tu Coach en todas las pantallas. Pregúntame dudas de ejercicios, pide abrir cualquier sección, iniciar un descanso o lanzar tu app de música.</div>
+    </div>
+    <form class="coach-chat-form" id="coach-chat-form">
+      <input type="text" id="coach-chat-input" placeholder="Escribe al Coach (ej. abre escáner)..." autocomplete="off">
+      <button type="submit" class="btn-small">Enviar</button>
+    </form>
+  </div>
+
   <!-- Barra de navegación inferior móvil (Bottom Tab Bar) -->
   <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación móvil">
     <button type="button" class="bottom-nav-btn active" data-section="inicio">
