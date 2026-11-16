@@ -5370,12 +5370,67 @@ $("hist-ejercicio").addEventListener("change", renderHistoricoCargas);
    ===================================================== */
 const FOTO_MAX_LADO = 500;
 
+let fotosCacheIDB = null;
+
+function abrirFotosDB() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) return reject(new Error("Sin IndexedDB"));
+    const req = indexedDB.open("fitnesscut_media", 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function initFotosIDB() {
+  try {
+    const db = await abrirFotosDB();
+    const tx = db.transaction("kv", "readonly");
+    const getReq = tx.objectStore("kv").get("fotos");
+    getReq.onsuccess = async () => {
+      const idbFotos = Array.isArray(getReq.result) ? getReq.result : null;
+      const lsFotos = cargarLS(KEY.fotos, []);
+      if (idbFotos) {
+        fotosCacheIDB = idbFotos;
+      } else if (lsFotos.length > 0) {
+        // Migrar fotos existentes desde localStorage a IndexedDB y liberar cuota
+        fotosCacheIDB = lsFotos;
+        await guardarFotosIDB(lsFotos);
+        try { localStorage.removeItem(KEY.fotos); } catch { /* noop */ }
+      } else {
+        fotosCacheIDB = [];
+      }
+      renderFotos();
+    };
+  } catch {
+    fotosCacheIDB = null;
+  }
+}
+
+async function guardarFotosIDB(fotos) {
+  try {
+    const db = await abrirFotosDB();
+    const tx = db.transaction("kv", "readwrite");
+    tx.objectStore("kv").put(fotos, "fotos");
+  } catch {
+    guardarLS(KEY.fotos, fotos);
+  }
+}
+
 function cargarFotos() {
-  return cargarLS(KEY.fotos, []);
+  return fotosCacheIDB !== null ? fotosCacheIDB : cargarLS(KEY.fotos, []);
 }
 
 function guardarFotos(fotos) {
-  guardarLS(KEY.fotos, fotos);
+  fotosCacheIDB = fotos;
+  if ("indexedDB" in window) {
+    guardarFotosIDB(fotos);
+  } else {
+    guardarLS(KEY.fotos, fotos);
+  }
 }
 
 $("foto-input").addEventListener("change", e => {
@@ -6237,7 +6292,129 @@ renderAgua();
 renderComidas();
 renderHomeStats();
 renderResumenSemanal();
+/* ---------- Escáner de Código de Barras (Open Food Facts) ---------- */
+let barcodeStream = null;
+let barcodeAnimId = null;
+
+function detenerBarcodeCamara() {
+  if (barcodeAnimId) cancelAnimationFrame(barcodeAnimId);
+  barcodeAnimId = null;
+  if (barcodeStream) {
+    barcodeStream.getTracks().forEach(t => t.stop());
+    barcodeStream = null;
+  }
+  const v = $("barcode-video");
+  if (v) {
+    v.srcObject = null;
+    v.style.display = "none";
+  }
+}
+
+async function buscarProductoOpenFoodFacts(codigo) {
+  const resDiv = $("barcode-result");
+  const clean = (codigo || "").trim();
+  if (!clean || !resDiv) return;
+  resDiv.innerHTML = `<div class="muted">🔍 Buscando producto ${escapeHtml(clean)}...</div>`;
+  try {
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(clean)}.json`);
+    const data = await r.json();
+    if (!data || data.status !== 1 || !data.product) {
+      resDiv.innerHTML = `<div class="muted">⚠️ Producto no encontrado en Open Food Facts.</div>`;
+      return;
+    }
+    const p = data.product;
+    const nutr = p.nutriments || {};
+    const nombre = p.product_name_es || p.product_name || `Producto ${clean}`;
+    const kcal100 = Math.round(nutr["energy-kcal_100g"] || nutr["energy-kcal"] || 0);
+    const prot100 = Math.round(nutr.proteins_100g || 0);
+    const carb100 = Math.round(nutr.carbohydrates_100g || 0);
+    const fat100 = Math.round(nutr.fat_100g || 0);
+
+    resDiv.innerHTML = `
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px;">
+        <strong>${escapeHtml(nombre)}</strong>
+        <div class="muted" style="font-size:0.82rem; margin:4px 0 8px;">Por 100g: <strong>${kcal100} kcal</strong> · P ${prot100}g · C ${carb100}g · G ${fat100}g</div>
+        <div class="btn-row">
+          <label style="font-size:0.8rem;">Gramos: <input type="number" id="barcode-gramos" value="100" min="5" max="2000" style="width:85px;"></label>
+          <button type="button" class="btn-small" id="btn-barcode-add-hoy">➕ Añadir a hoy</button>
+        </div>
+      </div>`;
+
+    const btnAdd = $("btn-barcode-add-hoy");
+    if (btnAdd) {
+      btnAdd.addEventListener("click", () => {
+        const g = parseFloat($("barcode-gramos")?.value) || 100;
+        const totalKcal = Math.round((kcal100 * g) / 100);
+        const comidas = cargarComidas();
+        const hoy = hoyISO();
+        if (!comidas[hoy]) comidas[hoy] = [];
+        comidas[hoy].push({ nombre: `${nombre} (${g}g)`, kcal: totalKcal });
+        guardarComidas(comidas);
+        sumarKcalDia(hoy, totalKcal);
+        renderComidas();
+        renderDiario();
+        resDiv.innerHTML = `<div style="color:var(--green); font-size:0.85rem;">✅ Añadido: ${escapeHtml(nombre)} (${totalKcal} kcal).</div>`;
+      });
+    }
+  } catch {
+    resDiv.innerHTML = `<div class="muted">⚠️ Error de conexión al consultar Open Food Facts.</div>`;
+  }
+}
+
+function initBarcodeScanner() {
+  const btnOpen = $("btn-scan-barcode");
+  const btnClose = $("btn-barcode-close");
+  const btnLookup = $("btn-barcode-lookup");
+  const panel = $("barcode-panel");
+  const video = $("barcode-video");
+  if (!btnOpen || !panel) return;
+
+  btnOpen.addEventListener("click", async () => {
+    panel.style.display = "block";
+    if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia || !video) return;
+    try {
+      barcodeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+      video.srcObject = barcodeStream;
+      video.style.display = "block";
+      const detector = new BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e"] });
+      const scanLoop = async () => {
+        if (!barcodeStream) return;
+        if (video.readyState >= 2) {
+          try {
+            const codes = await detector.detect(video);
+            if (codes.length && codes[0].rawValue) {
+              const code = codes[0].rawValue;
+              if ($("barcode-manual-input")) $("barcode-manual-input").value = code;
+              detenerBarcodeCamara();
+              buscarProductoOpenFoodFacts(code);
+              return;
+            }
+          } catch { /* noop */ }
+        }
+        barcodeAnimId = requestAnimationFrame(scanLoop);
+      };
+      barcodeAnimId = requestAnimationFrame(scanLoop);
+    } catch { /* sin permiso de cámara: usar entrada manual */ }
+  });
+
+  if (btnClose) {
+    btnClose.addEventListener("click", () => {
+      detenerBarcodeCamara();
+      panel.style.display = "none";
+    });
+  }
+
+  if (btnLookup) {
+    btnLookup.addEventListener("click", () => {
+      detenerBarcodeCamara();
+      buscarProductoOpenFoodFacts($("barcode-manual-input")?.value);
+    });
+  }
+}
+
 initPaquetesIA();
+initFotosIDB();
+initBarcodeScanner();
 actualizarEstadoAudioCoachUI();
 initFoodVision();
 initFormCheckVision();

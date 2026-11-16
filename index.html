@@ -835,7 +835,21 @@
             📁 Galería
             <input type="file" id="foto-comida-galeria" accept="image/*" style="display:none;">
           </label>
+          <button type="button" class="btn-small" id="btn-scan-barcode">🏷️ Código de barras</button>
           <button type="button" class="btn-small" id="btn-food-presets-toggle" style="margin-left:auto;">🥗 Platos fitness habituales</button>
+        </div>
+
+        <div id="barcode-panel" style="display: none; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+          <div class="card-head" style="margin-bottom: 8px;">
+            <strong style="font-size: 0.9rem;">🏷️ Lector de Código de Barras (Open Food Facts)</strong>
+            <button type="button" class="btn-xs" id="btn-barcode-close">✕</button>
+          </div>
+          <video id="barcode-video" autoplay playsinline muted style="display:none; width:100%; max-height:220px; border-radius:8px; background:#000; object-fit:cover; margin-bottom:10px;"></video>
+          <div class="btn-row">
+            <input type="text" id="barcode-manual-input" placeholder="Introduce o escanea código EAN (ej. 8480000105387)" style="flex:1; min-width:180px;">
+            <button type="button" class="btn-small" id="btn-barcode-lookup">🔍 Buscar</button>
+          </div>
+          <div id="barcode-result" style="margin-top: 10px;"></div>
         </div>
 
         <div id="food-presets-panel" style="display: none; background: var(--bg-input); border-radius: 10px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border);">
