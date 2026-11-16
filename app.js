@@ -702,6 +702,8 @@ function renderPlan(clave) {
                 <div class="ex-nota-wrap">
                   <button type="button" class="btn-link-subtle" data-escaner-ex="${nombre}">📷 Ajuste</button> ·
                   <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme con IA</button> ·
+                  <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a> ·
+                  <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a> ·
                   <button type="button" class="btn-link-subtle" data-notaex="${nombre}">
                     ${notaEx ? `📝 Ajuste: <em>"${notaEx}"</em>` : "＋ Añadir nota"}
                   </button>
