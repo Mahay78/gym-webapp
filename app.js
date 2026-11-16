@@ -3241,6 +3241,25 @@ function detenerCamaraLive() {
   }
 }
 
+async function medirAnguloPrincipalFrame(canvas, poseRef) {
+  if (!poseRef) return null;
+  return new Promise(resolve => {
+    const tOut = setTimeout(() => resolve(null), 900);
+    poseRef.onResults(res => {
+      clearTimeout(tOut);
+      const lm = res?.poseLandmarks;
+      if (!lm || !lm.length) return resolve(null);
+      const angRod = lm[23] && lm[25] && lm[27] ? calcularAngulo(lm[23], lm[25], lm[27]) : 180;
+      const angCodo = lm[11] && lm[13] && lm[15] ? calcularAngulo(lm[11], lm[13], lm[15]) : 180;
+      resolve(Math.min(angRod, angCodo));
+    });
+    poseRef.send({ image: canvas }).catch(() => {
+      clearTimeout(tOut);
+      resolve(null);
+    });
+  });
+}
+
 function extraerFramesDeVideo(videoBlobOrUrl, numFrames = 5) {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
@@ -3255,7 +3274,6 @@ function extraerFramesDeVideo(videoBlobOrUrl, numFrames = 5) {
       const duracion = video.duration;
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const frames = [];
 
       const maxW = 640;
       let w = video.videoWidth || 640;
@@ -3268,26 +3286,59 @@ function extraerFramesDeVideo(videoBlobOrUrl, numFrames = 5) {
       canvas.height = h;
 
       const durSegura = (duracion && !isNaN(duracion) && duracion > 0) ? duracion : 6;
-      const tiempos = [0.1, 0.3, 0.5, 0.7, 0.9].map(p => Math.min(Math.max(p * durSegura, 0.1), durSegura - 0.1));
+      const numMuestras = typeof Pose !== "undefined" ? 11 : 5;
+      const candidatos = [];
 
-      for (let i = 0; i < tiempos.length; i++) {
+      let poseOffline = null;
+      if (typeof Pose !== "undefined") {
+        try {
+          poseOffline = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          });
+          poseOffline.setOptions({ modelComplexity: 0, minDetectionConfidence: 0.45, minTrackingConfidence: 0.45 });
+        } catch { poseOffline = null; }
+      }
+
+      for (let i = 0; i < numMuestras; i++) {
+        const frac = 0.08 + (0.84 * i) / (numMuestras - 1);
+        const t = Math.min(Math.max(frac * durSegura, 0.08), durSegura - 0.08);
         await new Promise((resSeek) => {
-          video.currentTime = tiempos[i];
-          video.onseeked = () => {
+          video.currentTime = t;
+          video.onseeked = async () => {
             ctx.drawImage(video, 0, 0, w, h);
             const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
-            frames.push({
-              etiqueta: i === 0 ? "1. Setup / Inicio" :
-                        i === 1 ? "2. Fase Excéntrica" :
-                        i === 2 ? "3. Punto Crítico" :
-                        i === 3 ? "4. Fase Concéntrica" : "5. Bloqueo / Fin",
-              segundo: tiempos[i].toFixed(1) + "s",
-              base64: dataUrl
-            });
+            const angulo = poseOffline ? await medirAnguloPrincipalFrame(canvas, poseOffline) : null;
+            candidatos.push({ t, dataUrl, angulo });
             resSeek();
           };
         });
       }
+
+      try { poseOffline?.close?.(); } catch { /* noop */ }
+
+      let elegidos = candidatos;
+      if (candidatos.length > 5) {
+        let minIdx = 2;
+        let minAng = 999;
+        candidatos.forEach((c, idx) => {
+          if (idx > 0 && idx < candidatos.length - 1 && c.angulo !== null && c.angulo < minAng) {
+            minAng = c.angulo;
+            minIdx = idx;
+          }
+        });
+        const idx0 = 0;
+        const idx4 = candidatos.length - 1;
+        const idx1 = Math.max(1, Math.floor(minIdx / 2));
+        const idx3 = Math.min(idx4 - 1, Math.floor((minIdx + idx4) / 2));
+        elegidos = [candidatos[idx0], candidatos[idx1], candidatos[minIdx], candidatos[idx3], candidatos[idx4]];
+      }
+
+      const etiquetas = ["1. Setup / Inicio", "2. Fase Excéntrica", "3. Punto Crítico", "4. Fase Concéntrica", "5. Bloqueo / Fin"];
+      const frames = elegidos.slice(0, numFrames).map((c, i) => ({
+        etiqueta: etiquetas[i] || `Fotograma ${i + 1}`,
+        segundo: c.t.toFixed(1) + "s" + (c.angulo !== null ? ` (${c.angulo}°)` : ""),
+        base64: c.dataUrl
+      }));
 
       if (typeof videoBlobOrUrl !== "string") {
         URL.revokeObjectURL(url);
@@ -5993,6 +6044,7 @@ function cambiarAgua(deltaMl) {
   aguaMap[hoy] = Math.max(0, (aguaMap[hoy] || 0) + deltaMl);
   guardarLS("fitnesscut_agua", aguaMap);
   renderAgua();
+  renderCoachDiario();
 }
 
 if ($("btn-agua-mas")) $("btn-agua-mas").addEventListener("click", () => cambiarAgua(250));
@@ -6296,7 +6348,12 @@ renderResumenSemanal();
 let barcodeStream = null;
 let barcodeAnimId = null;
 
+let zxingReader = null;
+
 function detenerBarcodeCamara() {
+  if (zxingReader) {
+    try { zxingReader.reset(); } catch { /* noop */ }
+  }
   if (barcodeAnimId) cancelAnimationFrame(barcodeAnimId);
   barcodeAnimId = null;
   if (barcodeStream) {
@@ -6371,30 +6428,56 @@ function initBarcodeScanner() {
 
   btnOpen.addEventListener("click", async () => {
     panel.style.display = "block";
-    if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia || !video) return;
-    try {
-      barcodeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-      video.srcObject = barcodeStream;
-      video.style.display = "block";
-      const detector = new BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e"] });
-      const scanLoop = async () => {
-        if (!barcodeStream) return;
-        if (video.readyState >= 2) {
-          try {
-            const codes = await detector.detect(video);
-            if (codes.length && codes[0].rawValue) {
-              const code = codes[0].rawValue;
+    if (!navigator.mediaDevices?.getUserMedia || !video) return;
+
+    if ("BarcodeDetector" in window) {
+      try {
+        barcodeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        video.srcObject = barcodeStream;
+        video.style.display = "block";
+        const detector = new BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e"] });
+        const scanLoop = async () => {
+          if (!barcodeStream) return;
+          if (video.readyState >= 2) {
+            try {
+              const codes = await detector.detect(video);
+              if (codes.length && codes[0].rawValue) {
+                const code = codes[0].rawValue;
+                if ($("barcode-manual-input")) $("barcode-manual-input").value = code;
+                detenerBarcodeCamara();
+                buscarProductoOpenFoodFacts(code);
+                return;
+              }
+            } catch { /* noop */ }
+          }
+          barcodeAnimId = requestAnimationFrame(scanLoop);
+        };
+        barcodeAnimId = requestAnimationFrame(scanLoop);
+        return;
+      } catch { /* probar fallback ZXing o entrada manual */ }
+    }
+
+    // Fallback universal (iOS Safari / Firefox) con ZXing
+    if (typeof ZXing !== "undefined" && ZXing.BrowserMultiFormatReader) {
+      try {
+        zxingReader = new ZXing.BrowserMultiFormatReader();
+        video.style.display = "block";
+        zxingReader.decodeFromConstraints(
+          { video: { facingMode: "environment" } },
+          "barcode-video",
+          (result) => {
+            if (result && result.text) {
+              const code = result.text;
               if ($("barcode-manual-input")) $("barcode-manual-input").value = code;
               detenerBarcodeCamara();
               buscarProductoOpenFoodFacts(code);
-              return;
             }
-          } catch { /* noop */ }
-        }
-        barcodeAnimId = requestAnimationFrame(scanLoop);
-      };
-      barcodeAnimId = requestAnimationFrame(scanLoop);
-    } catch { /* sin permiso de cámara: usar entrada manual */ }
+          }
+        );
+      } catch {
+        video.style.display = "none";
+      }
+    }
   });
 
   if (btnClose) {
@@ -6412,9 +6495,33 @@ function initBarcodeScanner() {
   }
 }
 
+function renderCoachDiario() {
+  const el = $("coach-diario-banner");
+  if (!el) return;
+  const hoy = hoyISO();
+  const entrenos = cargarLS(KEY.entrenos, {});
+  const hechoHoy = Boolean(entrenos[hoy]);
+  const diario = cargarLS(KEY.diario, {});
+  const regHoy = diario[hoy] || {};
+  const pasos = regHoy.pasos || 0;
+  const kcal = regHoy.kcal || 0;
+  const agua = (cargarLS("fitnesscut_agua", {})[hoy]) || 0;
+
+  const partes = [];
+  partes.push(hechoHoy ? "✅ Entreno de hoy completado" : "🏋️ Entreno de hoy pendiente");
+  if (pasos < 8000) partes.push(`🚶 Faltan ${Math.max(0, 8000 - pasos).toLocaleString("es-ES")} pasos`);
+  else partes.push(`🚶 ${pasos.toLocaleString("es-ES")} pasos`);
+  if (agua < 2000) partes.push(`💧 Agua: ${agua}/2500 ml`);
+  if (kcal > 0) partes.push(`🍽️ ${kcal} kcal hoy`);
+
+  el.innerHTML = `<strong>🤖 Coach de hoy:</strong> ${partes.join(" · ")}`;
+  el.style.display = "block";
+}
+
 initPaquetesIA();
 initFotosIDB();
 initBarcodeScanner();
+renderCoachDiario();
 actualizarEstadoAudioCoachUI();
 initFoodVision();
 initFormCheckVision();

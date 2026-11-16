@@ -44,6 +44,8 @@
         <button class="btn" data-goto="calculadoras">Calcular mis calorías →</button>
       </div>
 
+      <div id="coach-diario-banner" class="plan-note" style="margin-bottom:14px; display:none;"></div>
+
       <div class="stats-row" id="home-stats"></div>
 
       <div class="grid-2">
@@ -984,6 +986,8 @@
     <button class="btn-xs" id="btn-pwa-reload" type="button">Actualizar</button>
   </div>
 
+  <!-- Lector universal de códigos de barras (respaldo iOS/Safari/Firefox) -->
+  <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js" crossorigin="anonymous"></script>
   <!-- Google MediaPipe Pose para visión y conteo biomecánico en tiempo real a 30-60 FPS -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
