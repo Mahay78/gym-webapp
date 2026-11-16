@@ -1593,3 +1593,67 @@ body.modo-entreno .set-chip {
 .pr-item-vals strong {
   color: var(--green);
 }
+
+/* ---------- IA Entrenamiento y Visión Avanzada ---------- */
+.live-opts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 8px 0 4px;
+}
+
+.live-opt-chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.live-opt-chk input {
+  width: auto;
+  margin: 0;
+}
+
+.mirror-live {
+  transform: scaleX(-1);
+}
+
+.pkg-filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.pkg-molestias-wrap {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.pkg-molestias-lbl {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pkg-bib-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}

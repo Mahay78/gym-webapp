@@ -2378,6 +2378,13 @@ let repsValidas = 0;
 let repsIncompletas = 0;
 let estadoFaseLive = "arriba";
 let tempoInicioBajada = 0;
+let tempoInicioSubida = 0;
+let tempoExcentricaSec = 0;
+let tempoConcentricaSec = 0;
+let anguloSuavizadoLive = null;
+let barPathPuntos = [];
+let ultimoMovimientoLive = 0;
+let liveMetricasAnalisis = { minAngulo: 180, maxAngulo: 0, fallos: [] };
 let ultimoAudioCueTime = 0;
 let ultimoErrorSnapTime = 0;
 let capturasErroresLive = [];
@@ -2706,11 +2713,77 @@ function evaluarPoseEnVivo(landmarks, ejercicio) {
     }
   }
 
-  return { anguloActual, puntoVertice, feedbackTexto, colorSemaforo, porcentajeRom };
+  let segmentoFallo = null;
+  if (anguloActual !== null) {
+    anguloSuavizadoLive = anguloSuavizadoLive === null
+      ? anguloActual
+      : Math.round(anguloSuavizadoLive * 0.62 + anguloActual * 0.38);
+    anguloActual = anguloSuavizadoLive;
+
+    if (anguloActual < liveMetricasAnalisis.minAngulo) liveMetricasAnalisis.minAngulo = anguloActual;
+    if (anguloActual > liveMetricasAnalisis.maxAngulo) liveMetricasAnalisis.maxAngulo = anguloActual;
+  }
+
+  // Chequeo bilateral de valgo de rodilla / asimetría y control de tronco
+  const r25 = landmarks[25], r26 = landmarks[26], t27 = landmarks[27], t28 = landmarks[28];
+  if (r25 && r26 && t27 && t28 && (r25.visibility || 0) > 0.5 && (r26.visibility || 0) > 0.5) {
+    const distRodillas = Math.abs(r25.x - r26.x);
+    const distTobillos = Math.abs(t27.x - t28.x);
+    if (distTobillos > 0.08 && distRodillas < distTobillos * 0.7) {
+      feedbackTexto = "⚠️ Valgo de rodilla: empuja rodillas hacia fuera";
+      colorSemaforo = "amarillo";
+      segmentoFallo = "rodilla";
+    }
+  }
+  const h11 = landmarks[11] || landmarks[12], c23 = landmarks[23] || landmarks[24];
+  if (!segmentoFallo && h11 && c23 && (ej.includes("sentadilla") || ej.includes("peso muerto") || ej.includes("rumano"))) {
+    const inclTronco = Math.abs(h11.x - c23.x);
+    if (inclTronco > 0.27 && Math.abs(h11.y - c23.y) < 0.25) {
+      feedbackTexto = "⚠️ Tronco muy inclinado: mantén el pecho erguido";
+      colorSemaforo = "amarillo";
+      segmentoFallo = "tronco";
+    }
+  }
+
+  // Estela Bar Path (muñeca o cadera)
+  const pTrack = (ej.includes("sentadilla") || ej.includes("peso muerto") || ej.includes("hip thrust"))
+    ? (landmarks[23] || landmarks[24])
+    : (landmarks[15] || landmarks[16]);
+  if (pTrack && (pTrack.visibility || 1) > 0.4) {
+    barPathPuntos.push({ x: pTrack.x, y: pTrack.y });
+    if (barPathPuntos.length > 26) barPathPuntos.shift();
+  }
+
+  // Tempo en vivo
+  if (estadoFaseLive === "abajo_valido" && tempoInicioBajada) {
+    tempoExcentricaSec = ((Date.now() - tempoInicioBajada) / 1000).toFixed(1);
+    if (!tempoInicioSubida) tempoInicioSubida = Date.now();
+  } else if (estadoFaseLive === "arriba" && tempoInicioSubida) {
+    tempoConcentricaSec = ((Date.now() - tempoInicioSubida) / 1000).toFixed(1);
+    tempoInicioSubida = 0;
+  }
+
+  if (colorSemaforo === "amarillo" && feedbackTexto && !liveMetricasAnalisis.fallos.includes(feedbackTexto)) {
+    liveMetricasAnalisis.fallos.push(feedbackTexto);
+  }
+
+  return { anguloActual, puntoVertice, feedbackTexto, colorSemaforo, porcentajeRom, segmentoFallo };
 }
 
 function dibujarEsqueletoEnCanvas(ctx, landmarks, w, h, ev) {
   ctx.clearRect(0, 0, w, h);
+
+  // Dibujar estela Bar Path
+  if (barPathPuntos.length > 2) {
+    ctx.beginPath();
+    barPathPuntos.forEach((pt, idx) => {
+      if (idx === 0) ctx.moveTo(pt.x * w, pt.y * h);
+      else ctx.lineTo(pt.x * w, pt.y * h);
+    });
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.75)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
 
   const CONEXIONES = [
     [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
@@ -2719,12 +2792,16 @@ function dibujarEsqueletoEnCanvas(ctx, landmarks, w, h, ev) {
   ];
 
   ctx.lineWidth = 4;
-  ctx.strokeStyle = ev.colorSemaforo === "verde" ? "rgba(74, 222, 128, 0.85)" : "rgba(251, 191, 36, 0.85)";
-
   CONEXIONES.forEach(([i, j]) => {
     const p1 = landmarks[i];
     const p2 = landmarks[j];
     if (p1 && p2 && (p1.visibility || 1) > 0.35 && (p2.visibility || 1) > 0.35) {
+      const esTronco = (i === 11 && j === 23) || (i === 12 && j === 24);
+      const esRodilla = (i === 23 && j === 25) || (i === 25 && j === 27) || (i === 24 && j === 26) || (i === 26 && j === 28);
+      const falloAqui = (ev.segmentoFallo === "tronco" && esTronco) || (ev.segmentoFallo === "rodilla" && esRodilla);
+      ctx.strokeStyle = falloAqui
+        ? "rgba(239, 68, 68, 0.95)"
+        : ev.colorSemaforo === "verde" ? "rgba(74, 222, 128, 0.85)" : "rgba(251, 191, 36, 0.85)";
       ctx.beginPath();
       ctx.moveTo(p1.x * w, p1.y * h);
       ctx.lineTo(p2.x * w, p2.y * h);
@@ -2809,8 +2886,21 @@ function onPoseResultsLive(results) {
 
   if (cueEl) cueEl.textContent = ev.feedbackTexto || "🟢 Buena alineación";
   if (angleEl) angleEl.textContent = ev.anguloActual ? `Ángulo: ${ev.anguloActual}°` : "Ángulo: --°";
+  if ($("live-hud-tempo")) {
+    $("live-hud-tempo").textContent = tempoExcentricaSec
+      ? `Tempo: ${tempoExcentricaSec}s baj · ${tempoConcentricaSec || "--"}s sub`
+      : "Tempo: --";
+  }
   if (romEl) romEl.style.width = `${ev.porcentajeRom}%`;
   if (repsEl) repsEl.textContent = String(repsEnVivo);
+
+  // Manos libres: auto-fin tras 5s sin actividad una vez iniciada la serie
+  if ($("live-handsfree-toggle")?.checked) {
+    if (ev.porcentajeRom > 18) ultimoMovimientoLive = Date.now();
+    if (repsEnVivo > 0 && ultimoMovimientoLive && (Date.now() - ultimoMovimientoLive > 5000)) {
+      finalizarSerieEnDirecto();
+    }
+  }
 }
 
 async function iniciarBucleMediaPipePose() {
@@ -2886,9 +2976,21 @@ async function iniciarLiveDirecto() {
     repsIncompletas = 0;
     totalFallosLive = 0;
     capturasErroresLive = [];
+    barPathPuntos = [];
+    anguloSuavizadoLive = null;
+    tempoInicioBajada = 0;
+    tempoInicioSubida = 0;
+    tempoExcentricaSec = 0;
+    tempoConcentricaSec = 0;
+    ultimoMovimientoLive = Date.now();
+    liveMetricasAnalisis = { minAngulo: 180, maxAngulo: 0, fallos: [] };
     ultimoErrorSnapTime = 0;
     estadoFaseLive = "arriba";
     tiempoInicioLive = Date.now();
+
+    const usarEspejo = camaraFrontal && ($("live-mirror-toggle")?.checked ?? true);
+    videoLive.classList.toggle("mirror-live", usarEspejo);
+    $("formcheck-canvas-live")?.classList.toggle("mirror-live", usarEspejo);
 
     const repsEl = $("live-hud-reps");
     if (repsEl) repsEl.textContent = "0";
@@ -3232,8 +3334,12 @@ async function procesarVideoGrabado(blobOrFile) {
 async function llamarGeminiCorreccionTecnica(apiKey, ejercicio, frames) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
+  const ctxMetricas = liveMetricasAnalisis.maxAngulo > 0
+    ? `\nMétricas reales detectadas por MediaPipe Pose en esta sesión: ángulo mínimo ${liveMetricasAnalisis.minAngulo}°, máximo ${liveMetricasAnalisis.maxAngulo}°, fallos observados: ${liveMetricasAnalisis.fallos.join("; ") || "ninguno"}.`
+    : "";
+
   const prompt = `Eres el Director de Rendimiento y Biomecánica Deportiva de FitnessCut.
-Se te presentan 5 fotogramas cronológicos secuenciales de una repetición del atleta realizando el ejercicio: "${ejercicio}".
+Se te presentan 5 fotogramas cronológicos secuenciales de una repetición del atleta realizando el ejercicio: "${ejercicio}".${ctxMetricas}
 - Fotograma 1: Setup inicial y postura de partida.
 - Fotograma 2: Fase excéntrica / descenso y trayectoria.
 - Fotograma 3: Punto de máxima profundidad / flexión articular.
@@ -3504,7 +3610,24 @@ function abrirFormCheckParaEjercicio(nombreEjercicio) {
   if (view) view.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function renderVisionLogs() {
+  const cont = $("vision-logs-list");
+  if (!cont) return;
+  const logs = cargarLS("fitnesscut_vision_logs", []);
+  if (!logs.length) {
+    cont.innerHTML = `<div class="muted">Aún no hay sesiones guardadas.</div>`;
+    return;
+  }
+  cont.innerHTML = logs.slice(0, 8).map(l => `
+    <div style="display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px dashed var(--border); font-size:0.83rem;">
+      <span><strong>${escapeHtml(l.ejercicio)}</strong> · ${fmtFecha(l.fecha)}</span>
+      <span><strong style="color:var(--green);">${escapeHtml(l.score)}</strong> · ${l.validas} válidas · ${escapeHtml(l.tut)}</span>
+    </div>
+  `).join("");
+}
+
 function initFormCheckVision() {
+  renderVisionLogs();
   const visionTabs = $("vision-tabs");
   if (visionTabs) {
     visionTabs.querySelectorAll(".tab").forEach(tab => {
@@ -3582,6 +3705,7 @@ function initFormCheckVision() {
         tut: tutTxt
       });
       guardarLS("fitnesscut_vision_logs", logs.slice(0, 30));
+      renderVisionLogs();
       const resumenTxt = `FitnessCut Escáner IA · ${ejercicio} (${hoyISO()}): Puntuación ${scoreTxt} | ${repsValidas} válidas, ${repsIncompletas} incompletas | TUT ${tutTxt}`;
       navigator.clipboard?.writeText(resumenTxt).catch(() => {});
       alert("✅ Resumen técnico guardado en el dispositivo y copiado al portapapeles.");
@@ -3958,8 +4082,55 @@ async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario) {
   return txt;
 }
 
+function obtenerFiltrosPaqueteIA() {
+  const tiempo = $("pkg-filtro-tiempo")?.value || "";
+  const material = $("pkg-filtro-material")?.value || "";
+  const molestias = Array.from(document.querySelectorAll(".pkg-molestia:checked")).map(c => c.value);
+  const periodizado = Boolean($("pkg-periodizado")?.checked);
+  return { tiempo, material, molestias, periodizado };
+}
+
+function construirContextoUsuarioIA() {
+  const cargas = cargarCargas();
+  const resumenCargas = Object.entries(cargas)
+    .filter(([, l]) => Array.isArray(l) && l.length)
+    .slice(0, 12)
+    .map(([nom, l]) => {
+      const ult = l[l.length - 1];
+      return `${nom}: ${ult.peso}kg (${ult.reps || "8-10"})`;
+    })
+    .join("; ");
+  const regs = cargarRegistros();
+  const ultPeso = regs.length ? regs[regs.length - 1].peso : null;
+  const meta = cargarLS(KEY.meta, null);
+  const filtros = obtenerFiltrosPaqueteIA();
+
+  return [
+    `Plan actual: ${getPlan(planActual)?.titulo || planActual}`,
+    ultPeso ? `Peso corporal actual: ${ultPeso} kg` : "",
+    meta?.peso ? `Objetivo de peso: ${meta.peso} kg` : "",
+    resumenCargas ? `Cargas recientes del usuario: ${resumenCargas}` : "",
+    filtros.tiempo ? `Duración máxima por sesión: ${filtros.tiempo} min` : "",
+    filtros.material === "mancuernas" ? "Material disponible: SOLO mancuernas y peso corporal (sin máquinas)" : "",
+    filtros.molestias.length ? `Proteger articulaciones con molestias: ${filtros.molestias.join(", ")}` : "",
+    filtros.periodizado ? "Incluir bloque periodizado de 4-6 semanas (acumulación, intensificación y deload)" : ""
+  ].filter(Boolean).join("\n");
+}
+
+function estimarPesoInicialIA(nombreEjercicio, cargas) {
+  const nom = (nombreEjercicio || "").toLowerCase();
+  const exact = cargas[nombreEjercicio];
+  if (exact && exact.length) return `${exact[exact.length - 1].peso} kg`;
+  const match = Object.entries(cargas).find(([k]) =>
+    nom.includes(k.toLowerCase().split(" ")[0]) || k.toLowerCase().includes(nom.split(" ")[0])
+  );
+  if (match && match[1].length) return `~${match[1][match[1].length - 1].peso} kg`;
+  return null;
+}
+
 function generarPlanHeuristico(prompt) {
-  const p = (prompt || "").toLowerCase();
+  const filtros = obtenerFiltrosPaqueteIA();
+  const p = `${prompt || ""} ${filtros.molestias.join(" ")} ${filtros.material}`.toLowerCase();
 
   let numDias = 4;
   const matchDias = p.match(/\b([2-6])\s*(?:días|dias|dia|d)\b/);
@@ -4032,6 +4203,67 @@ function generarPlanHeuristico(prompt) {
     }
   }
 
+  // Aplicar filtros de tiempo, material, lesiones y periodización en modo local
+  if (filtros.material === "mancuernas") {
+    const mapaMancuernas = [
+      [/prensa|hack|sentadilla/i, "Sentadilla goblet / búlgara con mancuernas"],
+      [/jalón|jalon/i, "Remo a una mano con mancuerna"],
+      [/remo/i, "Remo inclinado con mancuernas"],
+      [/press.*máquina|banca|pecho/i, "Press plano/inclinado con mancuernas"],
+      [/curl femoral/i, "Peso muerto rumano con mancuernas"],
+      [/tríceps|triceps/i, "Extensión de tríceps sobre cabeza con mancuerna"],
+      [/curl.*polea|curl de bíceps/i, "Curl alterno con mancuernas"]
+    ];
+    copia.dias.forEach(d => {
+      d.ejercicios = d.ejercicios.map(ej => {
+        const clone = [...ej];
+        const hit = mapaMancuernas.find(([rx]) => rx.test(clone[0]));
+        if (hit) clone[0] = hit[1];
+        return clone;
+      });
+    });
+  }
+
+  if (filtros.molestias.length) {
+    copia.dias.forEach(d => {
+      d.ejercicios = d.ejercicios.map(ej => {
+        const clone = [...ej];
+        if (filtros.molestias.includes("rodilla") && /sentadilla|zancada|extensión de cuádriceps/i.test(clone[0])) {
+          clone[0] = "Prensa de piernas (rango cómodo sin dolor)";
+          clone[5] = "Pies altos en plataforma para reducir estrés rotuliano";
+        }
+        if (filtros.molestias.includes("hombro") && /press militar|fondos|press inclinado/i.test(clone[0])) {
+          clone[0] = "Press en máquina agarre neutro";
+          clone[5] = "Codos a 45° sin bajar en exceso para proteger manguito";
+        }
+        if (filtros.molestias.includes("lumbar") && /peso muerto|remo con barra|sentadilla libre/i.test(clone[0])) {
+          clone[0] = "Remo sentado con apoyo pectoral en máquina";
+          clone[5] = "Pecho apoyado para descargar completamente la zona lumbar";
+        }
+        return clone;
+      });
+    });
+  }
+
+  if (filtros.tiempo === "30" || filtros.tiempo === "45") {
+    const maxEj = filtros.tiempo === "30" ? 4 : 5;
+    copia.dias.forEach(d => {
+      d.ejercicios = d.ejercicios.slice(0, maxEj).map(ej => {
+        const clone = [...ej];
+        clone[4] = Math.min(typeof clone[4] === "number" ? clone[4] : 75, filtros.tiempo === "30" ? 60 : 75);
+        return clone;
+      });
+    });
+  }
+
+  if (filtros.periodizado) {
+    copia.fases = [
+      "Semanas 1–2 (Acumulación): RIR 2 · técnica limpia y adaptación de volumen.",
+      "Semanas 3–5 (Intensificación): RIR 0–1 · sube +1–2,5 kg al completar el rango alto.",
+      "Semana 6 (Descarga / Deload): reduce series al 50% manteniendo el peso."
+    ];
+  }
+
   return copia;
 }
 
@@ -4039,7 +4271,12 @@ function renderResultadoPrompt(paquete) {
   const card = $("pkg-prompt-result");
   if (!card) return;
 
+  const cargas = cargarCargas();
   const totalEjercicios = paquete.dias.reduce((acc, d) => acc + d.ejercicios.length, 0);
+
+  const fasesHtml = Array.isArray(paquete.fases) && paquete.fases.length
+    ? `<div class="plan-note" style="margin-bottom:14px;"><strong>📅 Periodización (4–6 semanas):</strong><ul style="margin:6px 0 0 18px;">${paquete.fases.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul></div>`
+    : "";
 
   const diasHtml = paquete.dias.map(d => `
     <div style="background:var(--bg-input); border-radius:10px; padding:14px; margin-bottom:12px; border:1px solid var(--border);">
@@ -4050,21 +4287,25 @@ function renderResultadoPrompt(paquete) {
             <tr style="text-align:left; color:var(--muted); border-bottom:1px solid var(--border);">
               <th style="padding:4px 6px;">Ejercicio</th>
               <th style="padding:4px 6px;">Series</th>
+              <th style="padding:4px 6px;">Peso sug.</th>
               <th style="padding:4px 6px;">RIR</th>
               <th style="padding:4px 6px;">Descanso</th>
               <th style="padding:4px 6px;">Nota Biomecánica</th>
             </tr>
           </thead>
           <tbody>
-            ${d.ejercicios.map(e => `
+            ${d.ejercicios.map(e => {
+              const pesoSug = e[6] || estimarPesoInicialIA(e[0], cargas) || "Auto";
+              return `
               <tr style="border-bottom:1px dashed var(--border);">
                 <td style="padding:6px 6px; font-weight:600;">${escapeHtml(e[0])}</td>
                 <td style="padding:6px 6px;">${escapeHtml(e[2])}</td>
+                <td style="padding:6px 6px; color:var(--green); font-weight:600;">${escapeHtml(String(pesoSug))}</td>
                 <td style="padding:6px 6px; color:var(--accent);">${escapeHtml(e[3])}</td>
                 <td style="padding:6px 6px; color:var(--muted);">⏱ ${e[4]}s</td>
                 <td style="padding:6px 6px; color:var(--muted); font-size:0.78rem;">${escapeHtml(e[5] || "Técnica controlada")}</td>
-              </tr>
-            `).join("")}
+              </tr>`;
+            }).join("")}
           </tbody>
         </table>
       </div>
@@ -4078,13 +4319,23 @@ function renderResultadoPrompt(paquete) {
     </div>
     <h4 style="font-size:1.1rem; margin-bottom:6px;">${escapeHtml(paquete.titulo)}</h4>
     <p class="muted" style="margin-bottom:14px;">${escapeHtml(paquete.descripcion || "Plan estructurado con base en evidencia biomecánica y sobrecarga progresiva.")}</p>
-    
+    ${fasesHtml}
     <div style="margin-bottom:16px;">
       ${diasHtml}
     </div>
 
+    <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:14px;">
+      <label style="font-size:0.84rem; font-weight:700;">💬 Pedir cambios a este plan antes de instalar:
+        <div class="btn-row" style="margin-top:8px;">
+          <input type="text" id="pkg-refinar-input" placeholder="Ej: Cambia sentadilla por prensa o reduce a 45 min" style="flex:1; min-width:200px;">
+          <button class="btn-small" id="btn-refinar-pkg" type="button">✨ Ajustar plan</button>
+        </div>
+      </label>
+    </div>
+
     <div class="btn-row">
       <button class="btn" id="btn-instalar-prompt-pkg">📥 Instalar este paquete como mi plan activo →</button>
+      <button class="btn-small" id="btn-guardar-biblioteca-pkg" type="button">📚 Guardar en biblioteca</button>
     </div>
   `;
 
@@ -4094,9 +4345,101 @@ function renderResultadoPrompt(paquete) {
   const btnInstalar = $("btn-instalar-prompt-pkg");
   if (btnInstalar) {
     btnInstalar.addEventListener("click", () => {
+      guardarEnBibliotecaPaquetes(paquete);
       instalarPaquete(paquete, "paquete-ia-custom");
     });
   }
+
+  const btnGuardarBib = $("btn-guardar-biblioteca-pkg");
+  if (btnGuardarBib) {
+    btnGuardarBib.addEventListener("click", () => {
+      guardarEnBibliotecaPaquetes(paquete);
+      alert("📚 Paquete guardado en tu biblioteca personal.");
+    });
+  }
+
+  const btnRefinar = $("btn-refinar-pkg");
+  if (btnRefinar) {
+    btnRefinar.addEventListener("click", () => refinarPaqueteActual(paquete));
+  }
+}
+
+function guardarEnBibliotecaPaquetes(paquete) {
+  const bib = cargarLS("fitnesscut_paquetes_guardados", []);
+  const limpio = bib.filter(p => p.titulo !== paquete.titulo);
+  limpio.unshift({ ...paquete, guardadoEl: hoyISO() });
+  guardarLS("fitnesscut_paquetes_guardados", limpio.slice(0, 12));
+  renderBibliotecaPaquetes();
+}
+
+function renderBibliotecaPaquetes() {
+  const cont = $("pkg-biblioteca-list");
+  if (!cont) return;
+  const bib = cargarLS("fitnesscut_paquetes_guardados", []);
+  if (!bib.length) {
+    cont.innerHTML = `<div class="muted">Aún no has guardado paquetes personalizados.</div>`;
+    return;
+  }
+  cont.innerHTML = bib.map((p, idx) => `
+    <div class="pkg-bib-item">
+      <div>
+        <strong>${escapeHtml(p.titulo)}</strong>
+        <div class="muted" style="font-size:0.78rem;">${p.dias?.length || 0} días · guardado ${fmtFecha(p.guardadoEl || hoyISO())}</div>
+      </div>
+      <div class="btn-row" style="margin:0;">
+        <button class="btn-small" data-bib-instalar="${idx}" type="button">📥 Activar</button>
+        <button class="btn-small" data-bib-borrar="${idx}" type="button" title="Eliminar">🗑</button>
+      </div>
+    </div>
+  `).join("");
+
+  cont.querySelectorAll("[data-bib-instalar]").forEach(b => {
+    b.addEventListener("click", () => {
+      const item = bib[+b.dataset.bibInstalar];
+      if (item) instalarPaquete(item, "paquete-ia-custom");
+    });
+  });
+  cont.querySelectorAll("[data-bib-borrar]").forEach(b => {
+    b.addEventListener("click", () => {
+      bib.splice(+b.dataset.bibBorrar, 1);
+      guardarLS("fitnesscut_paquetes_guardados", bib);
+      renderBibliotecaPaquetes();
+    });
+  });
+}
+
+async function refinarPaqueteActual(paquete) {
+  const cambio = $("pkg-refinar-input")?.value.trim();
+  if (!cambio) {
+    alert("Escribe qué quieres cambiar del plan.");
+    return;
+  }
+  const apiKey = localStorage.getItem(KEY.geminiApiKey) || "";
+  if (apiKey) {
+    try {
+      const promptSis = `Eres el Director Técnico de FitnessCut. Modifica el paquete JSON proporcionado aplicando exactamente la petición del usuario. Devuelve ÚNICAMENTE JSON válido con el mismo esquema.`;
+      const jsonStr = await llamarGeminiTexto(apiKey, promptSis, `Plan actual:\n${JSON.stringify(paquete)}\n\nCambio solicitado: ${cambio}`);
+      const modificado = JSON.parse(jsonStr.replace(/```json/gi, "").replace(/```/g, "").trim());
+      if (modificado?.dias?.length) {
+        renderResultadoPrompt(modificado);
+        return;
+      }
+    } catch (e) {
+      console.warn("Refinamiento Gemini falló, usando ajuste local:", e);
+    }
+  }
+  // Ajuste local rápido
+  const copia = JSON.parse(JSON.stringify(paquete));
+  copia.descripcion = `${copia.descripcion || ""} · Ajustado: "${cambio}"`;
+  if (/45|30|corto|menos/i.test(cambio)) {
+    copia.dias.forEach(d => { d.ejercicios = d.ejercicios.slice(0, 4); });
+  }
+  if (/prensa/i.test(cambio) && /sentadilla/i.test(cambio)) {
+    copia.dias.forEach(d => {
+      d.ejercicios.forEach(e => { if (/sentadilla/i.test(e[0])) e[0] = "Prensa de piernas a 45°"; });
+    });
+  }
+  renderResultadoPrompt(copia);
 }
 
 async function generarPaquetePrompt(promptText) {
@@ -4116,23 +4459,26 @@ async function generarPaquetePrompt(promptText) {
 
   if (apiKey) {
     try {
+      const ctxUsuario = construirContextoUsuarioIA();
       const promptSistema = `Eres el Director Técnico y Biomecánico de FitnessCut. Tu tarea es diseñar un paquete de entrenamiento completo y personalizado en formato JSON riguroso para la aplicación de fitness.
+Contexto real del usuario:\n${ctxUsuario}\n
 Debe devolver ÚNICAMENTE un objeto JSON válido con este esquema exacto, sin explicaciones ni markdown circundante:
 {
   "titulo": "Nombre del Paquete",
   "diasSemana": 3,
   "descripcion": "Explicación biomecánica breve de por qué este paquete resuelve exactamente lo que pidió el usuario",
+  "fases": ["Semana 1-2: ...", "Semana 3-5: ...", "Semana 6 Deload: ..."],
   "dias": [
     {
       "dia": "Día 1: Nombre de la sesión",
       "ejercicios": [
-        ["Nombre del Ejercicio", "Grupo Muscular", "Series×Reps (ej: 3×8–10)", "RIR (ej: RIR 1–2)", 90, "Nota técnica de ejecución segura"]
+        ["Nombre del Ejercicio", "Grupo Muscular", "Series×Reps (ej: 3×8–10)", "RIR (ej: RIR 1–2)", 90, "Nota técnica de ejecución segura", "Peso inicial sugerido ej: 40 kg"]
       ]
     }
   ]
 }
-Cada ejercicio DEBE ser un array de 6 elementos: [Nombre, Grupo, Series, RIR, descansoEnSegundos, notaTecnica].
-Prioriza máquinas de gimnasio comerciales, poleas y mancuernas para máxima estabilidad.`;
+Cada ejercicio DEBE ser un array de 6 o 7 elementos: [Nombre, Grupo, Series, RIR, descansoEnSegundos, notaTecnica, pesoSugeridoOpcional].
+Prioriza máquinas de gimnasio comerciales, poleas y mancuernas según el material disponible del usuario.`;
 
       const jsonStr = await llamarGeminiTexto(apiKey, promptSistema, texto);
       const cleanJson = jsonStr.replace(/```json/gi, "").replace(/```/g, "").trim();
@@ -4502,6 +4848,11 @@ function initPaquetesIA() {
     });
   }
 
+  const btnAudSemana = $("btn-auditar-semana-ia");
+  if (btnAudSemana) {
+    btnAudSemana.addEventListener("click", auditarSemanaConIA);
+  }
+
   const btnRecalibrar = $("btn-recalibrar-plan");
   if (btnRecalibrar) {
     btnRecalibrar.addEventListener("click", () => {
@@ -4510,7 +4861,42 @@ function initPaquetesIA() {
   }
 
   renderCatalogoPaquetes();
+  renderBibliotecaPaquetes();
   poblarSelectorPlanesConverter();
+}
+
+async function auditarSemanaConIA() {
+  const cont = $("auditoria-ia-semana");
+  if (!cont) return;
+  cont.style.display = "block";
+  cont.innerHTML = `<div class="muted">⏳ Analizando tus sesiones de los últimos 7 días...</div>`;
+
+  const entrenos = cargarLS(KEY.entrenos, {});
+  const hoyMs = new Date(hoyISO() + "T12:00:00").getTime();
+  const ses7d = Object.entries(entrenos).filter(([f]) => {
+    const d = (hoyMs - new Date(f + "T12:00:00").getTime()) / 86400000;
+    return d >= 0 && d <= 7;
+  });
+  const ctx = construirContextoUsuarioIA();
+  const resumen = `Sesiones completadas esta semana: ${ses7d.length} (${ses7d.map(([f, v]) => `${f}: ${v.dia || v.plan}`).join(", ") || "ninguna"}).\n${ctx}`;
+
+  const apiKey = localStorage.getItem(KEY.geminiApiKey) || "";
+  if (apiKey) {
+    try {
+      const resp = await llamarGeminiTexto(
+        apiKey,
+        "Eres el Coach Semanal de FitnessCut. Analiza la semana del usuario y da 3 recomendaciones concretas y accionables (en texto breve con viñetas) para la próxima semana.",
+        resumen
+      );
+      cont.innerHTML = `<div class="plan-note"><strong>🤖 Coach Semanal IA:</strong><div style="margin-top:6px; white-space:pre-line;">${escapeHtml(resp)}</div></div>`;
+      return;
+    } catch { /* fallback local */ }
+  }
+
+  const msgLocal = ses7d.length >= 3
+    ? `✅ Excelente constancia (${ses7d.length} sesiones esta semana). Mantén tus cargas base y busca +1–2 repeticiones o +2,5 kg en tu ejercicio principal de cada día la próxima semana.`
+    : `⚠️ Esta semana llevas ${ses7d.length} sesiones registradas. Prioriza completar al menos 3 días base antes de añadir volumen extra.`;
+  cont.innerHTML = `<div class="plan-note"><strong>🤖 Coach Semanal:</strong> ${msgLocal}</div>`;
 }
 
 /* =====================================================

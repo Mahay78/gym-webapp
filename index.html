@@ -365,6 +365,10 @@
               </select>
             </label>
           </div>
+          <div class="live-opts-row">
+            <label class="live-opt-chk"><input type="checkbox" id="live-mirror-toggle" checked> 🪞 Espejo en cámara frontal</label>
+            <label class="live-opt-chk"><input type="checkbox" id="live-handsfree-toggle"> ✋ Manos libres (auto-inicio y auto-fin 5s)</label>
+          </div>
 
           <!-- Opciones de Grabación y Tiempo Real -->
           <div class="camera-actions" style="margin: 14px 0; gap: 10px; flex-wrap: wrap;">
@@ -403,6 +407,7 @@
                 <div class="live-hud-calib" id="live-hud-calib">📏 Calibrando encuadre...</div>
                 <div class="live-hud-cue" id="live-hud-cue">🟢 Detectando postura...</div>
                 <div class="live-hud-angle" id="live-hud-angle">Ángulo: --°</div>
+                <div class="live-hud-angle" id="live-hud-tempo">Tempo: --</div>
               </div>
             </div>
 
@@ -492,6 +497,12 @@
 
           <!-- Resultado del Análisis Técnico -->
           <div id="formcheck-resultado" style="display: none; margin-top: 16px;"></div>
+
+          <!-- Histórico de Evolución Técnica -->
+          <div id="vision-logs-card" class="card" style="margin-top: 16px; background: var(--bg-input);">
+            <h4 style="margin-bottom: 8px;">📈 Evolución de tu Técnica (Historial Escáner IA)</h4>
+            <div id="vision-logs-list" class="muted">Aún no hay sesiones guardadas.</div>
+          </div>
         </div>
       </div>
     </section>
@@ -529,6 +540,29 @@
             <button class="tab" data-promptchip="4 días con enfoque exclusivo en glúteo, isquiotibiales y abdomen sin sentadilla libre">🍑 Glúteos & Piernas</button>
             <button class="tab" data-promptchip="3 días, proteger articulaciones, cero dolor de hombro y rodilla, 100% poleas suaves">🛡 Cero dolor articular</button>
           </div>
+          <div class="pkg-filtros-grid">
+            <label>⏱ Duración máxima
+              <select id="pkg-filtro-tiempo">
+                <option value="">Sin límite</option>
+                <option value="30">30 min (Express)</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </label>
+            <label>🏋️ Material
+              <select id="pkg-filtro-material">
+                <option value="">Gimnasio completo (máquinas y poleas)</option>
+                <option value="mancuernas">Solo mancuernas / casa</option>
+              </select>
+            </label>
+            <div class="pkg-molestias-wrap">
+              <span class="pkg-molestias-lbl">🩹 Proteger articulaciones:</span>
+              <label class="live-opt-chk"><input type="checkbox" class="pkg-molestia" value="hombro"> Hombro</label>
+              <label class="live-opt-chk"><input type="checkbox" class="pkg-molestia" value="rodilla"> Rodilla</label>
+              <label class="live-opt-chk"><input type="checkbox" class="pkg-molestia" value="lumbar"> Lumbar</label>
+              <label class="live-opt-chk"><input type="checkbox" id="pkg-periodizado"> 📅 Bloque 4–6 semanas (con Deload)</label>
+            </div>
+          </div>
           <div class="btn-row">
             <button class="btn" id="btn-generar-prompt-pkg">✨ Generar paquete con IA →</button>
           </div>
@@ -541,6 +575,11 @@
         </div>
 
         <div id="pkg-prompt-result" class="card" style="display: none;"></div>
+
+        <div id="pkg-biblioteca-card" class="card">
+          <h3>📚 Biblioteca de Paquetes IA Guardados</h3>
+          <div id="pkg-biblioteca-list" class="muted">Aún no has guardado paquetes personalizados.</div>
+        </div>
       </div>
 
       <!-- 2. Catálogo de Paquetes Especializados -->
@@ -553,8 +592,12 @@
         <div class="card">
           <div class="card-head">
             <h3>🧠 Auditoría IA de Rendimiento y Sobrecarga Progresiva</h3>
-            <button class="btn-small" id="btn-refrescar-auditoria">🔄 Actualizar análisis</button>
+            <div class="btn-row" style="margin:0;">
+              <button class="btn-small" id="btn-auditar-semana-ia">🤖 Auditar mi semana con IA</button>
+              <button class="btn-small" id="btn-refrescar-auditoria">🔄 Actualizar análisis</button>
+            </div>
           </div>
+          <div id="auditoria-ia-semana" style="display:none; margin-bottom:14px;"></div>
           <p class="subtitle">La IA examina tus cargas guardadas, frecuencia de entrenamiento y balance muscular para detectar estancamiento o sobreentrenamiento:</p>
           <div id="auditoria-content"></div>
         </div>
