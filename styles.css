@@ -1657,3 +1657,64 @@ body.modo-entreno .set-chip {
   border-radius: 10px;
   margin-bottom: 8px;
 }
+
+/* ---------- Onboarding, Discos, RIR, Superseries, Comparador ---------- */
+.onboarding-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+
+.ex-wrap.ex-superserie {
+  border-left: 3px solid var(--accent);
+  padding-left: 8px;
+  background: rgba(255, 107, 53, 0.04);
+  border-radius: 8px;
+}
+
+.inline-tool-box {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.rpe-pills {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.rpe-pill {
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.rpe-pill.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}

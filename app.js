@@ -602,6 +602,32 @@ function renderPlanTabs() {
   );
 }
 
+function calcularDiscosBarra(pesoTotal, barra = 20) {
+  if (!pesoTotal || pesoTotal <= barra) return "Solo barra (20 kg) o mancuerna";
+  let lado = (pesoTotal - barra) / 2;
+  const discos = [20, 15, 10, 5, 2.5, 1.25];
+  const res = [];
+  discos.forEach(d => {
+    while (lado >= d - 0.01) {
+      res.push(d);
+      lado -= d;
+    }
+  });
+  return res.length ? `Por lado (barra 20 kg): ${res.map(x => `${x}kg`).join(" + ")}` : "Peso inferior a barra estándar";
+}
+
+function calcularAproximacion(peso) {
+  if (!peso || peso <= 15) return "1×10 ligero para calentar";
+  const r = v => Math.max(5, Math.round(v / 2.5) * 2.5);
+  return `Aprox: ${r(peso * 0.5)}kg×6 · ${r(peso * 0.75)}kg×3 · ${r(peso * 0.9)}kg×1`;
+}
+
+function formatearPlanTexto(plan) {
+  return `${plan.titulo}\n\n` + plan.dias.map(d =>
+    `${d.dia}\n` + d.ejercicios.map(e => `- ${e[0]}: ${e[2]} (${e[3] || "RIR 1-2"}, ${e[4] || 90}s)`).join("\n")
+  ).join("\n\n");
+}
+
 function renderPlan(clave) {
   planActual = clave;
   localStorage.setItem(KEY.planActual, clave);
@@ -677,12 +703,15 @@ function renderPlan(clave) {
             setsArr.push(setsGuardados[i] || { done: false, peso: ultimo ? ultimo.peso : "", reps: "" });
           }
 
+          const esSuperserie = Boolean(sesionHoy.superseries && sesionHoy.superseries[nombre]);
+          const rpeActual = (sesionHoy.rpe && sesionHoy.rpe[nombre]) || "";
+
           return `
-          <div class="ex-wrap">
+          <div class="ex-wrap${esSuperserie ? " ex-superserie" : ""}">
             <div class="exercise">
               ${rutaImg ? `<img class="ex-img" src="${rutaImg}" alt="Máquina: ${nombre}" loading="lazy" onerror="imgError(this)">` : ""}
               <div class="ex-name">
-                <div>${nombre}</div>
+                <div>${nombre}${esSuperserie ? ` <span class="pkg-badge" style="font-size:0.7rem;">🔗 Superserie</span>` : ""}</div>
                 <small>${grupo}${ultimo ? ` · Última vez: <strong>${ultimo.peso} kg</strong>${ultimo.reps ? ` (${ultimo.reps})` : ""} · ${fmtFecha(ultimo.fecha)}` : ""}</small>
                 <div class="ex-badges">
                   <span class="rir-badge" title="Reps en recámara recomendadas">${rir}</span>
@@ -698,16 +727,24 @@ function renderPlan(clave) {
                       <span class="set-chip-val">${st.done ? `✅ ${st.peso || (ultimo ? ultimo.peso : "—")}kg` : "〇"}</span>
                     </button>
                   `).join("")}
+                  <span class="rpe-pills" title="Sensación real de la serie">
+                    <button type="button" class="rpe-pill${rpeActual === "facil" ? " active" : ""}" data-rpe-ex="${nombre}" data-rpe="facil">😊 Fácil</button>
+                    <button type="button" class="rpe-pill${rpeActual === "justa" ? " active" : ""}" data-rpe-ex="${nombre}" data-rpe="justa">💪 Justa</button>
+                    <button type="button" class="rpe-pill${rpeActual === "limite" ? " active" : ""}" data-rpe-ex="${nombre}" data-rpe="limite">🔥 Límite</button>
+                  </span>
                 </div>` : ""}
                 <div class="ex-nota-wrap">
                   <button type="button" class="btn-link-subtle" data-escaner-ex="${nombre}">📷 Ajuste</button> ·
                   <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme con IA</button> ·
+                  ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${nombre}">🏋️ Discos</button> · <button type="button" class="btn-link-subtle" data-aprox="${nombre}">🔥 Aprox.</button> · ` : ""}
+                  <button type="button" class="btn-link-subtle" data-superserie="${nombre}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button> ·
                   <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a> ·
                   <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a> ·
                   <button type="button" class="btn-link-subtle" data-notaex="${nombre}">
                     ${notaEx ? `📝 Ajuste: <em>"${notaEx}"</em>` : "＋ Añadir nota"}
                   </button>
                 </div>
+                <div class="inline-tool-box" style="display:none;"></div>
               </div>
               <div class="ex-actions">
                 <div class="ex-sets">${series}</div>
@@ -737,6 +774,52 @@ function renderPlan(clave) {
 $("plan-content").addEventListener("click", e => {
   if (e.target.classList.contains("ex-img")) {
     abrirLightbox(e.target.src, e.target.alt);
+    return;
+  }
+
+  // Discos de barra, calentamiento aproximación, RIR sensación y superseries
+  const btnDiscos = e.target.closest("[data-discos]");
+  if (btnDiscos) {
+    const exWrap = btnDiscos.closest(".ex-wrap");
+    const box = exWrap?.querySelector(".inline-tool-box");
+    const peso = parseFloat(exWrap?.querySelector(".log-peso")?.value) || 0;
+    if (box) {
+      box.style.display = box.style.display === "none" ? "block" : "none";
+      box.innerHTML = `🏋️ <strong>${peso || 20} kg:</strong> ${calcularDiscosBarra(peso)}`;
+    }
+    return;
+  }
+
+  const btnAprox = e.target.closest("[data-aprox]");
+  if (btnAprox) {
+    const exWrap = btnAprox.closest(".ex-wrap");
+    const box = exWrap?.querySelector(".inline-tool-box");
+    const peso = parseFloat(exWrap?.querySelector(".log-peso")?.value) || 0;
+    if (box) {
+      box.style.display = box.style.display === "none" ? "block" : "none";
+      box.innerHTML = `🔥 <strong>Series de calentamiento:</strong> ${calcularAproximacion(peso)}`;
+    }
+    return;
+  }
+
+  const btnRpe = e.target.closest("[data-rpe-ex]");
+  if (btnRpe) {
+    const sesionHoy = cargarSesionHoy();
+    sesionHoy.rpe = sesionHoy.rpe || {};
+    sesionHoy.rpe[btnRpe.dataset.rpeEx] = btnRpe.dataset.rpe;
+    guardarSesionHoy(sesionHoy);
+    renderPlan(planActual);
+    return;
+  }
+
+  const btnSS = e.target.closest("[data-superserie]");
+  if (btnSS) {
+    const nom = btnSS.dataset.superserie;
+    const sesionHoy = cargarSesionHoy();
+    sesionHoy.superseries = sesionHoy.superseries || {};
+    sesionHoy.superseries[nom] = !sesionHoy.superseries[nom];
+    guardarSesionHoy(sesionHoy);
+    renderPlan(planActual);
     return;
   }
 
@@ -1110,6 +1193,16 @@ document.querySelectorAll("[data-timer]").forEach(b =>
 );
 
 $("btn-timer-stop").addEventListener("click", detenerTimer);
+
+if ($("btn-export-plan-txt")) {
+  $("btn-export-plan-txt").addEventListener("click", () => {
+    const txt = formatearPlanTexto(getPlan(planActual));
+    navigator.clipboard?.writeText(txt).catch(() => {});
+    if (confirm("📋 Rutina copiada al portapapeles.\n\n¿Quieres abrir también el diálogo de impresión / guardar PDF?")) {
+      window.print();
+    }
+  });
+}
 
 if ($("ft-minus15")) {
   $("ft-minus15").addEventListener("click", () => {
@@ -2436,7 +2529,7 @@ function avisarAudioLive(texto) {
   notificarLive(texto, true);
 }
 
-function evaluarCalibracionLive(landmarks) {
+function evaluarCalibracionLive(landmarks, ejercicio) {
   const clave = [11, 12, 23, 24, 25, 26];
   const vis = clave.map(i => landmarks[i]?.visibility || 0);
   const mediaVis = vis.reduce((a, b) => a + b, 0) / clave.length;
@@ -2447,6 +2540,11 @@ function evaluarCalibracionLive(landmarks) {
   const alto = Math.max(...ys) - Math.min(...ys);
   if (alto > 0.86) return { texto: "📏 Demasiado cerca: aléjate un paso", cls: "warn" };
   if (alto < 0.22) return { texto: "📏 Demasiado lejos: acércate un poco", cls: "warn" };
+  const ej = (ejercicio || "").toLowerCase();
+  const requierePerfil = ej.includes("sentadilla") || ej.includes("peso muerto") || ej.includes("rumano") || ej.includes("hip thrust") || ej.includes("remo");
+  if (requierePerfil && landmarks[11] && landmarks[12] && Math.abs(landmarks[11].x - landmarks[12].x) > 0.24) {
+    return { texto: "📐 Gira 90° de perfil para medir espalda y profundidad", cls: "warn" };
+  }
   return { texto: "✅ Encuadre óptimo", cls: "ok" };
 }
 
@@ -2869,7 +2967,7 @@ function onPoseResultsLive(results) {
 
   dibujarEsqueletoEnCanvas(ctx, landmarks, canvas.width, canvas.height, ev);
 
-  const calib = evaluarCalibracionLive(landmarks);
+  const calib = evaluarCalibracionLive(landmarks, ejercicio);
   const calibEl = $("live-hud-calib");
   if (calibEl) {
     calibEl.textContent = calib.texto;
@@ -3317,15 +3415,25 @@ function extraerFramesDeVideo(videoBlobOrUrl, numFrames = 5) {
       try { poseOffline?.close?.(); } catch { /* noop */ }
 
       let elegidos = candidatos;
+      let repsVideo = 0;
       if (candidatos.length > 5) {
         let minIdx = 2;
         let minAng = 999;
         candidatos.forEach((c, idx) => {
-          if (idx > 0 && idx < candidatos.length - 1 && c.angulo !== null && c.angulo < minAng) {
-            minAng = c.angulo;
-            minIdx = idx;
+          if (idx > 0 && idx < candidatos.length - 1 && c.angulo !== null) {
+            const prev = candidatos[idx - 1].angulo ?? 180;
+            const next = candidatos[idx + 1].angulo ?? 180;
+            if (c.angulo < 120 && c.angulo <= prev && c.angulo <= next) repsVideo++;
+            if (c.angulo < minAng) {
+              minAng = c.angulo;
+              minIdx = idx;
+            }
           }
         });
+        if (repsVideo > 0) {
+          liveMetricasAnalisis.repsVideo = repsVideo;
+          liveMetricasAnalisis.minAngulo = minAng;
+        }
         const idx0 = 0;
         const idx4 = candidatos.length - 1;
         const idx1 = Math.max(1, Math.floor(minIdx / 2));
@@ -3663,12 +3771,54 @@ function abrirFormCheckParaEjercicio(nombreEjercicio) {
   if (view) view.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function renderComparadorVision(logs) {
+  const wrap = $("vision-comp-wrap");
+  const selA = $("vision-comp-a");
+  const selB = $("vision-comp-b");
+  const res = $("vision-comp-res");
+  if (!wrap || !selA || !selB || !res) return;
+  if (logs.length < 2) {
+    wrap.style.display = "none";
+    return;
+  }
+  wrap.style.display = "block";
+  const opts = logs.map((l, i) => `<option value="${i}">${escapeHtml(l.ejercicio)} · ${fmtFecha(l.fecha)} (${escapeHtml(l.score)})</option>`).join("");
+  const prevA = selA.value, prevB = selB.value;
+  selA.innerHTML = opts;
+  selB.innerHTML = opts;
+  selA.value = prevA && logs[prevA] ? prevA : "1";
+  selB.value = prevB && logs[prevB] ? prevB : "0";
+
+  const pintar = () => {
+    const a = logs[+selA.value];
+    const b = logs[+selB.value];
+    if (!a || !b) return;
+    res.innerHTML = `
+      <div class="auditoria-grid">
+        <div class="card" style="margin:0; background:var(--bg-card);">
+          <div class="muted" style="font-size:0.75rem;">Sesión A (${fmtFecha(a.fecha)})</div>
+          <strong>${escapeHtml(a.ejercicio)}</strong>
+          <div>Score: <strong>${escapeHtml(a.score)}</strong> · ${a.validas} válidas · ${escapeHtml(a.tut)}</div>
+        </div>
+        <div class="card" style="margin:0; background:var(--bg-card);">
+          <div class="muted" style="font-size:0.75rem;">Sesión B (${fmtFecha(b.fecha)})</div>
+          <strong>${escapeHtml(b.ejercicio)}</strong>
+          <div>Score: <strong style="color:var(--green);">${escapeHtml(b.score)}</strong> · ${b.validas} válidas · ${escapeHtml(b.tut)}</div>
+        </div>
+      </div>`;
+  };
+  selA.onchange = pintar;
+  selB.onchange = pintar;
+  pintar();
+}
+
 function renderVisionLogs() {
   const cont = $("vision-logs-list");
   if (!cont) return;
   const logs = cargarLS("fitnesscut_vision_logs", []);
   if (!logs.length) {
     cont.innerHTML = `<div class="muted">Aún no hay sesiones guardadas.</div>`;
+    renderComparadorVision([]);
     return;
   }
   cont.innerHTML = logs.slice(0, 8).map(l => `
@@ -3677,6 +3827,7 @@ function renderVisionLogs() {
       <span><strong style="color:var(--green);">${escapeHtml(l.score)}</strong> · ${l.validas} válidas · ${escapeHtml(l.tut)}</span>
     </div>
   `).join("");
+  renderComparadorVision(logs);
 }
 
 function initFormCheckVision() {
@@ -4138,9 +4289,10 @@ async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario) {
 function obtenerFiltrosPaqueteIA() {
   const tiempo = $("pkg-filtro-tiempo")?.value || "";
   const material = $("pkg-filtro-material")?.value || "";
+  const progresion = $("pkg-filtro-progresion")?.value || "doble";
   const molestias = Array.from(document.querySelectorAll(".pkg-molestia:checked")).map(c => c.value);
   const periodizado = Boolean($("pkg-periodizado")?.checked);
-  return { tiempo, material, molestias, periodizado };
+  return { tiempo, material, progresion, molestias, periodizado };
 }
 
 function construirContextoUsuarioIA() {
@@ -4166,6 +4318,7 @@ function construirContextoUsuarioIA() {
     filtros.tiempo ? `Duración máxima por sesión: ${filtros.tiempo} min` : "",
     filtros.material === "mancuernas" ? "Material disponible: SOLO mancuernas y peso corporal (sin máquinas)" : "",
     filtros.molestias.length ? `Proteger articulaciones con molestias: ${filtros.molestias.join(", ")}` : "",
+    `Modelo de progresión: ${filtros.progresion === "lineal" ? "Lineal (+2,5 kg/semana en básicos)" : "Doble progresión (completar 8→12 reps antes de subir peso)"}`,
     filtros.periodizado ? "Incluir bloque periodizado de 4-6 semanas (acumulación, intensificación y deload)" : ""
   ].filter(Boolean).join("\n");
 }
@@ -4389,6 +4542,7 @@ function renderResultadoPrompt(paquete) {
     <div class="btn-row">
       <button class="btn" id="btn-instalar-prompt-pkg">📥 Instalar este paquete como mi plan activo →</button>
       <button class="btn-small" id="btn-guardar-biblioteca-pkg" type="button">📚 Guardar en biblioteca</button>
+      <button class="btn-small" id="btn-exportar-rutina-pkg" type="button">📋 Copiar / PDF</button>
     </div>
   `;
 
@@ -4408,6 +4562,17 @@ function renderResultadoPrompt(paquete) {
     btnGuardarBib.addEventListener("click", () => {
       guardarEnBibliotecaPaquetes(paquete);
       alert("📚 Paquete guardado en tu biblioteca personal.");
+    });
+  }
+
+  const btnExportPkg = $("btn-exportar-rutina-pkg");
+  if (btnExportPkg) {
+    btnExportPkg.addEventListener("click", () => {
+      const txt = formatearPlanTexto(paquete);
+      navigator.clipboard?.writeText(txt).catch(() => {});
+      if (confirm("📋 Rutina copiada al portapapeles.\n\n¿Abrir diálogo para imprimir / guardar como PDF?")) {
+        window.print();
+      }
     });
   }
 
@@ -5019,6 +5184,8 @@ $("btn-macros").addEventListener("click", () => {
     { v: grasaG + " g", l: "Grasa (0,9 g/kg)" },
     { v: carbG + " g", l: "Carbohidratos (el resto)" },
     { v: objetivo + " kcal", l: "Total objetivo" },
+    { v: (objetivo + 200) + " kcal", l: `🏋️ Día Entreno (${carbG + 50}g carbos)` },
+    { v: Math.max(1200, objetivo - 150) + " kcal", l: `😴 Día Descanso (${Math.max(40, carbG - 38)}g carbos)` },
   ].map(b => `<div class="result-box"><div class="result-value">${b.v}</div><div class="result-label">${b.l}</div></div>`).join("");
 });
 
@@ -5671,6 +5838,14 @@ function renderDiario() {
   if (difObjetivo !== null) {
     const cumpliendo = difObjetivo <= 0;
     html += `<div class="stat-box"><div class="stat-value" style="color:${cumpliendo ? "var(--green)" : "#ff7b7b"}">${difObjetivo >= 0 ? "+" : ""}${Math.round(difObjetivo)} kcal</div><div class="stat-label">${cumpliendo ? "Estás en déficit respecto al objetivo ✓" : "Estás por encima del objetivo"}</div></div>`;
+  }
+  if (objetivo) {
+    const ult7 = diario.filter(d => d.kcal != null).slice(-7);
+    const enRango = ult7.filter(d => Math.abs(d.kcal - objetivo) <= 200).length;
+    const adherencia = ult7.length ? Math.round((enRango / ult7.length) * 100) : 0;
+    if (ult7.length) {
+      html += `<div class="stat-box"><div class="stat-value" style="color:${adherencia >= 70 ? "var(--green)" : "var(--accent)"}">${adherencia}%</div><div class="stat-label">Adherencia semanal (±200 kcal · ${enRango}/${ult7.length} días)</div></div>`;
+    }
   }
   stats.innerHTML = html || `<div class="stat-box"><div class="stat-value">—</div><div class="stat-label">Registra tu primer día para ver medias</div></div>`;
 
@@ -6371,6 +6546,50 @@ async function buscarProductoOpenFoodFacts(codigo) {
   const resDiv = $("barcode-result");
   const clean = (codigo || "").trim();
   if (!clean || !resDiv) return;
+
+  // Si es texto (no solo dígitos), buscar por nombre en Open Food Facts
+  if (!/^\d{6,14}$/.test(clean)) {
+    resDiv.innerHTML = `<div class="muted">🔍 Buscando «${escapeHtml(clean)}» en Open Food Facts...</div>`;
+    try {
+      const r = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(clean)}&search_simple=1&action=process&json=1&page_size=5`);
+      const data = await r.json();
+      const prods = (data?.products || []).filter(p => p.product_name || p.product_name_es).slice(0, 5);
+      if (!prods.length) {
+        resDiv.innerHTML = `<div class="muted">⚠️ Sin resultados para «${escapeHtml(clean)}».</div>`;
+        return;
+      }
+      resDiv.innerHTML = prods.map((p, idx) => {
+        const nom = p.product_name_es || p.product_name;
+        const kcal100 = Math.round(p.nutriments?.["energy-kcal_100g"] || p.nutriments?.["energy-kcal"] || 0);
+        const prot100 = Math.round(p.nutriments?.proteins_100g || 0);
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 8px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; margin-bottom:6px; font-size:0.82rem;">
+            <span><strong>${escapeHtml(nom)}</strong> · ${kcal100} kcal/100g (P ${prot100}g)</span>
+            <button type="button" class="btn-xs" data-off-add="${idx}">➕ 100g</button>
+          </div>`;
+      }).join("");
+      resDiv.querySelectorAll("[data-off-add]").forEach(b => {
+        b.addEventListener("click", () => {
+          const p = prods[+b.dataset.offAdd];
+          const nom = p.product_name_es || p.product_name;
+          const kcal100 = Math.round(p.nutriments?.["energy-kcal_100g"] || p.nutriments?.["energy-kcal"] || 0);
+          const comidas = cargarComidas();
+          const hoy = hoyISO();
+          if (!comidas[hoy]) comidas[hoy] = [];
+          comidas[hoy].push({ nombre: `${nom} (100g)`, kcal: kcal100 });
+          guardarComidas(comidas);
+          sumarKcalDia(hoy, kcal100);
+          renderComidas();
+          renderDiario();
+          b.textContent = "✅";
+        });
+      });
+    } catch {
+      resDiv.innerHTML = `<div class="muted">⚠️ Error de conexión al buscar alimentos.</div>`;
+    }
+    return;
+  }
+
   resDiv.innerHTML = `<div class="muted">🔍 Buscando producto ${escapeHtml(clean)}...</div>`;
   try {
     const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(clean)}.json`);
@@ -6518,9 +6737,64 @@ function renderCoachDiario() {
   el.style.display = "block";
 }
 
+function initOnboarding() {
+  const modal = $("onboarding-modal");
+  if (!modal) return;
+  const yaHecho = localStorage.getItem("fitnesscut_onboarding_done") === "1";
+  if (!yaHecho && cargarRegistros().length === 0 && !cargarLS(KEY.meta, null)) {
+    modal.style.display = "flex";
+  }
+
+  $("btn-onb-saltar")?.addEventListener("click", () => {
+    localStorage.setItem("fitnesscut_onboarding_done", "1");
+    modal.style.display = "none";
+  });
+
+  $("btn-onb-guardar")?.addEventListener("click", () => {
+    const sexo = $("onb-sexo").value;
+    const edad = +$("onb-edad").value || 30;
+    const altura = +$("onb-altura").value || 175;
+    const peso = parseFloat($("onb-peso").value) || 80;
+    const metaPeso = parseFloat($("onb-meta").value) || 74;
+    const dias = $("onb-dias").value || "4dias";
+
+    if ($("calc-sexo")) $("calc-sexo").value = sexo;
+    if ($("calc-edad")) $("calc-edad").value = edad;
+    if ($("calc-altura")) $("calc-altura").value = altura;
+    if ($("calc-peso")) $("calc-peso").value = peso;
+    if ($("imc-peso")) $("imc-peso").value = peso;
+    if ($("imc-altura")) $("imc-altura").value = altura;
+
+    const regs = cargarRegistros();
+    regs.push({ fecha: hoyISO(), peso, cintura: null });
+    guardarRegistros(regs);
+    guardarLS(KEY.meta, { peso: metaPeso, fecha: null });
+    localStorage.setItem("fitnesscut_onboarding_done", "1");
+
+    actualizarCalorias();
+    actualizarImc();
+    renderPlan(dias);
+    renderProgreso();
+    renderMeta();
+    renderCoachDiario();
+    modal.style.display = "none";
+  });
+}
+
+if ($("btn-empezar-entreno-hoy")) {
+  $("btn-empezar-entreno-hoy").addEventListener("click", () => {
+    showSection("planes");
+    if (!modoEntrenoActivo) toggleModoEntreno();
+    const pendiente = Array.from(document.querySelectorAll("#plan-content .plan-day"))
+      .find(d => !d.querySelector(".day-done.hecho"));
+    (pendiente || $("plan-content"))?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
 initPaquetesIA();
 initFotosIDB();
 initBarcodeScanner();
+initOnboarding();
 renderCoachDiario();
 actualizarEstadoAudioCoachUI();
 initFoodVision();
