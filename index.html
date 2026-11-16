@@ -30,6 +30,7 @@
         <button class="nav-link" data-section="diario">Diario</button>
         <button class="nav-link" data-section="guia">Guía</button>
       </nav>
+      <button class="nav-link" id="btn-coach-chat" title="Abrir Coach IA" aria-label="Abrir Coach IA">🤖</button>
       <button class="nav-link" id="btn-tema" title="Cambiar tema" aria-label="Cambiar tema claro u oscuro">🌙</button>
     </div>
   </header>
@@ -1050,11 +1051,8 @@
     <button class="btn-xs" id="btn-pwa-reload" type="button">Actualizar</button>
   </div>
 
-  <!-- Chatbot Coach Flotante (en todas las pantallas) -->
-  <button type="button" class="coach-chat-fab" id="coach-chat-fab" title="Abrir Coach IA" aria-label="Abrir Coach IA">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  </button>
-  <div class="coach-chat-panel" id="coach-chat-panel" style="display: none;" role="dialog" aria-label="Coach IA FitnessCut">
+  <!-- Chatbot Coach Panel (abierto desde la barra superior) -->
+  <div class="coach-chat-panel" id="coach-chat-panel" role="dialog" aria-label="Coach IA FitnessCut">
     <div class="coach-chat-head">
       <strong>🤖 Coach FitnessCut</strong>
       <button type="button" class="btn-xs" id="btn-coach-chat-close" aria-label="Cerrar chat">✕</button>

@@ -7019,13 +7019,13 @@ if ($("btn-empezar-entreno-hoy")) {
 }
 
 function initCoachChatbot() {
-  const fab = $("coach-chat-fab");
+  const btnOpen = $("btn-coach-chat");
   const panel = $("coach-chat-panel");
   const btnClose = $("btn-coach-chat-close");
   const form = $("coach-chat-form");
   const input = $("coach-chat-input");
   const msgs = $("coach-chat-messages");
-  if (!fab || !panel || !form || !input || !msgs) return;
+  if (!btnOpen || !panel || !form || !input || !msgs) return;
 
   const agregarMsg = (html, tipo = "bot") => {
     const div = document.createElement("div");
@@ -7035,13 +7035,19 @@ function initCoachChatbot() {
     msgs.scrollTop = msgs.scrollHeight;
   };
 
-  fab.addEventListener("click", () => {
-    const abierto = panel.style.display !== "none";
-    panel.style.display = abierto ? "none" : "flex";
-    if (!abierto) input.focus();
+  btnOpen.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const abierto = panel.classList.toggle("open");
+    if (abierto) input.focus();
   });
 
-  if (btnClose) btnClose.addEventListener("click", () => { panel.style.display = "none"; });
+  if (btnClose) btnClose.addEventListener("click", () => panel.classList.remove("open"));
+
+  document.addEventListener("click", (e) => {
+    if (panel.classList.contains("open") && !panel.contains(e.target) && !btnOpen.contains(e.target)) {
+      panel.classList.remove("open");
+    }
+  });
 
   $("coach-chat-chips")?.querySelectorAll("[data-chatq]").forEach(b => {
     b.addEventListener("click", () => procesarPreguntaCoach(b.dataset.chatq));

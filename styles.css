@@ -1978,33 +1978,10 @@ body.vista-compacta .ex-nota-wrap {
 }
 
 /* ---------- Chatbot Coach Flotante ---------- */
-.coach-chat-fab {
-  position: fixed;
-  right: 16px;
-  bottom: 20px;
-  z-index: 1250;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-
-.coach-chat-fab:hover {
-  transform: scale(1.06);
-}
-
 .coach-chat-panel {
   position: fixed;
   right: 16px;
-  bottom: 80px;
+  top: 64px;
   z-index: 1260;
   width: min(360px, calc(100vw - 24px));
   max-height: 70vh;
@@ -2012,9 +1989,13 @@ body.vista-compacta .ex-nota-wrap {
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: hidden;
+}
+
+.coach-chat-panel.open {
+  display: flex;
 }
 
 .coach-chat-head {
@@ -2078,15 +2059,10 @@ body.vista-compacta .ex-nota-wrap {
 }
 
 @media (max-width: 760px) {
-  .coach-chat-fab {
-    bottom: 78px;
-    right: 12px;
-  }
-
   .coach-chat-panel {
     right: 12px;
-    bottom: 136px;
-    max-height: 60vh;
+    top: 58px;
+    max-height: 68vh;
   }
 }
 
