@@ -1052,11 +1052,26 @@
 
   <!-- Barra de navegación inferior móvil (Bottom Tab Bar) -->
   <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación móvil">
-    <button type="button" class="bottom-nav-btn active" data-section="inicio"><span>🏠</span><small>Inicio</small></button>
-    <button type="button" class="bottom-nav-btn" data-section="planes"><span>🏋️</span><small>Planes</small></button>
-    <button type="button" class="bottom-nav-btn" data-section="escaner"><span>📷</span><small>Escáner</small></button>
-    <button type="button" class="bottom-nav-btn" data-section="diario"><span>🍽️</span><small>Diario</small></button>
-    <button type="button" class="bottom-nav-btn" id="btn-bottom-more"><span>⋯</span><small>Más</small></button>
+    <button type="button" class="bottom-nav-btn active" data-section="inicio">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg>
+      <small>Inicio</small>
+    </button>
+    <button type="button" class="bottom-nav-btn" data-section="planes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg>
+      <small>Planes</small>
+    </button>
+    <button type="button" class="bottom-nav-btn" data-section="escaner">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3"/><circle cx="12" cy="12" r="3"/></svg>
+      <small>Escáner</small>
+    </button>
+    <button type="button" class="bottom-nav-btn" data-section="diario">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+      <small>Diario</small>
+    </button>
+    <button type="button" class="bottom-nav-btn" id="btn-bottom-more">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+      <small>Más</small>
+    </button>
   </nav>
   <div class="bottom-more-menu" id="bottom-more-menu" style="display:none;">
     <button type="button" data-section="paquetes">📦 Paquetes IA</button>
@@ -1066,10 +1081,10 @@
   </div>
 
   <!-- Lector universal de códigos de barras (respaldo iOS/Safari/Firefox) -->
-  <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js" crossorigin="anonymous"></script>
   <!-- Google MediaPipe Pose para visión y conteo biomecánico en tiempo real a 30-60 FPS -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
-  <script src="app.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <script defer src="app.js"></script>
 </body>
 </html>

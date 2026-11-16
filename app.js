@@ -162,16 +162,33 @@ navLinks.forEach(btn =>
   btn.addEventListener("click", () => showSection(btn.dataset.section))
 );
 
-document.querySelectorAll(".bottom-nav-btn[data-section], .bottom-more-menu [data-section]").forEach(btn =>
-  btn.addEventListener("click", () => showSection(btn.dataset.section))
-);
-
-if ($("btn-bottom-more")) {
-  $("btn-bottom-more").addEventListener("click", () => {
-    const m = $("bottom-more-menu");
-    if (m) m.style.display = m.style.display === "none" ? "flex" : "none";
+if ($("bottom-nav")) {
+  $("bottom-nav").addEventListener("click", e => {
+    const btnSec = e.target.closest(".bottom-nav-btn[data-section]");
+    if (btnSec) {
+      showSection(btnSec.dataset.section);
+      return;
+    }
+    if (e.target.closest("#btn-bottom-more")) {
+      const m = $("bottom-more-menu");
+      if (m) m.style.display = m.style.display === "none" ? "flex" : "none";
+    }
   });
 }
+
+if ($("bottom-more-menu")) {
+  $("bottom-more-menu").addEventListener("click", e => {
+    const btnSec = e.target.closest("[data-section]");
+    if (btnSec) showSection(btnSec.dataset.section);
+  });
+}
+
+document.addEventListener("click", e => {
+  const m = $("bottom-more-menu");
+  if (m && m.style.display !== "none" && !e.target.closest("#bottom-more-menu") && !e.target.closest("#btn-bottom-more")) {
+    m.style.display = "none";
+  }
+});
 
 document.querySelectorAll("[data-goto]").forEach(btn =>
   btn.addEventListener("click", () => showSection(btn.dataset.goto))

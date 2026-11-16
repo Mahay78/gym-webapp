@@ -1904,14 +1904,19 @@ body.vista-compacta .ex-nota-wrap {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1050;
+    z-index: 1200;
     display: flex;
     justify-content: space-around;
     align-items: center;
     background: var(--bg-card);
     border-top: 1px solid var(--border);
-    padding: 6px 4px;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
     backdrop-filter: blur(14px);
+    touch-action: manipulation;
+  }
+
+  .floating-timer {
+    bottom: 74px !important;
   }
 
   .bottom-nav-btn {
@@ -1921,20 +1926,20 @@ body.vista-compacta .ex-nota-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    justify-content: center;
+    gap: 3px;
     font-size: 0.72rem;
-    min-width: 48px;
+    min-width: 52px;
     min-height: 44px;
     padding: 4px 10px;
+    border-radius: 10px;
     cursor: pointer;
-  }
-
-  .bottom-nav-btn span {
-    font-size: 1.15rem;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .bottom-nav-btn.active {
     color: var(--accent);
+    background: var(--accent-soft);
     font-weight: 700;
   }
 }
