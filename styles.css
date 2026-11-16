@@ -1879,6 +1879,13 @@ body.vista-compacta .ex-nota-wrap {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
 
+.nav-link,
+.bottom-more-menu button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .bottom-more-menu button {
   background: var(--bg-input);
   color: var(--text);
