@@ -1,10 +1,12 @@
-const CACHE = "fitnesscut-v13";
+const CACHE = "fitnesscut-v14";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./icon.svg",
+  "./icon-192.png",
+  "./icon-512.png",
   "./manifest.json",
 ];
 

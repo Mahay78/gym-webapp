@@ -151,12 +151,27 @@ const sections = document.querySelectorAll(".section");
 function showSection(name) {
   sections.forEach(s => s.classList.toggle("active", s.id === name));
   navLinks.forEach(b => b.classList.toggle("active", b.dataset.section === name));
+  document.querySelectorAll(".bottom-nav-btn[data-section]").forEach(b =>
+    b.classList.toggle("active", b.dataset.section === name)
+  );
+  if ($("bottom-more-menu")) $("bottom-more-menu").style.display = "none";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 navLinks.forEach(btn =>
   btn.addEventListener("click", () => showSection(btn.dataset.section))
 );
+
+document.querySelectorAll(".bottom-nav-btn[data-section], .bottom-more-menu [data-section]").forEach(btn =>
+  btn.addEventListener("click", () => showSection(btn.dataset.section))
+);
+
+if ($("btn-bottom-more")) {
+  $("btn-bottom-more").addEventListener("click", () => {
+    const m = $("bottom-more-menu");
+    if (m) m.style.display = m.style.display === "none" ? "flex" : "none";
+  });
+}
 
 document.querySelectorAll("[data-goto]").forEach(btn =>
   btn.addEventListener("click", () => showSection(btn.dataset.goto))
@@ -165,14 +180,32 @@ document.querySelectorAll("[data-goto]").forEach(btn =>
 function aplicarTema() {
   const tema = localStorage.getItem(KEY.tema) || "oscuro";
   document.body.classList.toggle("light", tema === "claro");
-  $("btn-tema").textContent = tema === "claro" ? "☀️" : "🌙";
+  if (tema === "amoled") document.documentElement.setAttribute("data-theme", "amoled");
+  else document.documentElement.removeAttribute("data-theme");
+  $("btn-tema").textContent = tema === "claro" ? "☀️" : tema === "amoled" ? "🖤" : "🌙";
 }
 
 $("btn-tema").addEventListener("click", () => {
-  const nuevo = document.body.classList.contains("light") ? "oscuro" : "claro";
+  const actual = localStorage.getItem(KEY.tema) || "oscuro";
+  const nuevo = actual === "oscuro" ? "amoled" : actual === "amoled" ? "claro" : "oscuro";
   localStorage.setItem(KEY.tema, nuevo);
   aplicarTema();
 });
+
+function aplicarAcento(color) {
+  const c = color || localStorage.getItem("fitnesscut_accent") || "#ff6b35";
+  document.documentElement.style.setProperty("--accent", c);
+  document.querySelectorAll(".accent-dot").forEach(d => d.classList.toggle("active", d.dataset.accent === c));
+}
+
+document.querySelectorAll(".accent-dot").forEach(dot => {
+  dot.addEventListener("click", () => {
+    const c = dot.dataset.accent;
+    localStorage.setItem("fitnesscut_accent", c);
+    aplicarAcento(c);
+  });
+});
+aplicarAcento();
 
 /* =====================================================
    PLANES DE ENTRENAMIENTO (máquinas, poleas y peso libre)
@@ -672,14 +705,19 @@ function renderPlan(clave) {
       </div>
     </div>` : "";
 
+  let primerDiaPendiente = plan.dias.findIndex((d, i) => !(entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === i));
+  if (primerDiaPendiente < 0) primerDiaPendiente = 0;
+
   const html = nota + barraProgreso + plan.dias.map((dia, diaIdx) => {
     const hecho = entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === diaIdx;
+    const abierto = diaIdx === primerDiaPendiente;
     return `
-    <div class="plan-day">
-      <div class="day-head">
-        <h4>${dia.dia}</h4>
-        <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${dia.dia}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
-      </div>
+    <div class="plan-day${hecho ? " pr-celebrate" : ""}">
+      <details class="plan-day-details"${abierto ? " open" : ""}>
+        <summary class="day-head">
+          <h4>${abierto ? "▾" : "▸"} ${dia.dia}</h4>
+          <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${dia.dia}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
+        </summary>
       ${dia.ejercicios
         .map((ej, ejIdx) => {
           const nombre = ej[0];
@@ -735,14 +773,17 @@ function renderPlan(clave) {
                 </div>` : ""}
                 <div class="ex-nota-wrap">
                   <button type="button" class="btn-link-subtle" data-escaner-ex="${nombre}">📷 Ajuste</button> ·
-                  <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme con IA</button> ·
-                  ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${nombre}">🏋️ Discos</button> · <button type="button" class="btn-link-subtle" data-aprox="${nombre}">🔥 Aprox.</button> · ` : ""}
-                  <button type="button" class="btn-link-subtle" data-superserie="${nombre}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button> ·
-                  <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a> ·
-                  <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a> ·
-                  <button type="button" class="btn-link-subtle" data-notaex="${nombre}">
-                    ${notaEx ? `📝 Ajuste: <em>"${notaEx}"</em>` : "＋ Añadir nota"}
-                  </button>
+                  <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme</button>
+                  <details class="ex-tools-menu">
+                    <summary>⋯ Herramientas</summary>
+                    <div class="ex-tools-panel">
+                      ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${nombre}">🏋️ Discos</button><button type="button" class="btn-link-subtle" data-aprox="${nombre}">🔥 Aprox.</button>` : ""}
+                      <button type="button" class="btn-link-subtle" data-superserie="${nombre}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button>
+                      <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a>
+                      <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a>
+                      <button type="button" class="btn-link-subtle" data-notaex="${nombre}">${notaEx ? `📝 Nota: "${notaEx}"` : "＋ Nota"}</button>
+                    </div>
+                  </details>
                 </div>
                 <div class="inline-tool-box" style="display:none;"></div>
               </div>
@@ -765,6 +806,7 @@ function renderPlan(clave) {
           </div>`;
         })
         .join("")}
+      </details>
     </div>`;
   }).join("");
   $("plan-content").innerHTML = html;
@@ -1193,6 +1235,14 @@ document.querySelectorAll("[data-timer]").forEach(b =>
 );
 
 $("btn-timer-stop").addEventListener("click", detenerTimer);
+
+if ($("btn-vista-compacta")) {
+  $("btn-vista-compacta").addEventListener("click", () => {
+    const act = document.body.classList.toggle("vista-compacta");
+    $("btn-vista-compacta").style.borderColor = act ? "var(--accent)" : "var(--border)";
+    $("btn-vista-compacta").style.color = act ? "var(--accent)" : "var(--text)";
+  });
+}
 
 if ($("btn-export-plan-txt")) {
   $("btn-export-plan-txt").addEventListener("click", () => {
@@ -5228,15 +5278,24 @@ function svgLine(valores, color, { circulos = true, extra = null, colorExtra = "
     extraLine = `<polyline points="${extra.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${colorExtra}" stroke-width="2" stroke-dasharray="6 4"/>`;
   }
 
+  const areaPts = `${pts[0].split(",")[0]},${H - PAD} ${pts.join(" ")} ${pts[pts.length - 1].split(",")[0]},${H - PAD}`;
+
   return `
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">
+      <defs>
+        <linearGradient id="svgAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
       <line x1="${PAD}" y1="${PAD}" x2="${W - PAD}" y2="${PAD}" stroke="var(--border)" stroke-dasharray="4"/>
       <text x="${PAD - 6}" y="${PAD + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${max.toFixed(1)}</text>
       <line x1="${PAD}" y1="${H - PAD}" x2="${W - PAD}" y2="${H - PAD}" stroke="var(--border)" stroke-dasharray="4"/>
       <text x="${PAD - 6}" y="${H - PAD + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${min.toFixed(1)}</text>
       ${extraLine}
+      <polygon points="${areaPts}" fill="url(#svgAreaGrad)"/>
       <polyline points="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-      ${circulos ? valores.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4" fill="${color}"/>`).join("") : ""}
+      ${circulos ? valores.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4.5" fill="${color}"><title>${v.toFixed(1)}</title></circle>`).join("") : ""}
     </svg>`;
 }
 
@@ -5406,7 +5465,46 @@ function renderAjusteInteligente(registros) {
     : `<div class="muted">Registra al menos 2 pesos separados por 10+ días para recibir ajustes automáticos de calorías y descarga.</div>`;
 }
 
+function renderMapaMuscular() {
+  const cont = $("mapa-muscular-wrap");
+  if (!cont) return;
+  const plan = getPlan(planActual);
+  const conteo = { Pecho: 0, Espalda: 0, Hombros: 0, Brazos: 0, Piernas: 0, Abdomen: 0 };
+  (plan?.dias || []).forEach(d => {
+    d.ejercicios.forEach(ej => {
+      const g = (ej[1] || "").toLowerCase();
+      const s = parsearNumSeries(ej[2]);
+      if (g.includes("pecho")) conteo.Pecho += s;
+      else if (g.includes("espalda")) conteo.Espalda += s;
+      else if (g.includes("hombro")) conteo.Hombros += s;
+      else if (g.includes("brazo") || g.includes("bíceps") || g.includes("tríceps")) conteo.Brazos += s;
+      else if (g.includes("pierna") || g.includes("glúteo") || g.includes("femoral") || g.includes("gemelo")) conteo.Piernas += s;
+      else if (g.includes("abdomen") || g.includes("core")) conteo.Abdomen += s;
+    });
+  });
+  const color = s => s >= 10 ? "#4ade80" : s >= 5 ? "#ff6b35" : "#334155";
+  cont.innerHTML = `
+    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; background:var(--bg-input); border:1px solid var(--border); border-radius:10px; padding:12px;">
+      <svg width="110" height="130" viewBox="0 0 110 130" aria-label="Mapa muscular semanal">
+        <circle cx="55" cy="14" r="9" fill="#475569"/>
+        <rect x="33" y="27" width="44" height="22" rx="6" fill="${color(conteo.Pecho)}" opacity="0.9"><title>Pecho: ${conteo.Pecho} series</title></rect>
+        <rect x="20" y="27" width="11" height="14" rx="4" fill="${color(conteo.Hombros)}"><title>Hombros: ${conteo.Hombros} series</title></rect>
+        <rect x="79" y="27" width="11" height="14" rx="4" fill="${color(conteo.Hombros)}"><title>Hombros: ${conteo.Hombros} series</title></rect>
+        <rect x="20" y="43" width="10" height="26" rx="4" fill="${color(conteo.Brazos)}"><title>Brazos: ${conteo.Brazos} series</title></rect>
+        <rect x="80" y="43" width="10" height="26" rx="4" fill="${color(conteo.Brazos)}"><title>Brazos: ${conteo.Brazos} series</title></rect>
+        <rect x="38" y="51" width="34" height="22" rx="5" fill="${color(conteo.Abdomen)}"><title>Abdomen: ${conteo.Abdomen} series</title></rect>
+        <rect x="36" y="76" width="16" height="46" rx="6" fill="${color(conteo.Piernas)}"><title>Piernas: ${conteo.Piernas} series</title></rect>
+        <rect x="58" y="76" width="16" height="46" rx="6" fill="${color(conteo.Piernas)}"><title>Piernas: ${conteo.Piernas} series</title></rect>
+      </svg>
+      <div style="font-size:0.8rem; line-height:1.6;">
+        <strong>🗺️ Series semanales por grupo (plan activo):</strong><br>
+        ${Object.entries(conteo).map(([k, v]) => `<span style="margin-right:10px;">${k}: <strong style="color:${color(v)};">${v}</strong></span>`).join("")}
+      </div>
+    </div>`;
+}
+
 function renderPRs() {
+  renderMapaMuscular();
   const cont = $("pr-list");
   if (!cont) return;
   const cargas = cargarCargas();
@@ -6211,6 +6309,11 @@ function renderAgua() {
   const pct = Math.min(100, Math.round((ml / 2500) * 100));
   badge.textContent = `${ml} / 2500 ml`;
   fill.style.width = `${pct}%`;
+  const ring = $("agua-ring-fg");
+  if (ring) {
+    const circ = 94.25;
+    ring.style.strokeDashoffset = (circ * (1 - pct / 100)).toFixed(2);
+  }
 }
 
 function cambiarAgua(deltaMl) {
