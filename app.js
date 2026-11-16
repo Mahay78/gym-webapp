@@ -6129,6 +6129,152 @@ function procesarArchivoComida(file) {
   reader.readAsDataURL(file);
 }
 
+const RECETAS_PERDIDA_PESO_FALLBACK = {
+  ingredientesDetectados: ["Proteína magra", "Verduras / hortalizas", "Huevos o lácteos ligeros"],
+  recetas: [
+    {
+      nombre: "Revuelto proteico con verduras salteadas",
+      tiempo: "10 min",
+      kcal: 340,
+      proteinas: 34,
+      carbos: 12,
+      grasas: 16,
+      pasos: "Saltea las verduras disponibles con 1 cdta de aceite, añade 2 huevos + 150 ml de claras y cocina a fuego medio."
+    },
+    {
+      nombre: "Bowl saciante alto en proteína",
+      tiempo: "12 min",
+      kcal: 410,
+      proteinas: 38,
+      carbos: 36,
+      grasas: 11,
+      pasos: "Combina una base de verduras frescas o salteadas con tu proteína principal a la plancha, una porción moderada de carbohidrato y especias al gusto."
+    },
+    {
+      nombre: "Crema o salteado ligero de cena",
+      tiempo: "15 min",
+      kcal: 290,
+      proteinas: 28,
+      carbos: 18,
+      grasas: 9,
+      pasos: "Cocina al vapor o a la plancha las hortalizas y añade atún, pollo o queso fresco batido para aportar saciedad con pocas calorías."
+    }
+  ]
+};
+
+async function llamarGeminiRecetasProductos(apiKey, base64Data, mimeType) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const prompt = `Eres un chef y nutricionista deportivo especializado en pérdida de grasa.
+Observa los productos e ingredientes visibles en esta foto (nevera, despensa o encimera).
+Identifica los ingredientes que ves y propón 3 o 4 recetas saludables, fáciles, saciantes, altas en proteína y bajas en calorías usando principalmente esos productos.
+
+Responde ÚNICAMENTE con un JSON válido con esta estructura exacta, sin markdown:
+{
+  "ingredientesDetectados": ["Ingrediente 1", "Ingrediente 2"],
+  "recetas": [
+    {
+      "nombre": "Nombre atractivo de la receta",
+      "tiempo": "12 min",
+      "kcal": 360,
+      "proteinas": 35,
+      "carbos": 28,
+      "grasas": 10,
+      "pasos": "Explicación clara en 2-3 frases de cómo prepararla."
+    }
+  ]
+}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { text: prompt },
+          { inline_data: { mime_type: mimeType || "image/jpeg", data: base64Data.replace(/^data:[^;]+;base64,/, "") } }
+        ]
+      }],
+      generationConfig: { temperature: 0.35, response_mime_type: "application/json" }
+    })
+  });
+  if (!res.ok) throw new Error(`Error IA (${res.status})`);
+  const data = await res.json();
+  const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!txt) throw new Error("Sin respuesta de Gemini");
+  return JSON.parse(txt.replace(/```json/gi, "").replace(/```/g, "").trim());
+}
+
+function renderRecetasProductos(data) {
+  const resDiv = $("comida-ai-resultado");
+  if (!resDiv) return;
+  const ings = (data.ingredientesDetectados || []).map(i => `<span class="food-ing-tag">🥬 ${escapeHtml(i)}</span>`).join("");
+  const recetas = data.recetas || [];
+
+  resDiv.innerHTML = `
+    <div style="background:var(--bg-input); border-radius:12px; padding:16px; border:1px solid var(--border); margin-top:14px;">
+      <div class="card-head" style="margin-bottom:8px;">
+        <h4 style="color:var(--accent); font-size:1.05rem; margin:0;">🧑‍🍳 Recetas para Pérdida de Grasa</h4>
+        <span class="pkg-badge">${recetas.length} ideas</span>
+      </div>
+      ${ings ? `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">${ings}</div>` : ""}
+      ${recetas.map((r, idx) => `
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
+            <strong>${escapeHtml(r.nombre)}</strong>
+            <span class="muted" style="font-size:0.78rem;">⏱ ${escapeHtml(r.tiempo || "15 min")} · <strong style="color:var(--accent);">${Math.round(r.kcal)} kcal</strong> (P ${Math.round(r.proteinas || 0)}g · C ${Math.round(r.carbos || 0)}g · G ${Math.round(r.grasas || 0)}g)</span>
+          </div>
+          <p class="muted" style="font-size:0.83rem; margin-bottom:8px; line-height:1.4;">${escapeHtml(r.pasos || "")}</p>
+          <button type="button" class="btn-xs" data-add-receta="${idx}">➕ Anotar en mi diario de hoy</button>
+        </div>
+      `).join("")}
+    </div>`;
+  resDiv.style.display = "block";
+  resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+  resDiv.querySelectorAll("[data-add-receta]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const r = recetas[+btn.dataset.addReceta];
+      if (!r) return;
+      const kcal = Math.round(r.kcal || 0);
+      const comidas = cargarComidas();
+      const hoy = hoyISO();
+      if (!comidas[hoy]) comidas[hoy] = [];
+      comidas[hoy].push({ nombre: r.nombre, kcal });
+      guardarComidas(comidas);
+      sumarKcalDia(hoy, kcal);
+      renderComidas();
+      renderDiario();
+      renderCoachDiario();
+      btn.textContent = "✅ Añadida hoy";
+      btn.disabled = true;
+    });
+  });
+}
+
+async function sugerirRecetasConFoto() {
+  if (!fotoComidaBase64) {
+    alert("Sube o haz primero una foto de los productos que tienes.");
+    return;
+  }
+  const loading = $("comida-ai-loading");
+  const resDiv = $("comida-ai-resultado");
+  if (loading) loading.style.display = "block";
+  if (resDiv) resDiv.style.display = "none";
+
+  const apiKey = localStorage.getItem(KEY.geminiApiKey) || "";
+  let resultado = null;
+  if (apiKey) {
+    try {
+      resultado = await llamarGeminiRecetasProductos(apiKey, fotoComidaBase64, fotoComidaMime);
+    } catch (e) {
+      console.warn("Fallo recetas Gemini Vision, usando sugerencias base:", e);
+    }
+  }
+  if (!resultado) resultado = RECETAS_PERDIDA_PESO_FALLBACK;
+  if (loading) loading.style.display = "none";
+  renderRecetasProductos(resultado);
+}
+
 function initFoodVision() {
   const inputCam = $("foto-comida-camara");
   const inputGal = $("foto-comida-galeria");
@@ -6137,6 +6283,9 @@ function initFoodVision() {
 
   const btnAnalizar = $("btn-analizar-comida");
   if (btnAnalizar) btnAnalizar.addEventListener("click", analizarFotoComida);
+
+  const btnRecetas = $("btn-recetas-productos");
+  if (btnRecetas) btnRecetas.addEventListener("click", sugerirRecetasConFoto);
 
   const btnPresetsToggle = $("btn-food-presets-toggle");
   const presetsPanel = $("food-presets-panel");
