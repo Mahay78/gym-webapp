@@ -151,12 +151,27 @@ const sections = document.querySelectorAll(".section");
 function showSection(name) {
   sections.forEach(s => s.classList.toggle("active", s.id === name));
   navLinks.forEach(b => b.classList.toggle("active", b.dataset.section === name));
+  document.querySelectorAll(".bottom-nav-btn[data-section]").forEach(b =>
+    b.classList.toggle("active", b.dataset.section === name)
+  );
+  if ($("bottom-more-menu")) $("bottom-more-menu").style.display = "none";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 navLinks.forEach(btn =>
   btn.addEventListener("click", () => showSection(btn.dataset.section))
 );
+
+document.querySelectorAll(".bottom-nav-btn[data-section], .bottom-more-menu [data-section]").forEach(btn =>
+  btn.addEventListener("click", () => showSection(btn.dataset.section))
+);
+
+if ($("btn-bottom-more")) {
+  $("btn-bottom-more").addEventListener("click", () => {
+    const m = $("bottom-more-menu");
+    if (m) m.style.display = m.style.display === "none" ? "flex" : "none";
+  });
+}
 
 document.querySelectorAll("[data-goto]").forEach(btn =>
   btn.addEventListener("click", () => showSection(btn.dataset.goto))
@@ -672,14 +687,19 @@ function renderPlan(clave) {
       </div>
     </div>` : "";
 
+  let primerDiaPendiente = plan.dias.findIndex((d, i) => !(entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === i));
+  if (primerDiaPendiente < 0) primerDiaPendiente = 0;
+
   const html = nota + barraProgreso + plan.dias.map((dia, diaIdx) => {
     const hecho = entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === diaIdx;
+    const abierto = diaIdx === primerDiaPendiente;
     return `
     <div class="plan-day">
-      <div class="day-head">
-        <h4>${dia.dia}</h4>
-        <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${dia.dia}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
-      </div>
+      <details class="plan-day-details"${abierto ? " open" : ""}>
+        <summary class="day-head">
+          <h4>${abierto ? "▾" : "▸"} ${dia.dia}</h4>
+          <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${dia.dia}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
+        </summary>
       ${dia.ejercicios
         .map((ej, ejIdx) => {
           const nombre = ej[0];
@@ -735,14 +755,17 @@ function renderPlan(clave) {
                 </div>` : ""}
                 <div class="ex-nota-wrap">
                   <button type="button" class="btn-link-subtle" data-escaner-ex="${nombre}">📷 Ajuste</button> ·
-                  <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme con IA</button> ·
-                  ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${nombre}">🏋️ Discos</button> · <button type="button" class="btn-link-subtle" data-aprox="${nombre}">🔥 Aprox.</button> · ` : ""}
-                  <button type="button" class="btn-link-subtle" data-superserie="${nombre}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button> ·
-                  <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a> ·
-                  <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a> ·
-                  <button type="button" class="btn-link-subtle" data-notaex="${nombre}">
-                    ${notaEx ? `📝 Ajuste: <em>"${notaEx}"</em>` : "＋ Añadir nota"}
-                  </button>
+                  <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme</button>
+                  <details class="ex-tools-menu">
+                    <summary>⋯ Más</summary>
+                    <div class="ex-tools-panel">
+                      ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${nombre}">🏋️ Discos</button><button type="button" class="btn-link-subtle" data-aprox="${nombre}">🔥 Aprox.</button>` : ""}
+                      <button type="button" class="btn-link-subtle" data-superserie="${nombre}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button>
+                      <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a>
+                      <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a>
+                      <button type="button" class="btn-link-subtle" data-notaex="${nombre}">${notaEx ? `📝 Nota: "${notaEx}"` : "＋ Nota"}</button>
+                    </div>
+                  </details>
                 </div>
                 <div class="inline-tool-box" style="display:none;"></div>
               </div>
@@ -750,7 +773,9 @@ function renderPlan(clave) {
                 <div class="ex-sets">${series}</div>
                 ${conPeso ? `
                 <div class="ex-log">
+                  <button type="button" class="btn-step-kg" data-stepkg="-2.5" title="Restar 2,5 kg">−2.5</button>
                   <input type="number" step="0.5" min="0" max="500" class="log-peso" data-ex="${nombre}" value="${ultimo ? ultimo.peso : ""}" placeholder="kg" aria-label="Peso usado en ${nombre}">
+                  <button type="button" class="btn-step-kg" data-stepkg="2.5" title="Sumar 2,5 kg">+2.5</button>
                   <input type="text" class="log-reps" data-ex="${nombre}" value="${ultimo && ultimo.reps ? ultimo.reps : ""}" placeholder="${series}" aria-label="Series y repeticiones de ${nombre}">
                   <button type="button" class="btn-voice-log" data-mic-ex="${nombre}" title="Dictar peso y repes por voz (ej. '60 kilos 10 repes')">🎙️</button>
                   <button class="btn-small" data-guardar="${nombre}" title="Guardar peso usado">✓</button>
@@ -765,6 +790,7 @@ function renderPlan(clave) {
           </div>`;
         })
         .join("")}
+      </details>
     </div>`;
   }).join("");
   $("plan-content").innerHTML = html;
@@ -774,6 +800,19 @@ function renderPlan(clave) {
 $("plan-content").addEventListener("click", e => {
   if (e.target.classList.contains("ex-img")) {
     abrirLightbox(e.target.src, e.target.alt);
+    return;
+  }
+
+  // Stepper rápido +2.5 / -2.5 kg
+  const btnStepKg = e.target.closest("[data-stepkg]");
+  if (btnStepKg) {
+    const exLog = btnStepKg.closest(".ex-log");
+    const inp = exLog?.querySelector(".log-peso");
+    if (inp) {
+      const actual = parseFloat(inp.value) || 0;
+      const nuevo = Math.max(0, Math.round((actual + parseFloat(btnStepKg.dataset.stepkg)) * 10) / 10);
+      inp.value = nuevo;
+    }
     return;
   }
 
@@ -1193,6 +1232,14 @@ document.querySelectorAll("[data-timer]").forEach(b =>
 );
 
 $("btn-timer-stop").addEventListener("click", detenerTimer);
+
+if ($("btn-vista-compacta")) {
+  $("btn-vista-compacta").addEventListener("click", () => {
+    const act = document.body.classList.toggle("vista-compacta");
+    $("btn-vista-compacta").style.borderColor = act ? "var(--accent)" : "var(--border)";
+    $("btn-vista-compacta").style.color = act ? "var(--accent)" : "var(--text)";
+  });
+}
 
 if ($("btn-export-plan-txt")) {
   $("btn-export-plan-txt").addEventListener("click", () => {
@@ -5228,15 +5275,24 @@ function svgLine(valores, color, { circulos = true, extra = null, colorExtra = "
     extraLine = `<polyline points="${extra.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${colorExtra}" stroke-width="2" stroke-dasharray="6 4"/>`;
   }
 
+  const areaPts = `${pts[0].split(",")[0]},${H - PAD} ${pts.join(" ")} ${pts[pts.length - 1].split(",")[0]},${H - PAD}`;
+
   return `
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">
+      <defs>
+        <linearGradient id="svgAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
       <line x1="${PAD}" y1="${PAD}" x2="${W - PAD}" y2="${PAD}" stroke="var(--border)" stroke-dasharray="4"/>
       <text x="${PAD - 6}" y="${PAD + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${max.toFixed(1)}</text>
       <line x1="${PAD}" y1="${H - PAD}" x2="${W - PAD}" y2="${H - PAD}" stroke="var(--border)" stroke-dasharray="4"/>
       <text x="${PAD - 6}" y="${H - PAD + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${min.toFixed(1)}</text>
       ${extraLine}
+      <polygon points="${areaPts}" fill="url(#svgAreaGrad)"/>
       <polyline points="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-      ${circulos ? valores.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4" fill="${color}"/>`).join("") : ""}
+      ${circulos ? valores.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4.5" fill="${color}"><title>${v.toFixed(1)}</title></circle>`).join("") : ""}
     </svg>`;
 }
 
@@ -6360,6 +6416,11 @@ function renderAgua() {
   const pct = Math.min(100, Math.round((ml / 2500) * 100));
   badge.textContent = `${ml} / 2500 ml`;
   fill.style.width = `${pct}%`;
+  const ring = $("agua-ring-fg");
+  if (ring) {
+    const circ = 94.25;
+    ring.style.strokeDashoffset = (circ * (1 - pct / 100)).toFixed(2);
+  }
 }
 
 function cambiarAgua(deltaMl) {

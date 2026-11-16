@@ -1,4 +1,4 @@
-const CACHE = "fitnesscut-v16";
+const CACHE = "fitnesscut-v17";
 const ASSETS = [
   "./",
   "./index.html",

@@ -92,6 +92,7 @@
         </div>
         <div class="plan-header-actions">
           <button class="btn-small" id="btn-modo-entreno" title="Mantener pantalla encendida y vista enfocada de gimnasio">⚡ Entreno: <span id="modo-entreno-status">OFF</span></button>
+          <button class="btn-small" id="btn-vista-compacta" title="Alternar vista compacta">📐 Compacta</button>
           <button class="btn-small" id="btn-export-plan-txt" title="Copiar o imprimir rutina actual">📋 Exportar</button>
           <button class="btn-small" id="btn-toggle-audio-coach" title="Activar/desactivar entrenador y avisos por voz">🔊 Coach: <span id="coach-status-text">OFF</span></button>
           <button class="btn" id="btn-toggle-asistente">✨ Crear plan a medida</button>
@@ -392,6 +393,7 @@
 
           <!-- Visor de Grabación y Análisis en Vivo -->
           <div id="formcheck-live-wrap" style="display: none; background: #000; border-radius: 14px; overflow: hidden; position: relative; margin-bottom: 16px; border: 2px solid var(--border);">
+            <div class="live-viewfinder-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
             <video id="formcheck-video-live" autoplay playsinline muted style="width: 100%; max-height: 440px; object-fit: cover; display: block;"></video>
             
             <!-- Canvas para dibujo de esqueleto y ángulos en tiempo real -->
@@ -827,7 +829,13 @@
       <div class="card" id="agua-card">
         <div class="card-head">
           <h3>💧 Hidratación de hoy</h3>
-          <span class="pkg-badge" id="agua-total-badge">0 / 2500 ml</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="radial-ring" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true">
+              <circle class="radial-bg" cx="19" cy="19" r="15"></circle>
+              <circle class="radial-fg" id="agua-ring-fg" cx="19" cy="19" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"></circle>
+            </svg>
+            <span class="pkg-badge" id="agua-total-badge">0 / 2500 ml</span>
+          </div>
         </div>
         <div class="progress" style="margin: 10px 0;"><div class="progress-fill" id="agua-progress-fill" style="width: 0%;"></div></div>
         <div class="btn-row">
@@ -1040,6 +1048,21 @@
   <div id="pwa-update-banner" class="pwa-update-banner" style="display: none;" role="status" aria-live="polite">
     <span>🚀 Nueva versión de FitnessCut disponible</span>
     <button class="btn-xs" id="btn-pwa-reload" type="button">Actualizar</button>
+  </div>
+
+  <!-- Barra de navegación inferior móvil (Bottom Tab Bar) -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación móvil">
+    <button type="button" class="bottom-nav-btn active" data-section="inicio"><span>🏠</span><small>Inicio</small></button>
+    <button type="button" class="bottom-nav-btn" data-section="planes"><span>🏋️</span><small>Planes</small></button>
+    <button type="button" class="bottom-nav-btn" data-section="escaner"><span>📷</span><small>Escáner</small></button>
+    <button type="button" class="bottom-nav-btn" data-section="diario"><span>🍽️</span><small>Diario</small></button>
+    <button type="button" class="bottom-nav-btn" id="btn-bottom-more"><span>⋯</span><small>Más</small></button>
+  </nav>
+  <div class="bottom-more-menu" id="bottom-more-menu" style="display:none;">
+    <button type="button" data-section="paquetes">📦 Paquetes IA</button>
+    <button type="button" data-section="calculadoras">🧮 Calculadoras</button>
+    <button type="button" data-section="progreso">📈 Progreso</button>
+    <button type="button" data-section="guia">📘 Guía</button>
   </div>
 
   <!-- Lector universal de códigos de barras (respaldo iOS/Safari/Firefox) -->
