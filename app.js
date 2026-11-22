@@ -209,20 +209,21 @@ const PLANES = {
           ["Press de pecho en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Retrae escápulas y codos a 45–60° del torso. Pausa 1s abajo."],
           ["Jalón al pecho en polea", "Espalda", "3×8–10", "RIR 1–2", 90, "Lleva la barra a la clavícula manteniendo el pecho erguido."],
           ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje vertical fluido sin arquear la zona lumbar."],
-          ["Extensión de tríceps en polea", "Tríceps", "3×10–12", "RIR 1", 60, "Codos pegados a los costados, aprieta 1s en la extensión."],
-          ["Abdominal en máquina", "Core", "3×12–15", "RIR 1", 60, "Flexiona el torso desde el core, sin tirar con los brazos."],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×10–12", "RIR 1–2", 60, "Alterna curl en polea baja y extensión de tríceps sin descanso intermedio."],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Isometría anti-rotacional para proteger y estabilizar zona lumbar."],
           ["Cardio moderado en cinta inclinada", "Cardio", "15–20 min", "RPE 5–6", 0, "Caminata al 6–10% a ritmo constante."],
         ],
       },
       {
-        dia: "Sesión 2 · Cuerpo completo B (Cadena posterior / Brazos)",
+        dia: "Sesión 2 · Cuerpo completo B (Cadena posterior / Unilateral)",
         ejercicios: [
-          ["Curl femoral sentado o tumbado", "Femoral", "3×10–12", "RIR 1", 90, "Contracción sostenida 1s en el punto de máxima flexión."],
+          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1–2", 90, "Contracción sostenida 1s y estiramiento controlado de isquiotibiales."],
+          ["Sentadilla búlgara con barra Smith", "Piernas/Glúteo", "3×10–12", "RIR 1–2", 90, "Trabajo unilateral clave para glúteo, cuádriceps y equilibrio pélvico."],
           ["Remo sentado en máquina", "Espalda", "3×8–10", "RIR 1–2", 90, "Tracciona hacia el abdomen bajo juntando bien las escápulas."],
           ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Enfoque clavicular del pectoral con descenso en 2-3 segundos."],
-          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 0–1", 60, "Polea baja, eleva con el codo hasta la altura del hombro."],
-          ["Curl de bíceps en máquina o polea", "Bíceps", "3×10–12", "RIR 1", 60, "Codos inmóviles, solo flexiona el antebrazo con control."],
-          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1", 60, "De rodillas, aproxima las costillas a la pelvis."],
+          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Polea a altura de muñeca, eleva guiando con el codo."],
+          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1–2", 60, "Rotación externa al final para salud del manguito rotador."],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "De rodillas, aproxima las costillas a la pelvis."],
           ["HIIT en bici estática o remo", "Cardio", "10–12 min", "RPE 8–9", 0, "8 rondas: 20 s a tope / 40 s suave."],
         ],
       },
@@ -230,11 +231,13 @@ const PLANES = {
         dia: "Sesión 3 · Cuerpo completo C (Sobrecarga y volumen)",
         ejercicios: [
           ["Sentadilla en máquina Hack", "Piernas", "3×8–10", "RIR 1–2", 120, "Profundidad máxima controlada empujando con toda la planta."],
-          ["Peso muerto rumano con barra Smith", "Femoral/Glúteo", "3×8–10", "RIR 2", 120, "Empuja cadera atrás, ligera flexión de rodilla, espalda neutra."],
-          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 0–1", 60, "Gran estiramiento controlado, junta brazos sin chocar placas."],
-          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1", 90, "Pecho apoyado para aislar dorsales sin fatigar lumbares."],
-          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1", 60, "Lleva la cuerda a la frente separando manos."],
-          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 0–1", 60, "Pausa de 2s en estiramiento abajo antes de empujar."],
+          ["Peso muerto rumano con barra Smith", "Femoral/Glúteo", "3×8–10", "RIR 1–2", 120, "Empuja cadera atrás, ligera flexión de rodilla, espalda neutra."],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Bloqueo pélvico firme 1–2s arriba sin arquear espalda baja."],
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Gran estiramiento controlado, junta brazos sin chocar placas."],
+          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1–2", 90, "Pecho apoyado para aislar dorsales sin fatigar lumbares."],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2", 60, "Codos fijos a los costados, tensión continua en toda la curva."],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2", 60, "Separa la cuerda abajo apretando 1s el tríceps."],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Pausa de 2s en estiramiento abajo antes de empujar."],
         ],
       },
     ],
@@ -249,18 +252,20 @@ const PLANES = {
           ["Remo sentado en máquina", "Espalda", "4×6–8", "RIR 1–2", 120, "Tracción potente hacia la cintura, pausa 1s atrás."],
           ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje uniforme por encima de la cabeza."],
           ["Jalón al pecho agarre estrecho", "Espalda", "3×8–10", "RIR 1–2", 90, "Tracciona con los codos pegados para enfocar dorsal."],
-          ["Extensión de tríceps en polea", "Tríceps", "3×10–12", "RIR 1", 60, "Extensión completa sin mover los codos de posición."],
-          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1", 60, "Tensión constante durante toda la curva de fuerza."],
+          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1–2", 60, "Tracción alta hacia la frente para deltoides posterior y postura."],
+          ["Extensión de tríceps en polea", "Tríceps", "3×10–12", "RIR 1–2", 60, "Extensión completa sin mover los codos de posición."],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2", 60, "Tensión constante durante toda la curva de fuerza."],
         ],
       },
       {
-        dia: "Sesión 2 · Pierna A (Cuádriceps dominante)",
+        dia: "Sesión 2 · Pierna A (Cuádriceps & Unilateral)",
         ejercicios: [
           ["Prensa de piernas", "Cuádriceps", "4×8–10", "RIR 1–2", 120, "Pies bajos en la plataforma para mayor activación del cuádriceps."],
-          ["Extensión de cuádriceps", "Cuádriceps", "3×10–12", "RIR 1", 90, "Pausa de 1s arriba en máxima contracción concéntrica."],
-          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1", 90, "El curl sentado maximiza la hipertrofia por estiramiento."],
-          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 0–1", 60, "Rango completo de tobillo sin rebotar abajo."],
-          ["Abdominal en máquina", "Core", "3×12–15", "RIR 1", 60, "Añade peso progresivo semana a semana."],
+          ["Sentadilla búlgara con barra Smith", "Piernas/Glúteo", "3×10–12", "RIR 1–2", 90, "Unilateral para corregir asimetrías y reclutar glúteo y cuádriceps."],
+          ["Extensión de cuádriceps", "Cuádriceps", "3×10–12", "RIR 1–2 (última RIR 0)", 90, "Pausa de 1s arriba en máxima contracción concéntrica."],
+          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1–2", 90, "El curl sentado maximiza la hipertrofia por estiramiento."],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Rango completo de tobillo sin rebotar abajo."],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad anti-rotacional de core sin fatigar flexores lumbares."],
           ["Cardio LISS en cinta inclinada", "Cardio", "15 min", "RPE 5", 0, "Caminata suave para acelerar recuperación."],
         ],
       },
@@ -268,12 +273,12 @@ const PLANES = {
         dia: "Sesión 3 · Torso B (Hipertrofia & Congestión)",
         ejercicios: [
           ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Énfasis en el haz clavicular (pecho superior)."],
-          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1", 90, "Agarre prono o neutro, tracción fluida."],
-          ["Pec deck (aperturas en máquina)", "Pecho", "3×10–12", "RIR 0–1", 60, "Estiramiento controlado sintiendo la tensión en el pectoral."],
-          ["Pullover en polea o máquina", "Dorsal", "3×12–15", "RIR 1", 60, "Brazos semi-extendidos, gran elongación dorsal."],
-          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1", 60, "Rotación externa al final para salud del manguito rotador."],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Clave estética para dar amplitud de hombros."],
-          ["Superset bíceps/tríceps en polea", "Brazos", "3×12 c/u", "RIR 0–1", 60, "Alterna bíceps y tríceps sin descanso intermedio."],
+          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1–2", 90, "Agarre prono o neutro, tracción fluida."],
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Estiramiento controlado sintiendo la tensión en el pectoral."],
+          ["Pullover en polea o máquina", "Dorsal", "3×12–15", "RIR 1–2", 60, "Brazos semi-extendidos, gran elongación dorsal."],
+          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1–2", 60, "Rotación externa al final para salud del manguito rotador."],
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Clave estética para dar amplitud de hombros."],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Alterna bíceps y tríceps sin descanso intermedio."],
         ],
       },
       {
@@ -281,26 +286,28 @@ const PLANES = {
         ejercicios: [
           ["Sentadilla en máquina Hack", "Piernas", "3×10–12", "RIR 1–2", 120, "Pies ligeramente adelantados para repartir carga."],
           ["Peso muerto rumano con barra Smith", "Femoral/Glúteo", "4×8–10", "RIR 1–2", 120, "Estira los isquiosurales sintiendo tensión atrás."],
-          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1", 90, "Bloqueo firme de cadera arriba manteniendo mentón pegado."],
-          ["Curl femoral tumbado", "Femoral", "3×12–15", "RIR 0–1", 60, "Caderas bien pegadas al banco durante toda la serie."],
-          ["Gemelo sentado en máquina", "Gemelo", "4×15", "RIR 0–1", 60, "Activa de forma específica el sóleo."],
-          ["Crunch en polea alta", "Core", "3×15", "RIR 1", 60, "Contracción abdominal pura."],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Bloqueo firme de cadera arriba manteniendo mentón pegado."],
+          ["Curl femoral tumbado", "Femoral", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Caderas bien pegadas al banco durante toda la serie."],
+          ["Gemelo sentado en máquina", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Activa de forma específica el sóleo."],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Contracción abdominal pura."],
         ],
       },
     ],
   },
   "ppl": {
-    titulo: "Push / Pull / Legs · 3–6 días (Científico)",
+    titulo: "Push / Pull / Legs · 3–6 días (Científico · Escalable)",
+    notaExtra: "🔄 <strong>Cómo escalar de 3 a 6 días:</strong> Si entrenas <strong>3 días/semana</strong>, realiza las 3 sesiones tal cual (4 series en básicos). Si entrenas <strong>4–5 días</strong>, rota en bucle (Push → Pull → Legs → Push...). Si entrenas <strong>6 días (PPL × 2)</strong>, reduce la primera serie de cada ejercicio de 4 a 3 series para duplicar la frecuencia semanal sin sobreentrenar.",
     dias: [
       {
         dia: "Sesión 1 · Push (Pecho, Hombro anterior/lateral, Tríceps)",
         ejercicios: [
           ["Press de pecho en máquina", "Pecho", "4×8–10", "RIR 1–2", 120, "Empuje horizontal principal, retracción escapular activa."],
           ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Ángulo de 30-45° para estímulo de porción superior."],
-          ["Pec deck (aperturas en máquina)", "Pecho", "3×10–12", "RIR 0–1", 60, "Aislamiento pectoral con tensión continua."],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Elevación lateral controlada con codo alto."],
-          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1", 60, "Separa los extremos de la cuerda abajo del todo."],
-          ["Press francés en máquina o polea", "Tríceps", "3×12–15", "RIR 1", 60, "Enfoca la cabeza larga del tríceps por encima de la cabeza."],
+          ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje vertical clave para deltoides anterior y lateral."],
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Aislamiento pectoral con tensión continua."],
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Elevación lateral controlada con codo alto."],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2", 60, "Separa los extremos de la cuerda abajo del todo."],
+          ["Press francés en máquina o polea", "Tríceps", "3×12–15", "RIR 1–2", 60, "Enfoca la cabeza larga del tríceps en máximo estiramiento."],
         ],
       },
       {
@@ -308,10 +315,10 @@ const PLANES = {
         ejercicios: [
           ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Tracción vertical fundamental con retracción de escápulas."],
           ["Remo sentado en máquina", "Espalda", "4×8–10", "RIR 1–2", 90, "Tracción horizontal buscando densidad de espalda alta."],
-          ["Pullover en polea o máquina", "Dorsal", "3×12–15", "RIR 1", 60, "Aislamiento dorsal sin fatigar los flexores del codo."],
-          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1", 60, "Tracción a la frente con rotación externa."],
-          ["Curl de bíceps en polea o máquina", "Bíceps", "3×10–12", "RIR 1", 60, "Flexión estricta sin balancear la espalda."],
-          ["Curl martillo en polea con cuerda", "Bíceps/Antebrazo", "3×12–15", "RIR 1", 60, "Desarrolla el braquial para dar grosor al brazo."],
+          ["Pullover en polea o máquina", "Dorsal", "3×12–15", "RIR 1–2", 60, "Aislamiento dorsal sin fatigar los flexores del codo."],
+          ["Face pull en polea", "Hombro posterior", "4×12–15", "RIR 1–2", 60, "Tracción a la frente con rotación externa."],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2", 60, "Flexión estricta sin balancear la espalda."],
+          ["Curl martillo en polea con cuerda", "Bíceps/Antebrazo", "3×12–15", "RIR 1–2", 60, "Desarrolla el braquial para dar grosor al brazo."],
         ],
       },
       {
@@ -319,10 +326,12 @@ const PLANES = {
         ejercicios: [
           ["Prensa de piernas", "Cuádriceps", "4×8–10", "RIR 1–2", 120, "Empuje con talones y mediopié, rodillas alineadas."],
           ["Sentadilla en máquina Hack", "Piernas", "3×10–12", "RIR 1–2", 120, "Descenso profundo y controlado en 3 segundos."],
-          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1", 90, "Carga en estiramiento para máximo estímulo hipertrófico."],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Extensión completa de cadera con pausa 1–2s arriba."],
+          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1–2", 90, "Carga en estiramiento para máximo estímulo hipertrófico."],
           ["Peso muerto rumano con barra Smith", "Femoral/Glúteo", "3×10–12", "RIR 1–2", 90, "Bisagra de cadera profunda."],
-          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 0–1", 60, "Pausa abajo para suprimir el rebote elástico."],
-          ["Abdominal en máquina", "Core", "3×15", "RIR 1", 60, "Aislamiento abdominal con sobrecarga."],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Pausa abajo para suprimir el rebote elástico."],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad anti-rotacional del core."],
+          ["Abdominal en máquina", "Core", "3×12–15", "RIR 1–2", 60, "Aislamiento abdominal con sobrecarga."],
         ],
       },
     ],
@@ -335,9 +344,10 @@ const PLANES = {
         ejercicios: [
           ["Press de pecho en máquina", "Pecho", "4×8–10", "RIR 1–2", 120, "Empuje horizontal principal."],
           ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Pecho clavicular."],
-          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 0–1", 60, "Aislamiento y bombeo."],
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Aislamiento y bombeo."],
           ["Fondos en máquina asistida", "Pecho/Tríceps", "3×8–12", "RIR 1–2", 90, "Tronco ligeramente inclinado hacia delante."],
-          ["Extensión de tríceps en polea", "Tríceps", "3×12", "RIR 1", 60, "Bloqueo 1s abajo."],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2", 60, "Bloqueo 1s abajo separando la cuerda."],
+          ["Press francés en máquina o polea", "Tríceps", "3×12–15", "RIR 1–2", 60, "Estiramiento completo de la cabeza larga del tríceps."],
           ["Cardio LISS en cinta inclinada", "Cardio", "15 min", "RPE 5–6", 0, "Gasto calórico limpio post-entreno."],
         ],
       },
@@ -346,41 +356,44 @@ const PLANES = {
         ejercicios: [
           ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Tracción vertical con escápulas deprimidas."],
           ["Remo sentado en máquina", "Espalda", "4×8–10", "RIR 1–2", 90, "Tracción media."],
-          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1", 90, "Agarre neutro."],
-          ["Pullover en polea o máquina", "Dorsal", "3×12–15", "RIR 1", 60, "Aislamiento dorsal."],
-          ["Curl de bíceps en máquina", "Bíceps", "3×10–12", "RIR 1", 60, "Flexión estricta."],
+          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1–2", 90, "Agarre neutro."],
+          ["Pullover en polea o máquina", "Dorsal", "3×12–15", "RIR 1–2", 60, "Aislamiento dorsal."],
+          ["Curl de bíceps en máquina", "Bíceps", "3×10–12", "RIR 1–2", 60, "Flexión estricta en predicador o polea."],
+          ["Curl martillo en polea con cuerda", "Bíceps/Antebrazo", "3×10–12", "RIR 1–2", 60, "Énfasis en braquial y braquiorradial."],
           ["Cardio LISS en bici o elíptica", "Cardio", "15 min", "RPE 5–6", 0, "Ritmo continuo."],
         ],
       },
       {
-        dia: "Día 3 · Pierna 1 (Cuádriceps dominante) + Gemelos",
+        dia: "Día 3 · Pierna 1 (Cuádriceps & Unilateral) + Gemelos",
         ejercicios: [
           ["Prensa de piernas", "Cuádriceps", "4×10–12", "RIR 1–2", 120, "Pies bajos y juntos en la plancha."],
           ["Sentadilla en máquina Hack", "Cuádriceps", "3×10–12", "RIR 1–2", 120, "Bajada profunda y controlada."],
-          ["Extensión de cuádriceps", "Cuádriceps", "3×12–15", "RIR 0–1", 60, "Contracción arriba aguantando 1s."],
-          ["Curl femoral tumbado", "Femoral", "3×12–15", "RIR 1", 60, "Mantenimiento de isquiosurales."],
-          ["Gemelo de pie en máquina", "Gemelo", "4×15", "RIR 0–1", 60, "Pausa de 2s abajo en cada repetición."],
+          ["Sentadilla búlgara con barra Smith", "Piernas/Glúteo", "3×10–12", "RIR 1–2", 90, "Estabilidad unilateral y estiramiento de glúteo."],
+          ["Extensión de cuádriceps", "Cuádriceps", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Contracción arriba aguantando 1s."],
+          ["Curl femoral tumbado", "Femoral", "3×12–15", "RIR 1–2", 60, "Mantenimiento de isquiosurales."],
+          ["Gemelo de pie en máquina", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Pausa de 2s abajo en cada repetición."],
         ],
       },
       {
         dia: "Día 4 · Hombros + Core + HIIT",
         ejercicios: [
           ["Press de hombros en máquina", "Hombros", "4×8–10", "RIR 1–2", 90, "Empuje escapular sin hiperextender cuello."],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Tensión constante en abducción."],
-          ["Face pull en polea", "Hombro posterior", "3×15", "RIR 1", 60, "Rotación externa al final."],
-          ["Abdominal en máquina", "Core", "3×15", "RIR 1", 60, "Sobrecarga en flexión de columna."],
-          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1", 60, "De rodillas."],
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Tensión constante en abducción."],
+          ["Face pull en polea", "Hombro posterior", "4×12–15", "RIR 1–2", 60, "Rotación externa al final."],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Anti-rotación para faja abdominal firme."],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "De rodillas, flexión controlada de columna."],
           ["HIIT en máquina de remo o bici", "Cardio", "8×(30 s / 60 s)", "RPE 9", 0, "Intervalos de alta intensidad para quema lipídica."],
         ],
       },
       {
-        dia: "Día 5 · Pierna 2 (Femoral/Glúteo dominante) + Brazos",
+        dia: "Día 5 · Pierna 2 (Femoral/Glúteo) + Brazos + Gemelos",
         ejercicios: [
-          ["Peso muerto rumano con barra Smith", "Femoral/Glúteo", "4×10–12", "RIR 1–2", 120, "Enfoque bisagra de cadera."],
-          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1", 90, "Extensión terminal de cadera con glúteo activo."],
-          ["Curl femoral sentado", "Femoral", "3×12–15", "RIR 0–1", 60, "Aislamiento isquiosural."],
-          ["Abducción en máquina", "Glúteo medio", "3×15", "RIR 0–1", 60, "Tronco erguido o ligeramente hacia delante."],
-          ["Superset bíceps/tríceps en polea", "Brazos", "3×12 c/u", "RIR 0–1", 60, "Pump final de brazos."],
+          ["Peso muerto rumano con barra Smith", "Femoral/Glúteo", "4×8–10", "RIR 1–2", 120, "Enfoque bisagra de cadera."],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Extensión terminal de cadera con glúteo activo."],
+          ["Curl femoral sentado", "Femoral", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Aislamiento isquiosural en estiramiento."],
+          ["Abducción en máquina", "Glúteo medio", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Tronco erguido o ligeramente hacia delante."],
+          ["Gemelo sentado en máquina", "Gemelo", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Segundo estímulo semanal de gemelos (sóleo)."],
+          ["Superset bíceps/tríceps en polea", "Brazos", "4×10–12", "RIR 1–2 (última RIR 0)", 60, "Recordatorio de frecuencia 2 para brazos."],
           ["Caminata en cinta inclinada", "Cardio", "10–15 min", "RPE 5", 0, "Recuperación activa final."],
         ],
       },
@@ -395,9 +408,9 @@ const PLANES = {
           ["Press de banca con mancuernas", "Pecho", "4×8–10", "RIR 1–2", 120, "Gran rango de estiramiento en la base, empuje estable."],
           ["Remo con barra o mancuerna", "Espalda", "4×8–10", "RIR 1–2", 120, "Espalda neutra a 45°, tracciona hacia la cadera."],
           ["Press militar con mancuernas", "Hombros", "3×8–10", "RIR 1–2", 90, "Sentado con respaldo en banco a 75°."],
-          ["Jalón al pecho en polea", "Espalda", "3×10–12", "RIR 1", 90, "Complemento vertical en polea."],
-          ["Extensión de tríceps en polea", "Tríceps", "3×10–12", "RIR 1", 60, "Aislamiento de tríceps."],
-          ["Curl con mancuernas en banco inclinado", "Bíceps", "3×10–12", "RIR 1", 60, "Banco a 60°, máximo estiramiento de cabeza larga."],
+          ["Jalón al pecho en polea", "Espalda", "3×10–12", "RIR 1–2", 90, "Complemento vertical en polea."],
+          ["Extensión de tríceps en polea", "Tríceps", "3×10–12", "RIR 1–2", 60, "Aislamiento de tríceps."],
+          ["Curl con mancuernas en banco inclinado", "Bíceps", "3×10–12", "RIR 1–2", 60, "Banco a 60°, máximo estiramiento de cabeza larga."],
         ],
       },
       {
@@ -406,31 +419,32 @@ const PLANES = {
           ["Sentadilla con barra o Sentadilla Goblet", "Cuádriceps/Glúteo", "4×6–8", "RIR 2", 120, "Baja hasta paralelo con torso firme y rodillas hacia fuera."],
           ["Prensa de piernas", "Cuádriceps", "3×10–12", "RIR 1–2", 90, "Volumen complementario con menor demanda lumbar."],
           ["Peso muerto rumano con mancuernas", "Femoral/Glúteo", "4×8–10", "RIR 1–2", 120, "Mancuernas pegadas a piernas sintiendo estiramiento."],
-          ["Curl femoral sentado o tumbado", "Femoral", "3×12–15", "RIR 1", 60, "Aislamiento femoral en máquina."],
-          ["Gemelo de pie con mancuerna o máquina", "Gemelo", "4×12–15", "RIR 0–1", 60, "Pausa abajo."],
-          ["Abdominal en máquina o plancha", "Core", "3×12–15", "RIR 1", 60, "Estabilidad de tronco."],
+          ["Curl femoral sentado o tumbado", "Femoral", "3×12–15", "RIR 1–2", 60, "Aislamiento femoral en máquina."],
+          ["Gemelo de pie con mancuerna o máquina", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Pausa abajo."],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad anti-rotación de tronco."],
         ],
       },
       {
         dia: "Sesión 3 · Torso Hipertrofia (Estética & Poleas)",
         ejercicios: [
           ["Press inclinado con mancuernas", "Pecho", "3×8–10", "RIR 1–2", 90, "Banco a 30° para activación de haz clavicular."],
-          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 0–1", 60, "Tensión constante en estiramiento y contracción."],
-          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1", 90, "Enfocado en dorsal sin fatiga de espalda baja."],
-          ["Elevaciones laterales con mancuernas o polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Codos ligeramente flexionados, sin inercia."],
-          ["Face pull en polea", "Hombro posterior", "3×15", "RIR 1", 60, "Salud de hombro y separación escapular."],
-          ["Curl martillo con mancuernas", "Bíceps/Antebrazo", "3×10–12", "RIR 1", 60, "Agarre neutro para bíceps braquial."],
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Tensión constante en estiramiento y contracción."],
+          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1–2", 90, "Enfocado en dorsal sin fatiga de espalda baja."],
+          ["Elevaciones laterales con mancuernas o polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Codos ligeramente flexionados, sin inercia."],
+          ["Face pull en polea", "Hombro posterior", "3×12–15", "RIR 1–2", 60, "Salud de hombro y separación escapular."],
+          ["Curl martillo con mancuernas", "Bíceps/Antebrazo", "3×10–12", "RIR 1–2", 60, "Agarre neutro para bíceps braquial."],
+          ["Press francés en máquina o polea", "Tríceps", "3×10–12", "RIR 1–2", 60, "Estiramiento completo de la cabeza larga del tríceps."],
         ],
       },
       {
         dia: "Sesión 4 · Pierna & Glúteo Hipertrofia",
         ejercicios: [
           ["Hip thrust con barra o máquina", "Glúteo", "4×8–10", "RIR 1–2", 120, "Extensión explosiva de cadera con retroversión pélvica arriba."],
-          ["Zancadas con mancuernas o búlgara", "Piernas/Glúteo", "3×10–12 por pierna", "RIR 1–2", 90, "Trabajo unilateral clave para estabilidad."],
-          ["Extensión de cuádriceps", "Cuádriceps", "3×12–15", "RIR 0–1", 60, "Congestión final de cuádriceps."],
-          ["Curl femoral sentado", "Femoral", "3×12–15", "RIR 0–1", 60, "Aislamiento isquiosural."],
-          ["Gemelo sentado en máquina", "Gemelo", "4×15", "RIR 0–1", 60, "Sóleo a 90°."],
-          ["Crunch en polea alta", "Core", "3×15", "RIR 1", 60, "Cierre de sesión."],
+          ["Zancadas con mancuernas o búlgara", "Piernas/Glúteo", "3×10–12", "RIR 1–2", 90, "Trabajo unilateral clave para estabilidad."],
+          ["Extensión de cuádriceps", "Cuádriceps", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Congestión final de cuádriceps."],
+          ["Curl femoral sentado", "Femoral", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Aislamiento isquiosural."],
+          ["Gemelo sentado en máquina", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Sóleo a 90°."],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Cierre de sesión."],
         ],
       },
     ],
@@ -489,12 +503,27 @@ const IMG_EJERCICIOS = [
   ["abdominal en máquina", "img/abdominal-maquina.jpg"],
   ["abdominales en máquina", "img/abdominal-maquina.jpg"],
   ["crunch en polea", "img/crunch-polea.jpg"],
+  ["pallof", "img/crunch-polea.jpg"],
+  ["gemelo", "img/prensa-piernas.jpg"],
+  ["búlgara", "img/smith.jpg"],
+  ["cruce de poleas", "img/pec-deck.jpg"],
 ];
 
 function buscarImg(nombre) {
-  const n = nombre.toLowerCase();
-  const hit = IMG_EJERCICIOS.find(([clave]) => n.includes(clave));
-  return hit ? hit[1] : null;
+  const canon = (typeof normalizarEjercicioCanonico === "function" ? normalizarEjercicioCanonico(nombre) : nombre) || "";
+  const candidatos = [nombre.toLowerCase(), canon.toLowerCase()];
+  for (const n of candidatos) {
+    const hit = IMG_EJERCICIOS.find(([clave]) => n.includes(clave));
+    if (hit) return hit[1];
+  }
+  return null;
+}
+
+function obtenerAlternativasEjercicio(nombre) {
+  if (ALT_EJERCICIOS[nombre]) return ALT_EJERCICIOS[nombre];
+  const canon = typeof normalizarEjercicioCanonico === "function" ? normalizarEjercicioCanonico(nombre) : nombre;
+  if (canon && ALT_EJERCICIOS[canon]) return ALT_EJERCICIOS[canon];
+  return null;
 }
 
 /* ---------- Alternativas por ejercicio (si la máquina está ocupada) ---------- */
@@ -550,6 +579,9 @@ const ALT_EJERCICIOS = {
   "Hip thrust con barra o máquina": ["Hip thrust en máquina", "Prensa con pies altos", "Peso muerto rumano con barra Smith"],
   "Abducción en máquina": ["Prensa con pies altos", "Hiperextensiones en máquina 45°", "Sentadilla búlgara con barra Smith"],
   "Crunch en polea alta": ["Abdominal en máquina", "Elevación de piernas en silla romana", "Plancha isométrica"],
+  "Press Pallof en polea media": ["Plancha abdominal isométrica", "Abdominal en máquina", "Crunch en polea alta"],
+  "Cruce de poleas a la altura del pecho": ["Pec deck (aperturas en máquina)", "Press de pecho en máquina", "Press inclinado en máquina"],
+  "Pec deck inverso (deltoide posterior)": ["Face pull en polea", "Remo al mentón en polea"],
   "Superset bíceps/tríceps en polea": ["Curl de bíceps en máquina o polea", "Extensión de tríceps en polea"],
 };
 
@@ -584,7 +616,11 @@ function guardarCargas(cargas) {
 }
 
 function ultimoRegistroCarga(cargas, nombre) {
-  const logs = cargas[nombre];
+  let logs = cargas[nombre];
+  if ((!logs || logs.length === 0) && typeof normalizarEjercicioCanonico === "function") {
+    const canon = normalizarEjercicioCanonico(nombre);
+    if (canon && cargas[canon]) logs = cargas[canon];
+  }
   if (!logs || logs.length === 0) return null;
   return [...logs].sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
 }
@@ -630,7 +666,34 @@ function renderPlan(clave) {
   }
 
   const nota = `
-    <div class="plan-note">💡 <strong>Sobrecarga progresiva:</strong> Completa todas las series en el rango alto con el RIR indicado. Cuando lo consigas con técnica limpia, sube <strong>+0,5–1 kg</strong> en tren superior/brazos y <strong>+2,5–5 kg</strong> en sentadillas/prensa. Marca tus series completadas para activar el descanso automático.</div>`;
+    <div class="plan-note">💡 <strong>Sobrecarga progresiva (doble progresión):</strong> Completa todas las series en el tope del rango de repeticiones con el RIR indicado. Cuando lo logres con técnica limpia, sube <strong>+0,5–1 kg</strong> en tren superior/brazos y <strong>+2,5–5 kg</strong> en sentadillas/prensa. Reserves <strong>RIR 0</strong> solo para la última serie en máquinas seguras.<br>
+    📅 <strong>Periodización recomendada:</strong> 3–4 semanas de acumulación/progresión seguidas de <strong>1 semana de descarga (Deload)</strong> reduciendo las series al 50% con el mismo peso.</div>
+    ${plan.notaExtra ? `<div class="plan-note" style="border-left-color:var(--green);">${plan.notaExtra}</div>` : ""}`;
+
+  let semaforoHtml = "";
+  if (typeof calcularVolumenPorMusculo === "function") {
+    const vol = calcularVolumenPorMusculo(plan);
+    const gruposSem = [
+      ["Pecho", vol.Pecho, 8, 20],
+      ["Espalda", vol.Espalda, 8, 20],
+      ["Hombros", vol.Hombros, 6, 18],
+      ["Bíceps", vol.Bíceps, 6, 16],
+      ["Tríceps", vol.Tríceps, 6, 16],
+      ["Cuádriceps", vol.Cuádriceps, 6, 18],
+      ["Isquios/Glúteo", (vol.Isquios || 0) + (vol.Glúteo || 0), 6, 22],
+      ["Gemelos", vol.Gemelos, 4, 14],
+      ["Core", vol.Core, 3, 14],
+    ];
+    const badges = gruposSem.map(([nom, s, minOpt, maxOpt]) => {
+      const icon = s < Math.max(4, minOpt - 2) ? "🔴" : s < minOpt || s > maxOpt ? "🟡" : "🟢";
+      return `<span class="rir-badge" style="font-size:0.78rem; padding:4px 8px;" title="Recomendado: ${minOpt}–${maxOpt} series directas/semana">${icon} ${nom}: <strong>${s}</strong> s/sem</span>`;
+    }).join(" ");
+    semaforoHtml = `
+      <div class="plan-note" style="margin-bottom:12px;">
+        <div style="font-size:0.82rem; margin-bottom:6px;"><strong>📊 Semáforo de Volumen Semanal (series directas/semana):</strong> <span class="muted">(🟢 óptimo · 🟡 aceptable/alto · 🔴 bajo)</span></div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">${badges}</div>
+      </div>`;
+  }
 
   let totalSeriesPlan = 0;
   let seriesHechasPlan = 0;
@@ -658,7 +721,7 @@ function renderPlan(clave) {
   let primerDiaPendiente = plan.dias.findIndex((d, i) => !(entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === i));
   if (primerDiaPendiente < 0) primerDiaPendiente = 0;
 
-  const html = nota + barraProgreso + plan.dias.map((dia, diaIdx) => {
+  const html = nota + semaforoHtml + barraProgreso + plan.dias.map((dia, diaIdx) => {
     const hecho = entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === diaIdx;
     const abierto = diaIdx === primerDiaPendiente;
     return `
@@ -681,7 +744,7 @@ function renderPlan(clave) {
           const ultimo = conPeso ? ultimoRegistroCarga(cargas, nombre) : null;
           const sugerido = sugerirCarga(nombre, ultimo);
           const rutaImg = conPeso ? buscarImg(nombre) : null;
-          const alts = ALT_EJERCICIOS[nombre] || null;
+          const alts = obtenerAlternativasEjercicio(nombre);
           const notaEx = notasEjercicios[nombre] || "";
 
           const nSeries = parsearNumSeries(series);
@@ -1436,32 +1499,39 @@ if ($("btn-cerrar-guia-rir")) {
 }
 
 function generarPlanAMedida(dias, nivel, equipo, objetivo) {
-  const rirBase = nivel === "principiante" ? "RIR 2" : "RIR 1–2";
-  const seriesBase = nivel === "principiante" ? "3×10–12" : nivel === "avanzado" ? "4×8–10" : "3×8–10";
+  const rirCompuesto = nivel === "principiante" ? "RIR 2" : nivel === "avanzado" ? "RIR 1" : "RIR 1–2";
+  const rirAislamiento = nivel === "principiante" ? "RIR 2" : "RIR 1–2 (última RIR 0)";
+  const seriesCompuesto = nivel === "principiante" ? 3 : 4;
+  const seriesAislamiento = nivel === "avanzado" ? 4 : 3;
+  const rangoCompuesto = objetivo === "fuerza" ? "6–8" : objetivo === "grasa" ? "8–10" : "8–12";
+  const rangoAislamiento = objetivo === "fuerza" ? "8–10" : "10–15";
 
   let diasArr = [];
   if (dias === "2") {
     diasArr = [
       {
-        dia: "Sesión 1 · Full Body A",
+        dia: "Sesión 1 · Full Body A (Empuje + Cuádriceps + Brazos)",
         ejercicios: [
-          ["Prensa de piernas", "Piernas", seriesBase, rirBase, 120, "Enfoque cuádriceps y glúteo."],
-          ["Press de pecho en máquina", "Pecho", seriesBase, rirBase, 90, "Empuje horizontal con técnica estricta."],
-          ["Jalón al pecho en polea", "Espalda", seriesBase, rirBase, 90, "Tracción vertical completa."],
-          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 1", 60, "Aislamiento deltoide lateral."],
-          ["Extensión de tríceps en polea", "Tríceps", "3×12", "RIR 1", 60, "Bloqueo final."],
-          ["Abdominal en máquina", "Core", "3×15", "RIR 1", 60, "Sobrecarga progresiva."],
+          ["Prensa de piernas", "Piernas", `${seriesCompuesto}×${rangoCompuesto}`, rirCompuesto, 120, "Pies anchura media, baja controlado a 90°."],
+          ["Peso muerto rumano con barra Smith", "Femoral", `3×${rangoCompuesto}`, rirCompuesto, 120, "Bisagra de cadera, espalda neutra."],
+          ["Press de pecho en máquina", "Pecho", `${seriesCompuesto}×${rangoCompuesto}`, rirCompuesto, 90, "Escápulas retraídas, pausa de 1s abajo."],
+          ["Jalón al pecho en polea", "Espalda", `${seriesCompuesto}×${rangoCompuesto}`, rirCompuesto, 90, "Pecho alto, lleva la barra a la clavícula."],
+          ["Press de hombros en máquina", "Hombros", `3×${rangoCompuesto}`, rirCompuesto, 90, "Empuje vertical guiado sin arquear lumbar."],
+          ["Superset bíceps/tríceps en polea", "Brazos", `3×${rangoAislamiento}`, rirAislamiento, 60, "Codos fijos al torso; máxima densidad en poco tiempo."],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad anti-rotación para proteger zona lumbar."],
         ],
       },
       {
-        dia: "Sesión 2 · Full Body B",
+        dia: "Sesión 2 · Full Body B (Tracción + Cadena Posterior + Brazos)",
         ejercicios: [
-          ["Curl femoral sentado o tumbado", "Femoral", seriesBase, rirBase, 90, "Cadena posterior."],
-          ["Sentadilla en máquina Hack", "Piernas", seriesBase, rirBase, 120, "Cuádriceps dominante."],
-          ["Remo sentado en máquina", "Espalda", seriesBase, rirBase, 90, "Tracción horizontal."],
-          ["Press inclinado en máquina", "Pecho", seriesBase, rirBase, 90, "Haz clavicular."],
-          ["Curl de bíceps en polea o máquina", "Bíceps", "3×10–12", "RIR 1", 60, "Flexión estricta."],
-          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 0–1", 60, "Rango completo."],
+          ["Sentadilla en máquina Hack", "Piernas", `${seriesCompuesto}×${rangoCompuesto}`, rirCompuesto, 120, "Espalda pegada al respaldo, recorrido profundo seguro."],
+          ["Curl femoral sentado o tumbado", "Femoral", `3×10–12`, rirAislamiento, 90, "Cadera pegada al asiento, 1s de pausa en contracción."],
+          ["Hip thrust en máquina", "Glúteo", `3×10–12`, rirCompuesto, 90, "Retroversión pélvica y pausa de 2s arriba."],
+          ["Remo sentado en máquina", "Espalda", `${seriesCompuesto}×${rangoCompuesto}`, rirCompuesto, 90, "Apoyo pectoral, tracción hacia el abdomen."],
+          ["Press inclinado en máquina", "Pecho", `3×${rangoCompuesto}`, rirCompuesto, 90, "Énfasis en haz clavicular superior."],
+          ["Face pull en polea", "Hombros", `3×12–15`, rirAislamiento, 60, "Salud del manguito rotador y deltoide posterior."],
+          ["Superset bíceps/tríceps en polea", "Brazos", `3×${rangoAislamiento}`, rirAislamiento, 60, "3 series de curl + 3 de extensión sin descanso entre ambos."],
+          ["Gemelo en prensa", "Gemelo", `4×12–15`, rirAislamiento, 60, "Pausa de 2s en máximo estiramiento."],
         ],
       },
     ];
@@ -1470,15 +1540,62 @@ function generarPlanAMedida(dias, nivel, equipo, objetivo) {
   } else if (dias === "5") {
     diasArr = JSON.parse(JSON.stringify(PLANES["5dias"].dias));
   } else {
-    // 4 días (Torso / Pierna o Híbrido)
     diasArr = equipo === "hibrido"
       ? JSON.parse(JSON.stringify(PLANES["pesolibre"].dias))
       : JSON.parse(JSON.stringify(PLANES["4dias"].dias));
   }
 
+  // Aplicar transformación real por nivel, objetivo y equipamiento en 2, 3, 4 y 5 días
+  const mapaHibrido = [
+    [/^Press de pecho en máquina$/i, "Press de banca con mancuernas"],
+    [/^Press inclinado en máquina$/i, "Press inclinado con mancuernas"],
+    [/^Press de hombros en máquina$/i, "Press militar con mancuernas"],
+    [/^Remo sentado en máquina$/i, "Remo con barra o mancuerna"],
+    [/^Peso muerto rumano con barra Smith$/i, "Peso muerto rumano con mancuernas"],
+  ];
+
+  diasArr.forEach(d => {
+    d.ejercicios = d.ejercicios
+      .filter(ej => objetivo === "grasa" || !SIN_CARGA.includes(ej[1]))
+      .map(ej => {
+        const clone = [...ej];
+        if (SIN_CARGA.includes(clone[1])) return clone;
+
+        if (equipo === "hibrido") {
+          const swap = mapaHibrido.find(([rx]) => rx.test(clone[0]));
+          if (swap) clone[0] = swap[1];
+        }
+
+        const esCompuesto = /prensa|hack|sentadilla|peso muerto|hip thrust|press de pecho|press inclinado|press de banca|press de hombros|press militar|jalón|remo/i.test(clone[0]);
+        let nSeries = parsearNumSeries(clone[2]);
+        if (nivel === "principiante") {
+          nSeries = Math.min(3, nSeries);
+        } else if (nivel === "avanzado" && esCompuesto) {
+          nSeries = Math.max(4, nSeries);
+        } else if (seriesAislamiento === 4 && !esCompuesto && nivel === "avanzado") {
+          nSeries = Math.max(3, nSeries);
+        }
+
+        const rango = esCompuesto ? rangoCompuesto : rangoAislamiento;
+        clone[2] = `${nSeries}×${rango}`;
+        clone[3] = esCompuesto ? rirCompuesto : rirAislamiento;
+        if (objetivo === "fuerza" && esCompuesto) {
+          clone[4] = Math.max(120, typeof clone[4] === "number" ? clone[4] : 120);
+        } else if (objetivo === "grasa") {
+          clone[4] = Math.min(90, typeof clone[4] === "number" ? clone[4] : 75);
+        }
+        return clone;
+      });
+
+    if (objetivo === "grasa" && !d.ejercicios.some(e => SIN_CARGA.includes(e[1]))) {
+      d.ejercicios.push(["Caminata inclinada o bici (LISS)", "Cardio", "15–20 min", "Suave", 0, "Zona 2 post-pesas para oxidar grasa sin interferir en la recuperación."]);
+    }
+  });
+
+  const etiqObj = objetivo === "fuerza" ? "Fuerza" : objetivo === "hipertrofia" ? "Hipertrofia" : "Déficit / Pérdida Grasa";
   const custom = cargarLS(KEY.planesCustom, {});
   custom["personalizado"] = {
-    titulo: `✨ Mi Rutina a Medida (${dias} días · ${nivel})`,
+    titulo: `✨ Mi Rutina a Medida (${dias} días · ${nivel} · ${etiqObj})`,
     dias: diasArr,
   };
   guardarLS(KEY.planesCustom, custom);
@@ -1491,7 +1608,7 @@ function generarPlanAMedida(dias, nivel, equipo, objetivo) {
   renderHoyToca();
 
   if ($("panel-asistente")) $("panel-asistente").style.display = "none";
-  alert(`¡Listo! Tu rutina personalizada de ${dias} días (${nivel}) ha sido generada y activada con éxito.`);
+  alert(`¡Listo! Tu rutina personalizada de ${dias} días (${nivel} · ${etiqObj}) ha sido generada y activada con éxito.`);
 }
 
 if ($("btn-generar-plan")) {
@@ -1596,7 +1713,20 @@ $("btn-edit-guardar").addEventListener("click", () => {
 
   if (planKey === planActual) renderPlan(planKey);
   renderEditor();
-  alert("Cambios guardados.");
+
+  let avisoVol = "";
+  if (typeof calcularVolumenPorMusculo === "function") {
+    const vol = calcularVolumenPorMusculo(copia);
+    const bajos = [];
+    const altos = [];
+    [["Pecho", vol.Pecho], ["Espalda", vol.Espalda], ["Hombros", vol.Hombros], ["Bíceps", vol.Bíceps], ["Tríceps", vol.Tríceps], ["Cuádriceps", vol.Cuádriceps], ["Isquios/Glúteo", (vol.Isquios || 0) + (vol.Glúteo || 0)]].forEach(([g, s]) => {
+      if (s < 6) bajos.push(`${g} (${s} series)`);
+      if (s > 20) altos.push(`${g} (${s} series)`);
+    });
+    if (bajos.length) avisoVol += `\n⚠️ Volumen bajo (<6 series/sem): ${bajos.join(", ")}.`;
+    if (altos.length) avisoVol += `\n⚠️ Volumen muy alto (>20 series/sem, riesgo de sobreentrenamiento): ${altos.join(", ")}.`;
+  }
+  alert("Cambios guardados." + avisoVol);
 });
 
 $("btn-edit-reset").addEventListener("click", () => {
@@ -1940,11 +2070,179 @@ const BASE_DATOS_MAQUINAS = {
     rir: "RIR 1–2",
     descanso: 120,
     sustituye: "Peso muerto rumano con mancuernas o Curl femoral."
+  },
+  "Press de hombros en máquina": {
+    nombre: "Press de Hombros en Máquina Convergente",
+    grupo: "Deltoides anterior, deltoides lateral y tríceps",
+    ajustes: [
+      "Ajusta la altura del asiento para que los agarres queden a la altura de tus hombros o barbilla.",
+      "Elige el agarre neutro (palmas enfrentadas) si tienes molestias en el hombro, o prono para mayor énfasis lateral.",
+      "Apoya firmemente la espalda y la cabeza contra el respaldo."
+    ],
+    ejecucion: [
+      "Empuja las palancas verticalmente sin llegar a bloquear los codos con violencia.",
+      "Mantén las costillas bajas y el abdomen activo para no arquear la zona lumbar.",
+      "Desciende en 2–3 segundos hasta que las manos vuelvan a la altura de las orejas/barbilla."
+    ],
+    errores: [
+      "Despegar la zona lumbar del respaldo para empujar más peso.",
+      "Encoger los trapecios hacia las orejas al final del recorrido."
+    ],
+    series: "3×8–10",
+    rir: "RIR 1–2",
+    descanso: 90,
+    sustituye: "Press militar con mancuernas o en barra Smith."
+  },
+  "Face pull en polea": {
+    nombre: "Face Pull en Polea Alta con Cuerda",
+    grupo: "Deltoides posterior, manguito rotador y trapecio medio",
+    ajustes: [
+      "Coloca la polea a la altura de la cara o ligeramente por encima.",
+      "Engancha la cuerda doble y sujétala con agarre neutro (pulgares apuntando hacia atrás)."
+    ],
+    ejecucion: [
+      "Da un paso atrás para tensar el cable y mantén el torso firme.",
+      "Tira del centro de la cuerda hacia tu frente separando las manos y rotando los hombros hacia fuera (como haciendo doble bíceps).",
+      "Pausa 1 segundo apretando escápulas y regresa controlado."
+    ],
+    errores: [
+      "Usar demasiado peso e impulsarse con la espalda baja.",
+      "Bajar los codos en lugar de mantenerlos altos a la altura del hombro."
+    ],
+    series: "3×12–15",
+    rir: "RIR 1–2 (última RIR 0)",
+    descanso: 60,
+    sustituye: "Pec deck inverso (deltoide posterior)."
+  },
+  "Curl de bíceps en polea baja": {
+    nombre: "Curl de Bíceps en Polea Baja / Máquina",
+    grupo: "Bíceps braquial y braquiorradial",
+    ajustes: [
+      "Sitúa el carro de la polea en la posición más baja y acopla barra recta, barra Z o cuerda.",
+      "Da medio paso adelante o atrás para mantener tensión continua desde el inicio."
+    ],
+    ejecucion: [
+      "Pega los codos a las costillas y mantén los hombros deprimidos.",
+      "Flexiona el codo llevando la barra hacia los hombros y aprieta 1 segundo arriba.",
+      "Baja en 2–3 segundos extendiendo el brazo por completo sin perder tensión."
+    ],
+    errores: [
+      "Adelantar los codos para ayudarse con el deltoide anterior.",
+      "Balancear el tronco para mover cargas excesivas."
+    ],
+    series: "3×10–12",
+    rir: "RIR 1–2 (última RIR 0)",
+    descanso: 60,
+    sustituye: "Curl de bíceps en máquina predicador o con mancuernas."
+  },
+  "Gemelo en prensa": {
+    nombre: "Elevación de Gemelos en Prensa o Máquina",
+    grupo: "Gastrocnemio y sóleo (pantorrilla)",
+    ajustes: [
+      "Coloca solo la puntera y metatarso en el borde inferior de la plataforma, con losbloqueos de seguridad puestos.",
+      "Mantén las rodillas con una micro-flexión fija para proteger la articulación."
+    ],
+    ejecucion: [
+      "Deja bajar los talones todo lo posible y mantén una pausa de 2 segundos en máximo estiramiento (evita el rebote del tendón de Aquiles).",
+      "Empuja con el metatarso hasta la máxima extensión plantar y pausa 1 segundo arriba."
+    ],
+    errores: [
+      "Hacer rebotes rápidos y cortos sin pausa abajo.",
+      "Flexionar las rodillas durante el empuje."
+    ],
+    series: "4×12–15",
+    rir: "RIR 1–2 (última RIR 0)",
+    descanso: 60,
+    sustituye: "Gemelo sentado o de pie en máquina específica."
+  },
+  "Abducción en máquina": {
+    nombre: "Abducción de Cadera en Máquina",
+    grupo: "Glúteo medio, glúteo menor y fibras superiores del glúteo mayor",
+    ajustes: [
+      "Ajusta la apertura inicial de las almohadillas para que las piernas empiecen lo más juntas posible.",
+      "Coloca la parte externa de las rodillas contra los cojines."
+    ],
+    ejecucion: [
+      "Mantén la pelvis estable (puedes inclinar ligeramente el tronco hacia delante con espalda recta).",
+      "Abre las piernas empujando con las rodillas hacia fuera y mantén 1 segundo en máxima apertura.",
+      "Cierra en 2 segundos sin que las placas choquen."
+    ],
+    errores: [
+      "Hacer repeticiones explosivas con rebote.",
+      "Levantar los glúteos del asiento."
+    ],
+    series: "3×15–20",
+    rir: "RIR 1–2 (última RIR 0)",
+    descanso: 60,
+    sustituye: "Abducción en polea baja con tobillera."
+  },
+  "Press Pallof en polea media": {
+    nombre: "Press Pallof en Polea Media (Core Anti-Rotación)",
+    grupo: "Transverso abdominal, oblicuos y cuadrado lumbar",
+    ajustes: [
+      "Coloca la polea a la altura del esternón con un maneral individual (D-handle).",
+      "Colócate de perfil a la torre de poleas a un paso de distancia."
+    ],
+    ejecucion: [
+      "Sujeta el maneral con ambas manos pegado al centro del pecho y activa glúteos y abdomen.",
+      "Extiende los brazos al frente resistiendo la fuerza lateral de la polea que intenta girarte; pausa 2 segundos.",
+      "Vuelve al pecho despacio y repite con ambos lados."
+    ],
+    errores: [
+      "Rotar los hombros o la cadera hacia la polea.",
+      "Juntar demasiado los pies perdiendo base de sustentación."
+    ],
+    series: "3×12–15",
+    rir: "RIR 1–2",
+    descanso: 60,
+    sustituye: "Plancha abdominal isométrica o Crunch en polea alta."
+  },
+  "Sentadilla búlgara con barra Smith": {
+    nombre: "Sentadilla Búlgara en Multipower (Smith)",
+    grupo: "Cuádriceps, glúteo mayor e isquiotibiales (unilateral)",
+    ajustes: [
+      "Coloca un banco o rodillo detrás de la barra Smith a un paso de distancia.",
+      "Apoya el empeine del pie trasero en el banco y el pie delantero firme bajo la barra."
+    ],
+    ejecucion: [
+      "Desbloquea la barra sobre los trapecios y desciende flexionando la rodilla delantera hasta 90° (inclina el torso 15° para mayor glúteo o vertical para cuádriceps).",
+      "Empuja el suelo con toda la planta del pie delantero sin impulsarte con la pierna de atrás."
+    ],
+    errores: [
+      "Colocar el pie delantero en línea recta con el trasero como en una cuerda floja (mantén anchura de caderas).",
+      "Empujar con el pie trasero en vez de la pierna delantera."
+    ],
+    series: "3×10–12",
+    rir: "RIR 1–2",
+    descanso: 90,
+    sustituye: "Zancadas con mancuernas o Prensa unilateral."
   }
 };
 
+const ALIAS_MAQUINA_DB = {
+  "Extensión de tríceps en polea": "Polea tríceps",
+  "Remo sentado en máquina": "Remo máquina",
+  "Pec deck (aperturas en máquina)": "Pec Deck",
+  "Pec deck inverso (deltoide posterior)": "Face pull en polea",
+  "Peso muerto rumano con barra Smith": "Multipower (Smith)",
+  "Crunch en polea alta": "Abdominal en máquina"
+};
+
+function resolverClaveMaquinaDB(nombre) {
+  if (!nombre) return null;
+  if (BASE_DATOS_MAQUINAS[nombre]) return nombre;
+  if (ALIAS_MAQUINA_DB[nombre] && BASE_DATOS_MAQUINAS[ALIAS_MAQUINA_DB[nombre]]) return ALIAS_MAQUINA_DB[nombre];
+  const canon = typeof normalizarEjercicioCanonico === "function" ? normalizarEjercicioCanonico(nombre) : nombre;
+  if (canon && BASE_DATOS_MAQUINAS[canon]) return canon;
+  if (canon && ALIAS_MAQUINA_DB[canon] && BASE_DATOS_MAQUINAS[ALIAS_MAQUINA_DB[canon]]) return ALIAS_MAQUINA_DB[canon];
+  return null;
+}
+
 function buscarMaquinaDB(query) {
   if (!query) return null;
+  const directa = resolverClaveMaquinaDB(query);
+  if (directa) return BASE_DATOS_MAQUINAS[directa];
+
   const q = query.toLowerCase().trim();
   const keys = Object.keys(BASE_DATOS_MAQUINAS);
 
@@ -2001,7 +2299,8 @@ function mostrarGuiaMaquina(nombre, dataIA = null) {
   if (!cont || !card) return;
 
   const ctx = obtenerContextoSesionHoy();
-  const info = BASE_DATOS_MAQUINAS[nombre] || (dataIA ? {
+  const claveDB = resolverClaveMaquinaDB(nombre);
+  const info = (claveDB ? BASE_DATOS_MAQUINAS[claveDB] : null) || buscarMaquinaDB(nombre) || (dataIA ? {
     nombre: dataIA.nombre || nombre,
     grupo: dataIA.grupo || "Músculos principales",
     ajustes: dataIA.ajustes || [],
@@ -3932,84 +4231,96 @@ const PAQUETES_PRESETS = {
   "def-extrema": {
     titulo: "🔥 Definición Extrema & Retención Muscular (4 días)",
     badge: "Déficit Calórico",
-    descripcion: "Diseñado para periodos de recorte de grasa agresivo o moderado. Mantiene series efectivas de alta intensidad mecánica (RIR 1) para retener el 100% de la masa magra sin fatigar en exceso el Sistema Nervioso Central.",
+    descripcion: "Diseñado para periodos de recorte de grasa agresivo o moderado. Garantiza 10 series semanales de pecho y espalda, empuje vertical de hombros, 6 series de bíceps y tríceps, trabajo unilateral de pierna y core anti-rotación con fatiga sistémica controlada.",
     diasSemana: 4,
-    duracionMin: 50,
-    enfoque: "Retención de masa muscular y estímulo eficiente con fatiga sistémica controlada",
+    duracionMin: 55,
+    enfoque: "Retención del 100% de masa muscular y estímulo completo por grupo con fatiga controlada",
     dias: [
       {
-        dia: "Día 1: Torso A · Densidad y Estabilidad",
+        dia: "Día 1: Torso A · Empuje, Espalda y Brazos",
         ejercicios: [
-          ["Press inclinado en máquina", "Pecho", "3×6–8", "RIR 1", 120, "Tensión en haz clavicular, pausa de 1s abajo"],
-          ["Jalón al pecho en polea", "Espalda", "3×8–10", "RIR 1–2", 90, "Retracción escapular activa sin balanceo lumbar"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Tensión constante en posición acortada"],
-          ["Extensión de tríceps en polea", "Brazos", "3×10–12", "RIR 1", 60, "Codos pegados a los costados"],
-          ["Crunch en polea alta", "Abdomen", "3×12–15", "RIR 1–2", 60, "Flexión de columna toracolumbar"]
+          ["Press inclinado en máquina", "Pecho", "4×6–8", "RIR 1–2", 120, "Tensión en haz clavicular, pausa de 1s abajo"],
+          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Retracción escapular activa sin balanceo lumbar"],
+          ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje vertical guiado para retener fuerza en deltoides"],
+          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1–2", 90, "Tracción hacia abdomen bajo con pecho apoyado"],
+          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Tensión constante en deltoide lateral"],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Codos fijos a los costados"],
+          ["Extensión de tríceps en polea", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Bloqueo completo sin mover el hombro"]
         ]
       },
       {
-        dia: "Día 2: Pierna A · Cuádriceps y Glúteo",
+        dia: "Día 2: Pierna A · Cuádriceps, Unilateral y Core",
         ejercicios: [
-          ["Prensa de piernas", "Piernas", "3×8–10", "RIR 1–2", 120, "Pies en mitad de plataforma, máxima profundidad segura"],
-          ["Extensión de cuádriceps", "Piernas", "3×10–12", "RIR 1", 90, "Pausa de 1s en contracción pico"],
-          ["Curl femoral sentado", "Piernas", "3×10–12", "RIR 1", 90, "Torso inclinado al frente para estirar isquiotibiales"],
-          ["Elevación de gemelos en máquina", "Piernas", "4×12–15", "RIR 0–1", 60, "2s de estiramiento profundo abajo"]
+          ["Prensa de piernas", "Piernas", "4×8–10", "RIR 1–2", 120, "Pies en mitad de plataforma, máxima profundidad segura"],
+          ["Sentadilla búlgara con barra Smith", "Piernas", "3×10–12", "RIR 1–2", 90, "Trabajo unilateral clave para glúteo y cuádriceps"],
+          ["Curl femoral sentado", "Femoral", "3×10–12", "RIR 1–2", 90, "Torso inclinado al frente para estirar isquiotibiales"],
+          ["Extensión de cuádriceps", "Piernas", "3×12–15", "RIR 1–2 (última RIR 0)", 75, "Pausa de 1s en contracción pico"],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "2s de estiramiento profundo abajo"],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad anti-rotación para salud lumbar"]
         ]
       },
       {
-        dia: "Día 3: Torso B · Amplitud y Brazos",
+        dia: "Día 3: Torso B · Densidad, Pectoral y Brazos",
         ejercicios: [
-          ["Remo sentado en máquina", "Espalda", "3×8–10", "RIR 1–2", 90, "Apoyo esternal, codos pegados al cuerpo"],
           ["Press de pecho en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Apertura controlada sin hiperextender el hombro"],
-          ["Pec deck inverso (deltoide posterior)", "Hombros", "3×12–15", "RIR 1", 60, "Plano escapular para deltoides posterior"],
-          ["Curl de bíceps en polea baja", "Brazos", "3×10–12", "RIR 1", 60, "Codos fijos, supinación completa"],
-          ["Press francés en máquina o polea", "Brazos", "3×10–12", "RIR 1", 60, "Énfasis en cabeza larga del tríceps"]
+          ["Remo sentado en máquina", "Espalda", "3×8–10", "RIR 1–2", 90, "Apoyo esternal, codos pegados al cuerpo"],
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 75, "Aislamiento pectoral sin fatiga de tríceps"],
+          ["Pec deck inverso (deltoide posterior)", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Plano escapular para deltoide posterior"],
+          ["Curl de bíceps en máquina", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Estiramiento completo sin impulso"],
+          ["Press francés en máquina o polea", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Énfasis en cabeza larga del tríceps"]
         ]
       },
       {
-        dia: "Día 4: Pierna B · Cadena Posterior y Core",
+        dia: "Día 4: Pierna B · Cadena Posterior, Glúteo y Core",
         ejercicios: [
-          ["Peso muerto rumano con barra Smith", "Piernas", "3×8–10", "RIR 2", 120, "Bisagra de cadera con rodillas semi-flexionadas"],
-          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1", 90, "Bloqueo pélvico de 2s arriba en retroversión"],
-          ["Curl femoral tumbado", "Piernas", "3×12–15", "RIR 1", 75, "Pelvis firme contra el banco"],
-          ["Elevación de piernas en silla romana", "Abdomen", "3×12–15", "RIR 1–2", 60, "Enrollar la pelvis hacia el esternón"]
+          ["Peso muerto rumano con barra Smith", "Femoral", "4×8–10", "RIR 2", 120, "Bisagra de cadera con rodillas semi-flexionadas"],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Bloqueo pélvico de 2s arriba en retroversión"],
+          ["Curl femoral tumbado", "Femoral", "3×10–12", "RIR 1–2 (última RIR 0)", 75, "Pelvis firme contra el banco"],
+          ["Gemelo sentado en máquina", "Gemelo", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Énfasis en sóleo con pausa abajo"],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Flexión controlada de columna toracolumbar"]
         ]
       }
     ]
   },
   "express-poleas": {
-    titulo: "⚡ Hipertrofia Express en Poleas (40 min · 3 días)",
+    titulo: "⚡ Hipertrofia Express en Poleas y Máquinas (45 min · 3 días)",
     badge: "Ahorro de Tiempo",
-    descripcion: "100% en torre de poleas. Sin esperas de máquinas, transiciones de carga instantáneas con clavija y curva de resistencia continua sin puntos muertos en las articulaciones.",
+    descripcion: "Transiciones instantáneas con clavija combinando compuestos guiados y torre de poleas. Cubre pecho compuesto, press de hombros, espalda, pierna completa (cuádriceps, femoral, gemelo) y 6 series semanales de brazos.",
     diasSemana: 3,
-    duracionMin: 40,
-    enfoque: "Eficiencia máxima de tiempo, congestión metabólica y bajo estrés articular",
+    duracionMin: 45,
+    enfoque: "Eficiencia máxima de tiempo, compuestos guiados y tensión continua en polea",
     dias: [
       {
-        dia: "Día 1: Empujes & Tríceps en Polea",
+        dia: "Día 1: Empujes, Hombro & Brazos Express",
         ejercicios: [
-          ["Cruce de poleas a la altura del pecho", "Pecho", "4×10–12", "RIR 1", 75, "Cruce controlado al frente en fase final"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1", 60, "Cable a la altura de la rodilla o muñeca"],
-          ["Extensión de tríceps en polea con cuerda", "Brazos", "4×10–12", "RIR 1", 60, "Separar cuerdas al final de la extensión"],
-          ["Crunch en polea alta", "Abdomen", "3×15", "RIR 1", 60, "Flexión lumbar aislada con agarre a las orejas"]
+          ["Press de pecho en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Compuesto principal de pectoral con ajuste rápido de placas"],
+          ["Cruce de poleas a la altura del pecho", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Cruce controlado al frente en máxima contracción"],
+          ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje vertical guiado sin esperas"],
+          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Cable desde polea baja, tensión constante"],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Separar cuerdas al final de la extensión"],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Superserie opcional con tríceps para ahorrar tiempo"]
         ]
       },
       {
-        dia: "Día 2: Tracciones & Bíceps en Polea",
+        dia: "Día 2: Tracciones, Posterior & Brazos Express",
         ejercicios: [
-          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Agarre medio neutro, descender hacia clavícula"],
-          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1", 75, "Tracción hacia abdomen bajo con codos pegados"],
-          ["Face pull en polea alta", "Hombros", "3×15", "RIR 1", 60, "Codos altos y rotación externa para rotadores"],
-          ["Curl de bíceps en polea baja", "Brazos", "4×10–12", "RIR 1", 60, "Barra corta o cuerda, hombros inmóviles"]
+          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Agarre medio, descender hacia clavícula"],
+          ["Remo en polea baja con apoyo", "Espalda", "4×10–12", "RIR 1–2", 75, "Tracción hacia abdomen bajo con codos pegados"],
+          ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Estímulo de frecuencia 2 para pectoral superior"],
+          ["Face pull en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Codos altos y rotación externa para manguito rotador"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "3 series de curl + 3 de extensión seguidas en la misma polea"],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Flexión lumbar controlada"]
         ]
       },
       {
-        dia: "Día 3: Piernas & Core Cable-Focused",
+        dia: "Día 3: Pierna Completa, Gemelos & Core Anti-Rotación",
         ejercicios: [
-          ["Sentadilla Goblet con polea baja", "Piernas", "4×10–12", "RIR 1–2", 90, "Vector de fuerza posterior que descarga columna"],
-          ["Patada de glúteo en polea con tobillera", "Glúteo", "3×12–15", "RIR 1", 60, "Extensión en diagonal a 45°"],
-          ["Pull-through en polea baja (isquios y glúteos)", "Piernas", "3×12–15", "RIR 1", 75, "Bisagra pura de cadera con cuerda entre piernas"],
-          ["Press Pallof en polea media", "Core", "3×12 por lado", "RIR 2", 60, "Isometría anti-rotacional pura"]
+          ["Prensa de piernas", "Piernas", "4×8–10", "RIR 1–2", 120, "Compuesto base para cuádriceps y glúteo"],
+          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1–2 (última RIR 0)", 75, "Isquios en máxima elongación"],
+          ["Extensión de cuádriceps", "Piernas", "3×12–15", "RIR 1–2 (última RIR 0)", 75, "Pausa de 1s arriba"],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Extensión completa de cadera"],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "2s de estiramiento abajo"],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Isometría anti-rotacional por lado"]
         ]
       }
     ]
@@ -4017,46 +4328,52 @@ const PAQUETES_PRESETS = {
   "gluteo-cadena-post": {
     titulo: "🍑 Glúteos y Cadena Posterior Especializada (4 días)",
     badge: "Hipertrofia Glútea",
-    descripcion: "Enfoque biomecánico avanzado para el desarrollo de glúteo mayor, glúteo medio e isquiotibiales con estímulo en máxima elongación y contracción, combinado con tren superior estético en V.",
+    descripcion: "Enfoque biomecánico avanzado para glúteo mayor, medio e isquiotibiales, combinado con un tren superior realmente completo (pecho, espalda, hombros y 6 series semanales de bíceps y tríceps).",
     diasSemana: 4,
     duracionMin: 55,
-    enfoque: "Glúteo máximo, medio, femorales y proporción estética femenina/masculina",
+    enfoque: "Glúteo máximo, medio, femorales y tren superior estético equilibrado",
     dias: [
       {
         dia: "Día 1: Glúteo Mayor & Cuádriceps",
         ejercicios: [
-          ["Hip thrust en máquina", "Glúteo", "4×8–10", "RIR 1", 120, "Retroversión pélvica forzada arriba, pausa de 2s"],
-          ["Sentadilla búlgara con barra Smith", "Glúteo", "3×10 por pierna", "RIR 1–2", 90, "Torso inclinado al frente para reclutar glúteo"],
-          ["Prensa con pies altos", "Glúteo", "3×10–12", "RIR 1", 90, "Pies altos y anchos para mayor flexión de cadera"],
-          ["Abducción de cadera en máquina", "Glúteo", "3×15–20", "RIR 0–1", 60, "Inclinando el torso hacia adelante en el asiento"]
+          ["Hip thrust en máquina", "Glúteo", "4×8–10", "RIR 1–2", 120, "Retroversión pélvica arriba, pausa de 2s"],
+          ["Sentadilla búlgara con barra Smith", "Glúteo", "3×10–12", "RIR 1–2", 90, "Torso inclinado 15° al frente para reclutar glúteo"],
+          ["Prensa con pies altos", "Piernas", "3×10–12", "RIR 1–2", 90, "Pies altos para mayor flexión de cadera y cuádriceps"],
+          ["Extensión de cuádriceps", "Piernas", "3×12–15", "RIR 1–2 (última RIR 0)", 75, "Estímulo directo de cuádriceps"],
+          ["Abducción en máquina", "Glúteo", "3×15–20", "RIR 1–2 (última RIR 0)", 60, "Pausa de 1s en máxima apertura"]
         ]
       },
       {
-        dia: "Día 2: Torso Estético & Hombro 3D",
+        dia: "Día 2: Torso Estético A · Espalda, Pecho, Hombro y Brazos",
         ejercicios: [
-          ["Jalón al pecho en polea", "Espalda", "3×8–10", "RIR 1–2", 90, "Tirón controlado al esternón"],
-          ["Press de hombros en máquina", "Hombros", "3×10–12", "RIR 1–2", 90, "Empuje vertical suave sin hiperextensión"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Brazo en el plano escapular"],
-          ["Pec deck inverso (deltoide posterior)", "Hombros", "3×12–15", "RIR 1", 60, "Aislamiento de la cabeza posterior"],
-          ["Crunch en polea alta", "Abdomen", "3×15", "RIR 1", 60, "Flexión controlada de columna"]
+          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Tirón controlado al esternón"],
+          ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Firmeza y desarrollo del pectoral superior"],
+          ["Press de hombros en máquina", "Hombros", "3×10–12", "RIR 1–2", 90, "Empuje vertical guiado"],
+          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Brazo en el plano escapular"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "3 series de bíceps + 3 de tríceps para brazos tonificados"],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Flexión controlada de columna"]
         ]
       },
       {
-        dia: "Día 3: Isquiotibiales & Glúteo Medio",
+        dia: "Día 3: Isquiotibiales, Glúteo Medio & Core",
         ejercicios: [
-          ["Peso muerto rumano con barra Smith", "Piernas", "4×8–10", "RIR 1–2", 120, "Estiramiento profundo en isquiosurales"],
-          ["Curl femoral sentado", "Piernas", "3×10–12", "RIR 1", 90, "Fase excéntrica de 3 segundos"],
-          ["Patada de glúteo en polea con tobillera", "Glúteo", "3×12–15", "RIR 1", 60, "Movimiento fluido sin arquear zona lumbar"],
-          ["Abducción en máquina", "Glúteo", "3×20 (drop-set final)", "RIR 0", 60, "Congestión metabólica en glúteo medio"]
+          ["Peso muerto rumano con barra Smith", "Femoral", "4×8–10", "RIR 1–2", 120, "Estiramiento profundo en isquiosurales"],
+          ["Curl femoral sentado", "Femoral", "3×10–12", "RIR 1–2 (última RIR 0)", 90, "Fase excéntrica de 3 segundos"],
+          ["Hiperextensiones en máquina 45°", "Glúteo", "3×12–15", "RIR 1–2", 75, "Empuja la cadera contra el cojín apretando glúteos"],
+          ["Abducción en máquina", "Glúteo", "3×15–20", "RIR 1–2 (última RIR 0)", 60, "Drop-set opcional solo en la última serie"],
+          ["Gemelo en prensa", "Gemelo", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Pausa de 2s abajo"],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad pélvica y lumbar"]
         ]
       },
       {
-        dia: "Día 4: Full Body & Detalle",
+        dia: "Día 4: Torso Estético B & Recordatorio Glúteo",
         ejercicios: [
-          ["Remo sentado en máquina", "Espalda", "3×10–12", "RIR 1–2", 75, "Espalda neutra, retracción total"],
-          ["Press de pecho en máquina", "Pecho", "3×10–12", "RIR 1–2", 75, "Control en estiramiento del pectoral"],
-          ["Hiperextensiones en máquina 45° (énfasis glúteo)", "Glúteo", "3×12–15", "RIR 1", 60, "Espalda redondeada para aislar glúteos"],
-          ["Elevación de gemelos en máquina", "Piernas", "3×15", "RIR 1", 60, "Pausa de 2s abajo y arriba"]
+          ["Remo sentado en máquina", "Espalda", "4×8–10", "RIR 1–2", 90, "Espalda neutra, retracción escapular total"],
+          ["Press de pecho en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Control en estiramiento del pectoral"],
+          ["Pec deck (aperturas en máquina)", "Pecho", "2×12–15", "RIR 1–2", 60, "Aislamiento pectoral"],
+          ["Face pull en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Deltoide posterior y postura"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Completa las 6 series semanales de bíceps y tríceps"],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Bombeo final de glúteo"]
         ]
       }
     ]
@@ -4064,36 +4381,43 @@ const PAQUETES_PRESETS = {
   "zero-impact": {
     titulo: "🛡 Articulaciones Sanas & Zero Impact (3 días)",
     badge: "Protección Articular",
-    descripcion: "Cero cargas axiales comprimiendo la columna vertebral y cero impactos lesivos. Utiliza trayectorias guiadas convergentes y poleas, perfecto para personas con molestias lumbares, de rodilla o manguito rotador.",
+    descripcion: "Cero cargas axiales comprimiendo la columna vertebral y cero impactos lesivos. Incluye core estabilizador (Press Pallof), glúteo directo para proteger la zona lumbar y volumen equilibrado en brazos y torso.",
     diasSemana: 3,
-    duracionMin: 45,
-    enfoque: "Preservación articular total, cero dolor y máxima tensión mecánica segura",
+    duracionMin: 50,
+    enfoque: "Preservación articular total, core estabilizador lumbar y máxima tensión mecánica segura",
     dias: [
       {
-        dia: "Día 1: Empuje Articularmente Amigable",
+        dia: "Día 1: Empuje Articularmente Amigable & Core",
         ejercicios: [
           ["Press de pecho en máquina", "Pecho", "3×10–12", "RIR 2", 90, "Trayectoria convergente que no pinza el manguito rotador"],
-          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 1–2", 75, "Codos semi-flexionados y estables en los pads"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1", 60, "Tensión suave y constante sin picos de inercia"],
-          ["Extensión de tríceps en polea", "Brazos", "3×12–15", "RIR 1", 60, "Codo pegado al torso, cero estrés de muñeca"]
+          ["Pec deck (aperturas en máquina)", "Pecho", "3×12–15", "RIR 1–2", 75, "Codos semi-flexionados sin hiperextender hombro"],
+          ["Press de hombros en máquina", "Hombros", "3×10–12", "RIR 2", 90, "Agarre neutro para liberar el espacio subacromial"],
+          ["Elevaciones laterales en polea", "Hombros", "3×12–15", "RIR 1–2", 60, "Tensión suave y constante sin inercia"],
+          ["Extensión de tríceps en polea", "Tríceps", "3×12–15", "RIR 1–2", 60, "Codo pegado al torso, cero estrés de muñeca"],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Core anti-rotación imprescindible para proteger lumbares"]
         ]
       },
       {
-        dia: "Día 2: Tracción & Espalda Descomprimida",
+        dia: "Día 2: Tracción Descomprimida & Brazos",
         ejercicios: [
           ["Remo sentado en máquina", "Espalda", "4×10–12", "RIR 1–2", 90, "Apoyo en el pecho: anula la carga sobre la columna lumbar"],
-          ["Jalón al pecho agarre estrecho", "Espalda", "3×10–12", "RIR 1–2", 90, "Agarre neutro: alivia completamente el hombro y bíceps"],
-          ["Face pull en polea alta", "Hombros", "3×15", "RIR 1", 60, "Salud del manguito y postura escapular"],
-          ["Curl de bíceps en polea baja", "Brazos", "3×12–15", "RIR 1", 60, "Movimiento continuo sin balanceo lumbar"]
+          ["Jalón al pecho agarre estrecho", "Espalda", "4×10–12", "RIR 1–2", 90, "Agarre neutro: alivia hombro y descomprime columna"],
+          ["Press inclinado en máquina", "Pecho", "2×10–12", "RIR 2", 90, "Recorrido controlado sin bajar en exceso"],
+          ["Face pull en polea", "Hombros", "3×12–15", "RIR 1–2", 60, "Salud del manguito rotador y postura escapular"],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×12–15", "RIR 1–2", 60, "Movimiento continuo sin balanceo lumbar"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×12–15", "RIR 1–2", 60, "Estímulo articularmente seguro con cargas moderadas"]
         ]
       },
       {
-        dia: "Día 3: Piernas sin Compresión Lumbar",
+        dia: "Día 3: Piernas, Glúteo & Core sin Compresión Lumbar",
         ejercicios: [
           ["Prensa de piernas", "Piernas", "3×10–12", "RIR 2", 120, "Espalda baja pegada firmemente al respaldo"],
-          ["Curl femoral sentado", "Piernas", "4×10–12", "RIR 1", 90, "Seguro para la rodilla y cadera"],
-          ["Extensión de cuádriceps", "Piernas", "3×12–15", "RIR 1–2", 75, "Rango 10° a 80° sin bloqueo violento"],
-          ["Elevación de gemelos en máquina", "Piernas", "3×15", "RIR 1", 60, "Carga directa en pantorrilla sin comprimir vértebras"]
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Fortalece glúteo para descargar la columna lumbar"],
+          ["Curl femoral sentado", "Femoral", "4×10–12", "RIR 1–2", 90, "Estabilidad completa para rodilla y cadera"],
+          ["Extensión de cuádriceps", "Piernas", "3×12–15", "RIR 1–2", 75, "Rango controlado sin bloqueo violento"],
+          ["Abducción en máquina", "Glúteo", "3×15–20", "RIR 1–2", 60, "Estabilidad lateral de pelvis y cadera"],
+          ["Gemelo en prensa", "Gemelo", "3×12–15", "RIR 1–2", 60, "Carga directa en pantorrilla sin peso sobre los hombros"],
+          ["Abdominal en máquina", "Core", "3×12–15", "RIR 1–2", 60, "Respaldo guiado sin tirones cervicales"]
         ]
       }
     ]
@@ -4101,49 +4425,53 @@ const PAQUETES_PRESETS = {
   "torso-en-v": {
     titulo: "👑 Torso en V & Cintura Estrecha (4 días)",
     badge: "Proporción Estética",
-    descripcion: "Optimizado para construir la icónica silueta en V (V-Taper): máxima amplitud del dorsal ancho, deltoides lateral expandido y pecho superior denso, con base de pierna equilibrada.",
+    descripcion: "Optimizado para construir la silueta en V (V-Taper): máxima amplitud del dorsal ancho, deltoides 3D y pecho superior denso, con pierna completa (incluyendo PMR, glúteo y femoral) y 6 series de brazos.",
     diasSemana: 4,
-    duracionMin: 50,
-    enfoque: "Dorsal ancho, hombros 3D, haz clavicular pectoral y cintura estrecha",
+    duracionMin: 55,
+    enfoque: "Dorsal ancho, hombros 3D, haz clavicular pectoral y tren inferior compensado",
     dias: [
       {
-        dia: "Día 1: Espalda Anchura & Deltoides Lateral",
+        dia: "Día 1: Espalda Anchura, Deltoides & Bíceps",
         ejercicios: [
-          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1", 90, "Codos dirigidos a las caderas para activar dorsal"],
-          ["Remo en polea baja con apoyo", "Espalda", "3×8–10", "RIR 1", 90, "Tracción hacia el ombligo con pecho erguido"],
-          ["Pullover en polea", "Espalda", "3×12–15", "RIR 1", 60, "Aislamiento puro del dorsal en elongación"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Tensión continua en cabeza lateral"],
-          ["Pec deck inverso (deltoide posterior)", "Hombros", "3×12–15", "RIR 1", 60, "Rango completo para hombro posterior"]
+          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Codos dirigidos a las caderas para activar dorsal"],
+          ["Remo en polea baja con apoyo", "Espalda", "3×8–10", "RIR 1–2", 90, "Tracción hacia el ombligo con pecho erguido"],
+          ["Pullover en polea o máquina", "Espalda", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Aislamiento puro del dorsal en elongación"],
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Tensión continua en cabeza lateral"],
+          ["Pec deck inverso (deltoide posterior)", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Rango completo para hombro posterior"],
+          ["Curl de bíceps en máquina", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Aislamiento estricto en banco predicador"]
         ]
       },
       {
         dia: "Día 2: Pecho Superior & Brazos",
         ejercicios: [
-          ["Press inclinado en máquina", "Pecho", "4×8–10", "RIR 1", 120, "Banco a 30° para activación clavicular"],
+          ["Press inclinado en máquina", "Pecho", "4×8–10", "RIR 1–2", 120, "Énfasis en haz clavicular superior"],
           ["Press de banca con mancuernas", "Pecho", "3×8–10", "RIR 1–2", 90, "Aducción completa en fase concéntrica"],
-          ["Cruce de poleas a la altura del pecho", "Pecho", "3×12–15", "RIR 1", 60, "Énfasis en haz esternal superior"],
-          ["Curl de bíceps en polea baja", "Brazos", "3×10–12", "RIR 1", 60, "Estiramiento y contracción pico de 1s"],
-          ["Extensión de tríceps en polea con cuerda", "Brazos", "3×10–12", "RIR 1", 60, "Bloqueo lockout de 1s"]
+          ["Cruce de poleas a la altura del pecho", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Máxima contracción pectoral"],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Estiramiento y contracción pico de 1s"],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Bloqueo lockout de 1s"],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Mantiene cintura compacta y estable"]
         ]
       },
       {
-        dia: "Día 3: Pierna Completa & Core",
+        dia: "Día 3: Pierna Completa (Cuádriceps, Isquios & Glúteo)",
         ejercicios: [
           ["Sentadilla en máquina Hack", "Piernas", "3×8–10", "RIR 1–2", 120, "Cero estrés en hombros, sobrecarga en cuádriceps"],
+          ["Peso muerto rumano con barra Smith", "Femoral", "3×8–10", "RIR 1–2", 120, "Bisagra de cadera para isquiotibiales y glúteo"],
           ["Prensa de piernas", "Piernas", "3×10–12", "RIR 1–2", 90, "Recorrido profundo controlado"],
-          ["Curl femoral sentado", "Piernas", "3×10–12", "RIR 1", 75, "Pausa de 1s en contracción"],
-          ["Elevación de gemelos en máquina", "Piernas", "3×15", "RIR 1", 60, "Excéntrica lenta de 3 segundos"],
-          ["Crunch en polea alta", "Abdomen", "3×15", "RIR 1", 60, "Flexión lumbar aislada"]
+          ["Curl femoral sentado", "Femoral", "3×10–12", "RIR 1–2 (última RIR 0)", 75, "Pausa de 1s en contracción"],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Compensa la cadena posterior"],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Excéntrica lenta de 3 segundos"]
         ]
       },
       {
-        dia: "Día 4: Torso Densidad & Hombro 3D",
+        dia: "Día 4: Torso Densidad, Hombro 3D & Tríceps",
         ejercicios: [
-          ["Remo sentado en máquina", "Espalda", "3×8–10", "RIR 1", 90, "Retracción fuerte de trapecio medio y romboides"],
-          ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1", 90, "Empuje vertical guiado"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0", 60, "Drop-set final en la última serie"],
-          ["Fondos en máquina asistida", "Pecho", "3×10–12", "RIR 1", 75, "Inclinación leve al frente para pectoral"],
-          ["Elevación de piernas en silla romana", "Abdomen", "3×12–15", "RIR 1", 60, "Elevación de pelvis hacia el pecho"]
+          ["Remo sentado en máquina", "Espalda", "3×8–10", "RIR 1–2", 90, "Retracción fuerte de trapecio medio y romboides"],
+          ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje vertical guiado"],
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Drop-set final solo en la última serie"],
+          ["Fondos en máquina asistida", "Pecho", "3×10–12", "RIR 1–2", 75, "Pectoral inferior y tríceps"],
+          ["Press francés en máquina o polea", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Cabeza larga del tríceps"],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Flexión lumbar aislada"]
         ]
       }
     ]
@@ -4329,6 +4657,8 @@ function generarPlanHeuristico(prompt) {
   const matchDias = p.match(/\b([2-6])\s*(?:días|dias|dia|d)\b/);
   if (matchDias) {
     numDias = parseInt(matchDias[1], 10);
+  } else if (p.includes("6 días") || p.includes("6 dias") || p.includes("seis")) {
+    numDias = 6;
   } else if (p.includes("3 días") || p.includes("3 dias") || p.includes("tres")) {
     numDias = 3;
   } else if (p.includes("2 días") || p.includes("2 dias") || p.includes("dos")) {
@@ -4337,11 +4667,11 @@ function generarPlanHeuristico(prompt) {
     numDias = 5;
   }
 
-  const esGluteo = p.includes("glúteo") || p.includes("gluteo") || p.includes("cadena posterior") || p.includes("femoral") || p.includes("pierna");
-  const esVTorso = p.includes("torso") || p.includes("espalda") || p.includes("hombro") || p.includes(" en v") || p.includes("v-taper");
+  const esGluteo = p.includes("glúteo") || p.includes("gluteo") || p.includes("cadena posterior") || p.includes("femoral");
+  const esVTorso = p.includes("torso en v") || p.includes(" en v") || p.includes("v-taper") || ((p.includes("espalda") || p.includes("hombro")) && !p.includes("grasa") && !p.includes("defin") && !p.includes("perder"));
   const esSalud = p.includes("articulac") || p.includes("lesion") || p.includes("dolor") || p.includes("cero dolor") || p.includes("lumbar") || p.includes("suave");
   const esPoleas = p.includes("polea") || p.includes("express") || p.includes("40 min") || p.includes("45 min") || p.includes("rápido") || p.includes("rapido");
-  const esDefinicion = p.includes("grasa") || p.includes("defin") || p.includes("perder") || p.includes("cut");
+  const esDefinicion = p.includes("grasa") || p.includes("defin") || p.includes("perder") || p.includes("cut") || p.includes("déficit") || p.includes("deficit");
 
   let base = null;
   let sufijoTitulo = "";
@@ -4349,6 +4679,9 @@ function generarPlanHeuristico(prompt) {
   if (esSalud) {
     base = PAQUETES_PRESETS["zero-impact"];
     sufijoTitulo = "Zero Impact & Salud Articular";
+  } else if (esDefinicion && !esGluteo && !esPoleas) {
+    base = PAQUETES_PRESETS["def-extrema"];
+    sufijoTitulo = (p.includes("espalda") || p.includes("hombro")) ? "Definición & Torso Estético" : "Definición y Pérdida Grasa";
   } else if (esGluteo && !esVTorso) {
     base = PAQUETES_PRESETS["gluteo-cadena-post"];
     sufijoTitulo = "Glúteos & Cadena Posterior";
@@ -4368,29 +4701,89 @@ function generarPlanHeuristico(prompt) {
   copia.descripcion = `Plan personalizado por IA biomecánica según tu solicitud: "${prompt.slice(0, 90)}...". Estructurado con sobrecarga progresiva, volumen científicamente calibrado y protección articular.`;
   copia.diasSemana = numDias;
 
-  if (numDias < copia.dias.length) {
-    copia.dias = copia.dias.slice(0, numDias);
+  // Caso especial 2 días: construir Full Body A/B completo con pierna + torso + brazos en ambas sesiones (nunca dejar sin piernas por slice)
+  if (numDias === 2) {
+    copia.dias = [
+      {
+        dia: "Día 1: Full Body A · Empuje, Cuádriceps & Brazos",
+        ejercicios: [
+          ["Prensa de piernas", "Piernas", "4×8–10", "RIR 1–2", 120, "Profundidad controlada sin despegar pelvis"],
+          ["Peso muerto rumano con barra Smith", "Femoral", "3×8–10", "RIR 1–2", 120, "Bisagra de cadera e isquiotibiales"],
+          ["Press de pecho en máquina", "Pecho", "4×8–10", "RIR 1–2", 90, "Escápulas retraídas, pausa de 1s"],
+          ["Jalón al pecho en polea", "Espalda", "4×8–10", "RIR 1–2", 90, "Tracción vertical hacia clavícula"],
+          ["Press de hombros en máquina", "Hombros", "3×8–10", "RIR 1–2", 90, "Empuje vertical guiado"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "3 series de bíceps + 3 de tríceps"],
+          ["Press Pallof en polea media", "Core", "3×12–15", "RIR 1–2", 60, "Estabilidad anti-rotación lumbar"]
+        ]
+      },
+      {
+        dia: "Día 2: Full Body B · Tracción, Cadena Posterior & Brazos",
+        ejercicios: [
+          ["Sentadilla en máquina Hack", "Piernas", "4×8–10", "RIR 1–2", 120, "Espalda apoyada, recorrido completo"],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Pausa de 2s en retroversión arriba"],
+          ["Curl femoral sentado", "Femoral", "3×10–12", "RIR 1–2 (última RIR 0)", 90, "Control excéntrico de 3s"],
+          ["Remo sentado en máquina", "Espalda", "4×8–10", "RIR 1–2", 90, "Tracción horizontal con apoyo pectoral"],
+          ["Press inclinado en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Énfasis en pectoral superior"],
+          ["Face pull en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Salud del hombro y deltoide posterior"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Completa 6 series semanales de brazos"],
+          ["Gemelo en prensa", "Gemelo", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "2s de estiramiento abajo"]
+        ]
+      }
+    ];
+  } else if (numDias === 6) {
+    // Caso especial 6 días: PPL × 2 completo (6 días reales)
+    const pplBase = JSON.parse(JSON.stringify(PLANES["ppl"].dias));
+    copia.dias = [
+      { dia: "Día 1: Push A (Pecho + Hombros + Tríceps)", ejercicios: JSON.parse(JSON.stringify(pplBase[0].ejercicios)) },
+      { dia: "Día 2: Pull A (Espalda + Deltoide post. + Bíceps)", ejercicios: JSON.parse(JSON.stringify(pplBase[1].ejercicios)) },
+      { dia: "Día 3: Legs A (Cuádriceps + Glúteo + Core)", ejercicios: JSON.parse(JSON.stringify(pplBase[2].ejercicios)) },
+      { dia: "Día 4: Push B (Hipertrofia Pectoral & Hombro 3D)", ejercicios: JSON.parse(JSON.stringify(pplBase[0].ejercicios)) },
+      { dia: "Día 5: Pull B (Densidad Dorsal & Brazos)", ejercicios: JSON.parse(JSON.stringify(pplBase[1].ejercicios)) },
+      { dia: "Día 6: Legs B (Cadena Posterior & Glúteo)", ejercicios: JSON.parse(JSON.stringify(pplBase[2].ejercicios)) },
+    ];
+  } else if (numDias < copia.dias.length) {
+    // Si pide 3 días sobre un plan de 4 (Torso/Pierna), convertir el Día 3 en Pierna + Torso Completo para no perder día de pierna o torso
+    if (numDias === 3 && copia.dias.length === 4) {
+      copia.dias = [
+        copia.dias[0],
+        copia.dias[1],
+        {
+          dia: "Día 3: Full Body Compensatorio (Torso B + Cadena Posterior)",
+          ejercicios: [
+            ["Peso muerto rumano con barra Smith", "Femoral", "3×8–10", "RIR 1–2", 120, "Cadena posterior e isquios"],
+            ["Hip thrust en máquina", "Glúteo", "3×10–12", "RIR 1–2", 90, "Glúteo mayor en contracción"],
+            ["Remo sentado en máquina", "Espalda", "3×8–10", "RIR 1–2", 90, "Espalda media y dorsal"],
+            ["Press de pecho en máquina", "Pecho", "3×8–10", "RIR 1–2", 90, "Empuje horizontal guiado"],
+            ["Face pull en polea", "Hombros", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Deltoide posterior"],
+            ["Superset bíceps/tríceps en polea", "Brazos", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Brazos completos"]
+          ]
+        }
+      ];
+    } else {
+      copia.dias = copia.dias.slice(0, numDias);
+    }
   } else if (numDias > copia.dias.length) {
+    if (numDias >= 4 && copia.dias.length === 3) {
+      copia.dias.push({
+        dia: "Día 4: Torso & Brazos Complementario",
+        ejercicios: [
+          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1–2", 75, "Tracción al abdomen bajo"],
+          ["Cruce de poleas a la altura del pecho", "Pecho", "3×12–15", "RIR 1–2 (última RIR 0)", 60, "Cruce controlado al frente"],
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Tensión constante"],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Bloqueo lockout de 1s"],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Codos estables"]
+        ]
+      });
+    }
     if (numDias === 5 && copia.dias.length === 4) {
       copia.dias.push({
         dia: "Día 5: Full Body Compensatorio & Brazos",
         ejercicios: [
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Tensión constante en plano escapular"],
-          ["Curl de bíceps en polea baja", "Brazos", "3×10–12", "RIR 1", 60, "Codos fijos, supinación completa"],
-          ["Extensión de tríceps en polea con cuerda", "Brazos", "3×10–12", "RIR 1", 60, "Separación terminal de las cuerdas"],
-          ["Prensa de piernas", "Piernas", "3×10–12", "RIR 2", 90, "Recorrido fluido y controlado"],
-          ["Crunch en polea alta", "Abdomen", "3×15", "RIR 1", 60, "Flexión de columna toracolumbar"]
-        ]
-      });
-    } else if (numDias === 4 && copia.dias.length === 3) {
-      copia.dias.push({
-        dia: "Día 4: Torso & Brazos Complementario",
-        ejercicios: [
-          ["Remo en polea baja con apoyo", "Espalda", "3×10–12", "RIR 1", 75, "Tracción al abdomen bajo"],
-          ["Cruce de poleas a la altura del pecho", "Pecho", "3×12–15", "RIR 1", 60, "Cruce controlado al frente"],
-          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 0–1", 60, "Tensión constante"],
-          ["Extensión de tríceps en polea con cuerda", "Brazos", "3×12", "RIR 1", 60, "Bloqueo lockout de 1s"],
-          ["Curl de bíceps en polea baja", "Brazos", "3×12", "RIR 1", 60, "Codos estables"]
+          ["Elevaciones laterales en polea", "Hombros", "4×12–15", "RIR 1–2 (última RIR 0)", 60, "Tensión constante en plano escapular"],
+          ["Curl de bíceps en polea baja", "Bíceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Codos fijos, supinación completa"],
+          ["Extensión de tríceps en polea con cuerda", "Tríceps", "3×10–12", "RIR 1–2 (última RIR 0)", 60, "Separación terminal de las cuerdas"],
+          ["Prensa de piernas", "Piernas", "3×10–12", "RIR 1–2", 90, "Recorrido fluido y controlado"],
+          ["Crunch en polea alta", "Core", "3×12–15", "RIR 1–2", 60, "Flexión de columna toracolumbar"]
         ]
       });
     }

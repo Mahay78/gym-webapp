@@ -5,7 +5,8 @@ const fitnessMath = Object.fromEntries([
   "hoyISO", "fmtFecha", "escapeHtml", "sugerirCarga", "parsearNumSeries",
   "calcularDiscosBarra", "calcularAproximacion", "calcularRacha",
   "formatearPlanTexto", "normalizarTextoVoz", "parsearComandoCarga",
-  "calcularAngulo", "calcularTdee", "calcularMacros", "categoriaImc"
+  "calcularAngulo", "calcularTdee", "calcularMacros", "categoriaImc",
+  "normalizarEjercicioCanonico", "calcularVolumenPorMusculo"
 ].map(n => [n, "readonly"]));
 
 export default [

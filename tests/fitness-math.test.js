@@ -139,3 +139,44 @@ test("formatearPlanTexto exporta el plan en texto plano", () => {
   });
   assert.equal(txt, "Full Body\n\nDía 1\n- Prensa: 4x10 (RIR 2, 90s)");
 });
+
+/* ---------- IDs canónicos y Volumen Semanal ---------- */
+test("normalizarEjercicioCanonico unifica alias de máquinas, poleas y gemelos", () => {
+  assert.equal(fm.normalizarEjercicioCanonico("Polea tríceps"), "Extensión de tríceps en polea");
+  assert.equal(fm.normalizarEjercicioCanonico("Remo máquina"), "Remo sentado en máquina");
+  assert.equal(fm.normalizarEjercicioCanonico("Elevación de gemelos en máquina"), "Gemelo en prensa");
+  assert.equal(fm.normalizarEjercicioCanonico("Pec deck inverso (deltoide posterior)"), "Face pull en polea");
+  assert.equal(fm.normalizarEjercicioCanonico("Face pull en polea alta"), "Face pull en polea");
+  assert.equal(fm.normalizarEjercicioCanonico("Abducción de cadera en máquina"), "Abducción en máquina");
+});
+
+test("calcularVolumenPorMusculo contabiliza series directas y superseries antagonistas", () => {
+  const plan = {
+    dias: [
+      {
+        dia: "Día 1",
+        ejercicios: [
+          ["Press de pecho en máquina", "Pecho", "4×8–10"],
+          ["Jalón al pecho en polea", "Espalda", "4×8–10"],
+          ["Superset bíceps/tríceps en polea", "Brazos", "3×12–15"],
+          ["Prensa de piernas", "Piernas", "4×8–10"],
+          ["Peso muerto rumano con barra Smith", "Femoral", "3×8–10"],
+          ["Hip thrust en máquina", "Glúteo", "3×10–12"],
+          ["Gemelo en prensa", "Gemelo", "4×12–15"],
+          ["Press Pallof en polea media", "Core", "3×12–15"]
+        ]
+      }
+    ]
+  };
+  const vol = fm.calcularVolumenPorMusculo(plan);
+  assert.equal(vol.Pecho, 4);
+  assert.equal(vol.Espalda, 4);
+  assert.equal(vol.Bíceps, 3);
+  assert.equal(vol.Tríceps, 3);
+  assert.equal(vol.Cuádriceps, 4);
+  assert.equal(vol.Isquios, 3);
+  assert.equal(vol.Glúteo, 3);
+  assert.equal(vol.Gemelos, 4);
+  assert.equal(vol.Core, 3);
+});
+
