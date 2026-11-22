@@ -110,19 +110,6 @@ function guardarLS(clave, val) {
   }
 }
 
-function hoyISO() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function fmtFecha(iso) {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
-}
-
 function lunesISO(iso) {
   const d = new Date(iso + "T12:00:00");
   const dia = (d.getDay() + 6) % 7; // lunes = 0
@@ -459,7 +446,6 @@ let planActual = localStorage.getItem(KEY.planActual) || "3dias";
 
 /* ---------- Registro de cargas ---------- */
 const SIN_CARGA = ["Cardio", "NEAT", "Recuperación"];
-const MAQUINAS_GRANDES = /(prensa|hack|hip thrust|rumano|smith|sentadilla|banca|deadlift)/i;
 
 /* ---------- Fotos de las máquinas (en orden: las más específicas primero) ---------- */
 const IMG_EJERCICIOS = [
@@ -603,17 +589,6 @@ function ultimoRegistroCarga(cargas, nombre) {
   return [...logs].sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
 }
 
-function sugerirCarga(nombre, ultimo) {
-  if (!ultimo) return null;
-  const delta = MAQUINAS_GRANDES.test(nombre) ? 2.5 : 0.5;
-  return Math.round((ultimo.peso + delta) * 2) / 2;
-}
-
-function parsearNumSeries(seriesStr) {
-  const m = (seriesStr || "").match(/^(\d+)\s*[x×]/i);
-  return m ? parseInt(m[1], 10) : 3;
-}
-
 function renderPlanTabs() {
   const cont = $("plan-tabs");
   if (!cont) return;
@@ -624,7 +599,7 @@ function renderPlanTabs() {
     const pl = getPlan(k);
     const activo = k === planActual;
     const nombreCorto = pl.titulo.split(" (")[0] || pl.titulo;
-    return `<button class="tab${activo ? " active" : ""}" data-plan="${k}">${nombreCorto}</button>`;
+    return `<button class="tab${activo ? " active" : ""}" data-plan="${escapeHtml(k)}">${escapeHtml(nombreCorto)}</button>`;
   }).join("");
 
   cont.querySelectorAll(".tab").forEach(tab =>
@@ -634,32 +609,6 @@ function renderPlanTabs() {
       renderPlan(tab.dataset.plan);
     })
   );
-}
-
-function calcularDiscosBarra(pesoTotal, barra = 20) {
-  if (!pesoTotal || pesoTotal <= barra) return "Solo barra (20 kg) o mancuerna";
-  let lado = (pesoTotal - barra) / 2;
-  const discos = [20, 15, 10, 5, 2.5, 1.25];
-  const res = [];
-  discos.forEach(d => {
-    while (lado >= d - 0.01) {
-      res.push(d);
-      lado -= d;
-    }
-  });
-  return res.length ? `Por lado (barra 20 kg): ${res.map(x => `${x}kg`).join(" + ")}` : "Peso inferior a barra estándar";
-}
-
-function calcularAproximacion(peso) {
-  if (!peso || peso <= 15) return "1×10 ligero para calentar";
-  const r = v => Math.max(5, Math.round(v / 2.5) * 2.5);
-  return `Aprox: ${r(peso * 0.5)}kg×6 · ${r(peso * 0.75)}kg×3 · ${r(peso * 0.9)}kg×1`;
-}
-
-function formatearPlanTexto(plan) {
-  return `${plan.titulo}\n\n` + plan.dias.map(d =>
-    `${d.dia}\n` + d.ejercicios.map(e => `- ${e[0]}: ${e[2]} (${e[3] || "RIR 1-2"}, ${e[4] || 90}s)`).join("\n")
-  ).join("\n\n");
 }
 
 function renderPlan(clave) {
@@ -716,8 +665,8 @@ function renderPlan(clave) {
     <div class="plan-day">
       <details class="plan-day-details"${abierto ? " open" : ""}>
         <summary class="day-head">
-          <h4>${abierto ? "▾" : "▸"} ${dia.dia}</h4>
-          <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${dia.dia}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
+          <h4>${abierto ? "▾" : "▸"} ${escapeHtml(dia.dia)}</h4>
+          <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${escapeHtml(dia.dia)}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
         </summary>
       ${dia.ejercicios
         .map((ej, ejIdx) => {
@@ -748,18 +697,18 @@ function renderPlan(clave) {
           return `
           <div class="ex-wrap${esSuperserie ? " ex-superserie" : ""}">
             <div class="exercise">
-              ${rutaImg ? `<img class="ex-img" src="${rutaImg}" alt="Máquina: ${nombre}" loading="lazy" onerror="imgError(this)">` : ""}
+              ${rutaImg ? `<img class="ex-img" src="${rutaImg}" alt="Máquina: ${escapeHtml(nombre)}" loading="lazy" onerror="imgError(this)">` : ""}
               <div class="ex-name">
-                <div>${nombre}${esSuperserie ? ` <span class="pkg-badge" style="font-size:0.7rem;">🔗 Superserie</span>` : ""}</div>
-                <small>${grupo}${ultimo ? ` · Última vez: <strong>${ultimo.peso} kg</strong>${ultimo.reps ? ` (${ultimo.reps})` : ""} · ${fmtFecha(ultimo.fecha)}` : ""}</small>
+                <div>${escapeHtml(nombre)}${esSuperserie ? ` <span class="pkg-badge" style="font-size:0.7rem;">🔗 Superserie</span>` : ""}</div>
+                <small>${escapeHtml(grupo)}${ultimo ? ` · Última vez: <strong>${ultimo.peso} kg</strong>${ultimo.reps ? ` (${escapeHtml(ultimo.reps)})` : ""} · ${fmtFecha(ultimo.fecha)}` : ""}</small>
                 <div class="ex-badges">
-                  <span class="rir-badge" title="Reps en recámara recomendadas">${rir}</span>
-                  ${sugerido && (!ultimo || sugerido > ultimo.peso) ? `<button type="button" class="overload-badge" data-aplicarsug="${nombre}" data-sug="${sugerido}" title="Aplicar sobrecarga progresiva sugerida">📈 Subir a ${sugerido} kg</button>` : ""}
+                  <span class="rir-badge" title="Reps en recámara recomendadas">${escapeHtml(rir)}</span>
+                  ${sugerido && (!ultimo || sugerido > ultimo.peso) ? `<button type="button" class="overload-badge" data-aplicarsug="${escapeHtml(nombre)}" data-sug="${sugerido}" title="Aplicar sobrecarga progresiva sugerida">📈 Subir a ${sugerido} kg</button>` : ""}
                   ${descanso > 0 ? `<button type="button" class="timer-badge" data-iniciartimer="${descanso}" title="Iniciar descanso">⏱ ${descanso}s descanso</button>` : ""}
                 </div>
-                ${cue ? `<span class="ex-cue">💡 ${cue}</span>` : ""}
+                ${cue ? `<span class="ex-cue">💡 ${escapeHtml(cue)}</span>` : ""}
                 ${conPeso ? `
-                <div class="set-tracker" data-ex="${nombre}" data-descanso="${descanso}">
+                <div class="set-tracker" data-ex="${escapeHtml(nombre)}" data-descanso="${descanso}">
                   ${setsArr.map((st, sIdx) => `
                     <button type="button" class="set-chip${st.done ? " done" : ""}" data-setchip="${sIdx}" title="${st.done ? "Serie completada · Clic para desmarcar" : "Completar serie e iniciar descanso"}">
                       <span class="set-chip-num">S${sIdx + 1}</span>
@@ -767,22 +716,22 @@ function renderPlan(clave) {
                     </button>
                   `).join("")}
                   <span class="rpe-pills" title="Sensación real de la serie">
-                    <button type="button" class="rpe-pill${rpeActual === "facil" ? " active" : ""}" data-rpe-ex="${nombre}" data-rpe="facil">😊 Fácil</button>
-                    <button type="button" class="rpe-pill${rpeActual === "justa" ? " active" : ""}" data-rpe-ex="${nombre}" data-rpe="justa">💪 Justa</button>
-                    <button type="button" class="rpe-pill${rpeActual === "limite" ? " active" : ""}" data-rpe-ex="${nombre}" data-rpe="limite">🔥 Límite</button>
+                    <button type="button" class="rpe-pill${rpeActual === "facil" ? " active" : ""}" data-rpe-ex="${escapeHtml(nombre)}" data-rpe="facil">😊 Fácil</button>
+                    <button type="button" class="rpe-pill${rpeActual === "justa" ? " active" : ""}" data-rpe-ex="${escapeHtml(nombre)}" data-rpe="justa">💪 Justa</button>
+                    <button type="button" class="rpe-pill${rpeActual === "limite" ? " active" : ""}" data-rpe-ex="${escapeHtml(nombre)}" data-rpe="limite">🔥 Límite</button>
                   </span>
                 </div>` : ""}
                 <div class="ex-nota-wrap">
-                  <button type="button" class="btn-link-subtle" data-escaner-ex="${nombre}">📷 Ajuste</button> ·
-                  <button type="button" class="btn-link-subtle" data-video-check="${nombre}">📹 Grabarme</button>
+                  <button type="button" class="btn-link-subtle" data-escaner-ex="${escapeHtml(nombre)}">📷 Ajuste</button> ·
+                  <button type="button" class="btn-link-subtle" data-video-check="${escapeHtml(nombre)}">📹 Grabarme</button>
                   <details class="ex-tools-menu">
                     <summary>⋯ Más</summary>
                     <div class="ex-tools-panel">
-                      ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${nombre}">🏋️ Discos</button><button type="button" class="btn-link-subtle" data-aprox="${nombre}">🔥 Aprox.</button>` : ""}
-                      <button type="button" class="btn-link-subtle" data-superserie="${nombre}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button>
+                      ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${escapeHtml(nombre)}">🏋️ Discos</button><button type="button" class="btn-link-subtle" data-aprox="${escapeHtml(nombre)}">🔥 Aprox.</button>` : ""}
+                      <button type="button" class="btn-link-subtle" data-superserie="${escapeHtml(nombre)}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button>
                       <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a>
                       <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a>
-                      <button type="button" class="btn-link-subtle" data-notaex="${nombre}">${notaEx ? `📝 Nota: "${notaEx}"` : "＋ Nota"}</button>
+                      <button type="button" class="btn-link-subtle" data-notaex="${escapeHtml(nombre)}">${notaEx ? `📝 Nota: "${escapeHtml(notaEx)}"` : "＋ Nota"}</button>
                     </div>
                   </details>
                 </div>
@@ -1063,20 +1012,6 @@ $("plan-content").addEventListener("click", e => {
 /* =====================================================
    ENTRENOS COMPLETADOS: RACHA, CALENDARIO, "HOY TOCA"
    ===================================================== */
-function calcularRacha(entrenos) {
-  // Permite 1 día de descanso entre sesiones; se corta con 2 días sin entrenar
-  let racha = 0, fallos = 0;
-  const d = new Date();
-  if (!entrenos[hoyISO()]) d.setDate(d.getDate() - 1);
-  while (fallos < 2) {
-    const iso = d.toISOString().slice(0, 10);
-    if (entrenos[iso]) { racha++; fallos = 0; }
-    else fallos++;
-    d.setDate(d.getDate() - 1);
-  }
-  return racha;
-}
-
 function renderEntrenos() {
   const cont = $("entrenos-card");
   const entrenos = cargarLS(KEY.entrenos, {});
@@ -1344,64 +1279,6 @@ if ($("btn-toggle-audio-coach")) {
 
 /* ---------- Reconocimiento de Voz y Dictado de Cargas ---------- */
 let activeRecognition = null;
-
-function normalizarTextoVoz(str) {
-  let s = (str || "").toLowerCase().trim();
-  const palabrasNum = {
-    "cero": 0, "un": 1, "uno": 1, "una": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
-    "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10, "once": 11, "doce": 12,
-    "trece": 13, "catorce": 14, "quince": 15, "dieciséis": 16, "dieciseis": 16,
-    "diecisiete": 17, "dieciocho": 18, "diecinueve": 19, "veinte": 20, "veintiuno": 21,
-    "veintidós": 22, "veintidos": 22, "veintitrés": 23, "veintitres": 23, "veinticinco": 25,
-    "treinta": 30, "treinta y cinco": 35, "cuarenta": 40, "cuarenta y cinco": 45,
-    "cincuenta": 50, "cincuenta y cinco": 55, "sesenta": 60, "sesenta y cinco": 65,
-    "setenta": 70, "setenta y cinco": 75, "ochenta": 80, "ochenta y cinco": 85,
-    "noventa": 90, "noventa y cinco": 95, "cien": 100
-  };
-  for (const [palabra, num] of Object.entries(palabrasNum)) {
-    const reg = new RegExp(`\\b${palabra}\\b`, "gi");
-    s = s.replace(reg, num);
-  }
-  return s;
-}
-
-function parsearComandoCarga(raw) {
-  const norm = normalizarTextoVoz(raw);
-  if (/completar|hecha|hecho|terminad[ao]|siguiente/i.test(norm)) {
-    return { accion: "completar_serie" };
-  }
-  let peso = null;
-  let reps = null;
-
-  const m1 = norm.match(/(\d+(?:[.,]\d+)?)\s*(?:kilos?|kg|k)\b/i);
-  if (m1) peso = parseFloat(m1[1].replace(",", "."));
-
-  const m2 = norm.match(/(\d+)\s*(?:repeticiones|repes|reps|veces)\b/i);
-  if (m2) reps = parseInt(m2[1], 10);
-
-  if (peso === null && reps === null) {
-    const m3 = norm.match(/(\d+(?:[.,]\d+)?)\s*(?:por|[x×]|con)\s*(\d+)/i);
-    if (m3) {
-      peso = parseFloat(m3[1].replace(",", "."));
-      reps = parseInt(m3[2], 10);
-    }
-  }
-
-  if (peso === null && reps === null) {
-    const m4 = norm.match(/(\d+(?:[.,]\d+)?)\s+(\d+)/);
-    if (m4) {
-      peso = parseFloat(m4[1].replace(",", "."));
-      reps = parseInt(m4[2], 10);
-    }
-  }
-
-  if (peso === null && norm.match(/\b\d+(?:[.,]\d+)?\b/)) {
-    const soloNum = norm.match(/\b(\d+(?:[.,]\d+)?)\b/);
-    if (soloNum) peso = parseFloat(soloNum[1].replace(",", "."));
-  }
-
-  return { accion: "guardar_carga", peso, reps, original: raw };
-}
 
 function mostrarVoiceHud(titulo, subtitulo) {
   const hud = $("voice-hud");
@@ -2217,7 +2094,7 @@ function adaptarMaquinaAlPlan(nombreMaquina, series = "3×8–10", rir = "RIR 1�
 }
 
 async function llamarGeminiVision(apiKey, base64Data, mimeType, contextoPlan) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
   const prompt = `Actúa como entrenador personal y especialista en biomecánica deportiva en sala de musculación.
 El usuario ha tomado una foto a una máquina del gimnasio con su móvil.
 Contexto de su entrenamiento:
@@ -2268,7 +2145,7 @@ Analiza la máquina que aparece en la imagen y devuelve una guía clara, directa
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify(payload)
   });
 
@@ -2480,18 +2357,6 @@ if ($("btn-guardar-apikey")) {
 }
 
 /* =====================================================
-   PAQUETES DE ENTRENAMIENTO IA
-   ===================================================== */
-
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-/* =====================================================
    CORRECCIÓN DE TÉCNICA EN VÍDEO CON VISIÓN IA (FORM CHECK)
    ===================================================== */
 const ANGULOS_RECOMENDADOS = {
@@ -2523,13 +2388,6 @@ let camaraFrontal = false;
 let framesActuales = [];
 
 /* ---------- Entrenador en Tiempo Real (MediaPipe Pose 30 FPS) ---------- */
-function calcularAngulo(a, b, c) {
-  const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
-  let angle = Math.abs((radians * 180.0) / Math.PI);
-  if (angle > 180.0) angle = 360.0 - angle;
-  return Math.round(angle);
-}
-
 let poseInstancia = null;
 let modoEnDirectoActivo = false;
 let animFrameLoop = null;
@@ -3559,7 +3417,7 @@ async function procesarVideoGrabado(blobOrFile) {
 }
 
 async function llamarGeminiCorreccionTecnica(apiKey, ejercicio, frames) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
   const ctxMetricas = liveMetricasAnalisis.maxAngulo > 0
     ? `\nMétricas reales detectadas por MediaPipe Pose en esta sesión: ángulo mínimo ${liveMetricasAnalisis.minAngulo}°, máximo ${liveMetricasAnalisis.maxAngulo}°, fallos observados: ${liveMetricasAnalisis.fallos.join("; ") || "ninguno"}.`
@@ -3620,7 +3478,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta, sin 
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify(payload)
   });
 
@@ -3810,6 +3668,50 @@ function renderResultadoTecnico(resultado, ejercicio) {
       decirVoz(`Puntuación: ${resultado.puntuacion} sobre 100. ${cueParaAudio}`);
     });
   }
+}
+
+async function analizarTecnicaConVisionIA() {
+  const ejercicio = $("formcheck-ejercicio-select")?.value || "Ejercicio libre";
+  const loading = $("formcheck-loading");
+  const resDiv = $("formcheck-resultado");
+  const btn = $("btn-analizar-tecnica-ia");
+
+  if (!framesActuales.length) {
+    alert("Graba o sube una serie primero: la IA necesita 5 fotogramas para evaluar tu técnica.");
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  if (loading) {
+    loading.style.display = "block";
+    loading.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  if (resDiv) resDiv.style.display = "none";
+
+  const apiKey = localStorage.getItem(KEY.geminiApiKey) || "";
+  let resultado = null;
+  let motor = "local";
+
+  if (apiKey) {
+    try {
+      resultado = await llamarGeminiCorreccionTecnica(apiKey, ejercicio, framesActuales);
+      motor = "ia";
+    } catch (err) {
+      console.warn("Fallo en Gemini API, usando análisis local de referencia:", err);
+    }
+  }
+
+  if (!resultado) resultado = generarCorreccionHeuristica(ejercicio);
+
+  if (loading) loading.style.display = "none";
+  renderResultadoTecnico(resultado, ejercicio);
+
+  // Transparencia: el análisis local no evalúa tus fotogramas reales
+  if (motor === "local" && resDiv) {
+    resDiv.insertAdjacentHTML("afterbegin", `<div class="plan-note" style="margin-bottom:10px;">ℹ️ Análisis de referencia local${apiKey ? " (la IA no respondió, vuelve a intentarlo más tarde)" : " — conecta tu API key de Gemini en 🔑 para que la IA evalúe tus fotogramas reales"}</div>`);
+  }
+
+  if (btn) btn.disabled = false;
 }
 
 function abrirFormCheckParaEjercicio(nombreEjercicio) {
@@ -4006,6 +3908,9 @@ function initFormCheckVision() {
   if (btnAnalizar) btnAnalizar.addEventListener("click", analizarTecnicaConVisionIA);
 }
 
+/* =====================================================
+   PAQUETES DE ENTRENAMIENTO IA
+   ===================================================== */
 const PAQUETES_PRESETS = {
   "def-extrema": {
     titulo: "🔥 Definición Extrema & Retención Muscular (4 días)",
@@ -4320,7 +4225,7 @@ function renderCatalogoPaquetes() {
 }
 
 async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
   const payload = {
     contents: [
       {
@@ -4337,7 +4242,7 @@ async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario) {
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify(payload)
   });
 
@@ -5197,12 +5102,6 @@ function leerPerfil() {
   };
 }
 
-function calcularTdee(p) {
-  // Mifflin–St Jeor
-  const base = 10 * p.peso + 6.25 * p.altura - 5 * p.edad + (p.sexo === "h" ? 5 : -161);
-  return { bmr: base, tdee: base * p.actividad };
-}
-
 function objetivoKcalDiario() {
   const p = leerPerfil();
   if (!p.edad || !p.peso || !p.altura) return null;
@@ -5240,10 +5139,7 @@ $("btn-macros").addEventListener("click", () => {
   const { tdee } = calcularTdee(p);
   const objetivo = Math.round(tdee * (1 - p.deficit / 100));
 
-  const protG = Math.round(p.peso * 2);
-  const grasaG = Math.round(p.peso * 0.9);
-  const restoKcal = Math.max(objetivo - protG * 4 - grasaG * 9, 0);
-  const carbG = Math.round(restoKcal / 4);
+  const { protG, grasaG, carbG } = calcularMacros(p.peso, objetivo);
 
   $("macros-results").innerHTML = [
     { v: protG + " g", l: "Proteína (2 g/kg)" },
@@ -5260,13 +5156,7 @@ function actualizarImc() {
   const altura = +$("imc-altura").value;
   if (!peso || !altura) return;
   const imc = peso / Math.pow(altura / 100, 2);
-  let cat, color;
-  if (imc < 18.5)      { cat = "Bajo peso";       color = "var(--blue)"; }
-  else if (imc < 25)   { cat = "Peso normal";     color = "var(--green)"; }
-  else if (imc < 30)   { cat = "Sobrepeso";       color = "var(--accent)"; }
-  else if (imc < 35)   { cat = "Obesidad grado I"; color = "#ff7b7b"; }
-  else if (imc < 40)   { cat = "Obesidad grado II"; color = "#ff7b7b"; }
-  else                 { cat = "Obesidad grado III"; color = "#ff7b7b"; }
+  const { cat, color } = categoriaImc(imc);
 
   $("imc-results").innerHTML = `
     <div class="result-box"><div class="result-value" style="color:${color}">${imc.toFixed(1)}</div><div class="result-label">Tu IMC</div></div>
@@ -6016,7 +5906,7 @@ let fotoComidaMime = "image/jpeg";
 let ultimoPlatoAnalizado = null;
 
 async function llamarGeminiFoodVision(apiKey, base64Data, mimeType) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
   const prompt = `Eres un nutricionista deportivo de élite y experto en composición corporal.
 Analiza la imagen de este plato de comida.
 Identifica los ingredientes visibles y estima el peso aproximado en gramos, las calorías totales y los macronutrientes en gramos (Proteínas, Carbohidratos y Grasas).
@@ -6057,7 +5947,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta, sin 
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify(payload)
   });
 
@@ -6238,7 +6128,7 @@ const RECETAS_PERDIDA_PESO_FALLBACK = {
 };
 
 async function llamarGeminiRecetasProductos(apiKey, base64Data, mimeType) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
   const prompt = `Eres un chef y nutricionista deportivo especializado en pérdida de grasa.
 Observa los productos e ingredientes visibles en esta foto (nevera, despensa o encimera).
 Identifica los ingredientes que ves y propón 3 o 4 recetas saludables, fáciles, saciantes, altas en proteína y bajas en calorías usando principalmente esos productos.
@@ -6261,7 +6151,7 @@ Responde ÚNICAMENTE con un JSON válido con esta estructura exacta, sin markdow
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
       contents: [{
         parts: [
@@ -6525,7 +6415,7 @@ function renderComidas() {
     </div>
     <table>
       <thead><tr><th>Alimento</th><th>kcal</th></tr></thead>
-      <tbody>${lista.map(c => `<tr><td>${c.nombre}</td><td>${c.kcal.toLocaleString("es")}</td></tr>`).join("")}</tbody>
+      <tbody>${lista.map(c => `<tr><td>${escapeHtml(c.nombre)}</td><td>${c.kcal.toLocaleString("es")}</td></tr>`).join("")}</tbody>
     </table>`;
 
   $("btn-vaciar-comidas").addEventListener("click", () => {

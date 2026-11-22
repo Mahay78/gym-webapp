@@ -1,10 +1,12 @@
-const CACHE = "fitnesscut-v22";
+const CACHE = "fitnesscut-v23";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
+  "./lib/fitness-math.js",
   "./app.js",
   "./icon.svg",
+  "./og-image.png",
   "./manifest.json",
 ];
 
@@ -45,7 +47,15 @@ self.addEventListener("fetch", e => {
           }
           return res;
         })
-        .catch(() => caches.match(e.request).then(c => c || caches.match("./index.html")))
+        .catch(() => {
+          // Offline: el HTML solo se sirve como fallback de navegaciones;
+          // para el resto de peticiones, solo la copia exacta en caché
+          // (evita devolver index.html con MIME incorrecto para JS/CSS).
+          if (e.request.mode === "navigate") {
+            return caches.match(e.request).then(c => c || caches.match("./index.html"));
+          }
+          return caches.match(e.request);
+        })
     );
   } else {
     // Cache-First para recursos externos (CDN)
