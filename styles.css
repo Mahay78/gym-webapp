@@ -2079,3 +2079,455 @@ body.vista-compacta .ex-nota-wrap {
     display: none !important;
   }
 }
+
+/* =====================================================
+   REDISEÑO DE LA INTERFAZ DE PLANES (MODO GIMNASIO)
+   ===================================================== */
+
+/* 1. Temporizador superior compacto */
+.timer-card-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.timer-card-compact.timer-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.timer-compact-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timer-compact-title {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.timer-display-compact {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 10px;
+  min-width: 78px;
+  text-align: center;
+}
+
+.timer-card-compact .timer-row {
+  gap: 6px;
+}
+
+.timer-card-compact .timer-row .tab {
+  padding: 6px 12px;
+  font-size: 0.84rem;
+}
+
+.timer-card-compact .timer-row input {
+  width: 90px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* 2. Pestañas de planes con iconos y scroll horizontal limpio */
+#plan-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  padding-bottom: 6px;
+  margin: 10px 0 14px;
+  scrollbar-width: thin;
+}
+
+.plan-tab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 9px 15px;
+}
+
+.plan-tab-days {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.plan-tab-pill.active .plan-tab-days {
+  background: var(--accent);
+  color: #16110d;
+}
+
+/* 3. Cabecera del Plan Activo y Semáforo de Volumen */
+.plan-dashboard-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.plan-dash-title {
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.plan-dash-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.plan-meta-chip {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.plan-semaforo-details {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.plan-semaforo-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--muted);
+  list-style: none;
+}
+
+.plan-semaforo-summary::-webkit-details-marker {
+  display: none;
+}
+
+.plan-semaforo-cta {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.plan-semaforo-body {
+  margin-top: 12px;
+}
+
+.vol-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 8px;
+}
+
+.vol-mini-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.vol-mini-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  margin-bottom: 5px;
+}
+
+.vol-mini-val small {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.vol-mini-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.vol-mini-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+}
+
+.vol-mini-card.warn .vol-mini-fill {
+  background: #fbbf24;
+}
+
+.vol-mini-card.low .vol-mini-fill {
+  background: #ff6b6b;
+}
+
+/* 4. Selector rápido de Día (Píldoras de sesión) */
+.day-selector-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.day-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-pill:hover {
+  border-color: var(--accent);
+}
+
+.day-pill.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.15);
+}
+
+.day-pill.hecho {
+  border-color: var(--green);
+}
+
+.day-pill-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.day-pill-title {
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
+.day-pill.active .day-pill-title {
+  color: var(--accent);
+}
+
+.day-pill-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--bg-input);
+  color: var(--muted);
+}
+
+.day-pill-sub {
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 5. Tarjetas de Ejercicio rediseñadas */
+.day-head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-head-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.ex-wrap {
+  margin-bottom: 12px;
+}
+
+.ex-wrap .exercise {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ex-wrap.ex-completado .exercise {
+  border-color: rgba(62, 207, 142, 0.55);
+  background: linear-gradient(135deg, rgba(62, 207, 142, 0.07), var(--bg-input));
+}
+
+.ex-top-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ex-media-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ex-order-num {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.ex-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ex-title-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ex-done-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(62, 207, 142, 0.16);
+  color: var(--green);
+  border: 1px solid rgba(62, 207, 142, 0.4);
+}
+
+.grp-pill {
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.grp-pecho { color: #ff8a65; border-color: rgba(255, 138, 101, 0.35); }
+.grp-espalda { color: #64b5f6; border-color: rgba(100, 181, 246, 0.35); }
+.grp-piernas { color: #4db6ac; border-color: rgba(77, 182, 172, 0.35); }
+.grp-posterior { color: #ba68c8; border-color: rgba(186, 104, 200, 0.35); }
+.grp-hombros { color: #ffd54f; border-color: rgba(255, 213, 79, 0.35); }
+.grp-brazos { color: #81c784; border-color: rgba(129, 199, 132, 0.35); }
+.grp-core { color: #4dd0e1; border-color: rgba(77, 208, 225, 0.35); }
+
+.ex-sets-pill {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.ex-last-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.ex-user-note {
+  margin-top: 5px;
+  font-size: 0.79rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.ex-Interactive-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+.ex-Interactive-zone .ex-actions {
+  justify-content: flex-start;
+}
+
+.ex-Interactive-zone .ex-log {
+  width: 100%;
+  background: var(--bg-card);
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.btn-save-carga {
+  margin-left: auto;
+  font-weight: 700;
+}
+
+.ex-toolbar-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.ex-tool-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ex-tool-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+

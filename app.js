@@ -625,17 +625,44 @@ function ultimoRegistroCarga(cargas, nombre) {
   return [...logs].sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
 }
 
+const diaSeleccionadoPorPlan = {};
+
+function colorGrupoMuscular(grupo) {
+  const g = String(grupo || "").toLowerCase();
+  if (g.includes("pecho")) return "pecho";
+  if (g.includes("espalda") || g.includes("dorsal")) return "espalda";
+  if (g.includes("pierna") || g.includes("cuádriceps") || g.includes("cuadriceps") || g.includes("gemelo")) return "piernas";
+  if (g.includes("femoral") || g.includes("glúteo") || g.includes("gluteo") || g.includes("isquio")) return "posterior";
+  if (g.includes("hombro")) return "hombros";
+  if (g.includes("bíceps") || g.includes("tríceps") || g.includes("brazos")) return "brazos";
+  if (g.includes("core") || g.includes("abdomen")) return "core";
+  return "general";
+}
+
 function renderPlanTabs() {
   const cont = $("plan-tabs");
   if (!cont) return;
   const custom = cargarLS(KEY.planesCustom, {});
   const todasClaves = [...new Set([...Object.keys(PLANES), ...Object.keys(custom)])];
+  const iconosPlan = {
+    "3dias": "🏋️",
+    "4dias": "⚡",
+    "ppl": "🔄",
+    "5dias": "🔥",
+    "pesolibre": "💪",
+  };
 
   cont.innerHTML = todasClaves.map(k => {
     const pl = getPlan(k);
     const activo = k === planActual;
-    const nombreCorto = pl.titulo.split(" (")[0] || pl.titulo;
-    return `<button class="tab${activo ? " active" : ""}" data-plan="${escapeHtml(k)}">${escapeHtml(nombreCorto)}</button>`;
+    const icono = iconosPlan[k] || "✨";
+    const numDias = Array.isArray(pl.dias) ? pl.dias.length : "";
+    const nombreCorto = (pl.titulo.split(" (")[0] || pl.titulo).replace(/^[✨🔥⚡🍑🛡👑]\s*/, "");
+    return `<button class="tab plan-tab-pill${activo ? " active" : ""}" data-plan="${escapeHtml(k)}">
+      <span class="plan-tab-icon">${icono}</span>
+      <span class="plan-tab-name">${escapeHtml(nombreCorto)}</span>
+      ${numDias ? `<span class="plan-tab-days">${numDias}d</span>` : ""}
+    </button>`;
   }).join("");
 
   cont.querySelectorAll(".tab").forEach(tab =>
@@ -665,12 +692,47 @@ function renderPlan(clave) {
     renderPlanTabs();
   }
 
-  const nota = `
-    <div class="plan-note">💡 <strong>Sobrecarga progresiva (doble progresión):</strong> Completa todas las series en el tope del rango de repeticiones con el RIR indicado. Cuando lo logres con técnica limpia, sube <strong>+0,5–1 kg</strong> en tren superior/brazos y <strong>+2,5–5 kg</strong> en sentadillas/prensa. Reserves <strong>RIR 0</strong> solo para la última serie en máquinas seguras.<br>
-    📅 <strong>Periodización recomendada:</strong> 3–4 semanas de acumulación/progresión seguidas de <strong>1 semana de descarga (Deload)</strong> reduciendo las series al 50% con el mismo peso.</div>
-    ${plan.notaExtra ? `<div class="plan-note" style="border-left-color:var(--green);">${plan.notaExtra}</div>` : ""}`;
+  // Determinar qué sesión toca hoy según el historial
+  const ultimosEntrenos = Object.keys(entrenos).filter(f => entrenos[f].plan === planActual).sort();
+  const ultimoEntreno = ultimosEntrenos.length ? entrenos[ultimosEntrenos[ultimosEntrenos.length - 1]] : null;
+  let primerDiaPendiente = plan.dias.findIndex((d, i) => entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === i);
+  if (primerDiaPendiente < 0) {
+    primerDiaPendiente = ultimoEntreno ? (ultimoEntreno.diaIdx + 1) % plan.dias.length : 0;
+  }
 
+  if (diaSeleccionadoPorPlan[clave] === undefined || (diaSeleccionadoPorPlan[clave] !== "todos" && diaSeleccionadoPorPlan[clave] >= plan.dias.length)) {
+    diaSeleccionadoPorPlan[clave] = primerDiaPendiente;
+  }
+  const vistaDia = diaSeleccionadoPorPlan[clave];
+  const diaActivoIdx = vistaDia === "todos" ? primerDiaPendiente : vistaDia;
+  const diaActivoObj = plan.dias[diaActivoIdx] || plan.dias[0];
+
+  // Calcular progreso de cada día y de la sesión activa
+  const statsPorDia = plan.dias.map((d) => {
+    let totalS = 0;
+    let hechasS = 0;
+    let totalEx = 0;
+    let hechosEx = 0;
+    d.ejercicios.forEach(ej => {
+      if (SIN_CARGA.includes(ej[1])) return;
+      totalEx++;
+      const nS = parsearNumSeries(ej[2]);
+      totalS += nS;
+      const guardadas = (sesionHoy.sets && sesionHoy.sets[ej[0]]) || [];
+      const h = Math.min(nS, guardadas.filter(s => s && s.done).length);
+      hechasS += h;
+      if (h >= nS && nS > 0) hechosEx++;
+    });
+    return { totalS, hechasS, totalEx, hechosEx };
+  });
+
+  const statActiva = statsPorDia[diaActivoIdx] || { totalS: 0, hechasS: 0, totalEx: 0, hechosEx: 0 };
+  const pctProgreso = statActiva.totalS > 0 ? Math.min(100, Math.round((statActiva.hechasS / statActiva.totalS) * 100)) : 0;
+  const minEstimados = Math.max(25, Math.round(statActiva.totalS * 2.5));
+
+  // Semáforo de Volumen Semanal con mini-barras visuales
   let semaforoHtml = "";
+  let totalSeriesSemana = 0;
   if (typeof calcularVolumenPorMusculo === "function") {
     const vol = calcularVolumenPorMusculo(plan);
     const gruposSem = [
@@ -684,52 +746,108 @@ function renderPlan(clave) {
       ["Gemelos", vol.Gemelos, 4, 14],
       ["Core", vol.Core, 3, 14],
     ];
-    const badges = gruposSem.map(([nom, s, minOpt, maxOpt]) => {
-      const icon = s < Math.max(4, minOpt - 2) ? "🔴" : s < minOpt || s > maxOpt ? "🟡" : "🟢";
-      return `<span class="rir-badge" style="font-size:0.78rem; padding:4px 8px;" title="Recomendado: ${minOpt}–${maxOpt} series directas/semana">${icon} ${nom}: <strong>${s}</strong> s/sem</span>`;
-    }).join(" ");
+    totalSeriesSemana = gruposSem.reduce((acc, g) => acc + (g[1] || 0), 0);
+    const cardsVol = gruposSem.map(([nom, s, minOpt, maxOpt]) => {
+      const estado = s < Math.max(4, minOpt - 2) ? "low" : s < minOpt || s > maxOpt ? "warn" : "ok";
+      const icon = estado === "low" ? "🔴" : estado === "warn" ? "🟡" : "🟢";
+      const pctVol = Math.min(100, Math.round((s / maxOpt) * 100));
+      return `
+        <div class="vol-mini-card ${estado}" title="Recomendado: ${minOpt}–${maxOpt} series directas/semana">
+          <div class="vol-mini-top">
+            <span class="vol-mini-name">${icon} ${nom}</span>
+            <strong class="vol-mini-val">${s} <small>s/sem</small></strong>
+          </div>
+          <div class="vol-mini-track">
+            <div class="vol-mini-fill" style="width:${pctVol}%"></div>
+          </div>
+        </div>`;
+    }).join("");
+
     semaforoHtml = `
-      <div class="plan-note" style="margin-bottom:12px;">
-        <div style="font-size:0.82rem; margin-bottom:6px;"><strong>📊 Semáforo de Volumen Semanal (series directas/semana):</strong> <span class="muted">(🟢 óptimo · 🟡 aceptable/alto · 🔴 bajo)</span></div>
-        <div style="display:flex; flex-wrap:wrap; gap:6px;">${badges}</div>
-      </div>`;
+      <details class="plan-semaforo-details">
+        <summary class="plan-semaforo-summary">
+          <span>📊 <strong>Volumen semanal por músculo (${totalSeriesSemana} series/sem)</strong> & guía de periodización</span>
+          <span class="plan-semaforo-cta">Ver desglose ▾</span>
+        </summary>
+        <div class="plan-semaforo-body">
+          <div class="vol-mini-grid">${cardsVol}</div>
+          <div class="plan-note" style="margin:12px 0 0;">
+            💡 <strong>Doble progresión:</strong> Completa todas las series en el tope del rango con el RIR indicado y sube <strong>+0,5–1 kg</strong> en torso/brazos o <strong>+2,5–5 kg</strong> en prensa/sentadilla. Reserva <strong>RIR 0</strong> solo para la última serie en máquinas seguras.<br>
+            📅 <strong>Periodización 3:1:</strong> 3–4 semanas de sobrecarga progresiva seguidas de <strong>1 semana de descarga (Deload)</strong> al 50% de series.
+          </div>
+          ${plan.notaExtra ? `<div class="plan-note" style="margin:10px 0 0; border-color:var(--green);">${plan.notaExtra}</div>` : ""}
+        </div>
+      </details>`;
   }
 
-  let totalSeriesPlan = 0;
-  let seriesHechasPlan = 0;
-  plan.dias.forEach(d => {
-    d.ejercicios.forEach(ej => {
-      if (SIN_CARGA.includes(ej[1])) return;
-      const nS = parsearNumSeries(ej[2]);
-      totalSeriesPlan += nS;
-      const guardadas = (sesionHoy.sets && sesionHoy.sets[ej[0]]) || [];
-      seriesHechasPlan += guardadas.filter(s => s && s.done).length;
-    });
-  });
-  const pctProgreso = totalSeriesPlan > 0 ? Math.min(100, Math.round((seriesHechasPlan / totalSeriesPlan) * 100)) : 0;
-  const barraProgreso = totalSeriesPlan > 0 ? `
-    <div class="entreno-progreso-bar" id="entreno-progreso-bar">
-      <div class="entreno-progreso-top">
-        <span>🏋️ Progreso de hoy: <strong>${seriesHechasPlan} / ${totalSeriesPlan} series</strong></span>
-        <span>${pctProgreso}%</span>
-      </div>
-      <div class="entreno-progreso-track">
-        <div class="entreno-progreso-fill" style="width: ${pctProgreso}%"></div>
-      </div>
-    </div>` : "";
+  // Selector rápido de Día (Píldoras de sesión + Ver todos)
+  const selectorDiasHtml = `
+    <div class="day-selector-bar" role="tablist" aria-label="Seleccionar día del plan">
+      ${plan.dias.map((d, idx) => {
+        const esActivo = vistaDia === idx;
+        const esHoyToca = idx === primerDiaPendiente;
+        const hechoHoy = Boolean(entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === idx);
+        const st = statsPorDia[idx];
+        const etiqCorta = d.dia.split("·")[0].split(":")[0].trim() || `Día ${idx + 1}`;
+        const subEtiq = (d.dia.split(/[:·]/)[1] || "").trim();
+        return `
+          <button type="button" class="day-pill${esActivo ? " active" : ""}${hechoHoy ? " hecho" : ""}" data-select-day="${idx}">
+            <div class="day-pill-top">
+              <span class="day-pill-title">${hechoHoy ? "✅ " : esHoyToca ? "🎯 " : ""}${escapeHtml(etiqCorta)}</span>
+              <span class="day-pill-count">${st.hechasS}/${st.totalS}s</span>
+            </div>
+            ${subEtiq ? `<div class="day-pill-sub">${escapeHtml(subEtiq)}</div>` : ""}
+          </button>`;
+      }).join("")}
+      <button type="button" class="day-pill day-pill-all${vistaDia === "todos" ? " active" : ""}" data-select-day="todos">
+        <div class="day-pill-top">
+          <span class="day-pill-title">📋 Todos</span>
+          <span class="day-pill-count">${plan.dias.length} días</span>
+        </div>
+        <div class="day-pill-sub">Vista completa</div>
+      </button>
+    </div>`;
 
-  let primerDiaPendiente = plan.dias.findIndex((d, i) => !(entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === i));
-  if (primerDiaPendiente < 0) primerDiaPendiente = 0;
+  // Cabecera del Plan Activo + Barra de Progreso de la Sesión Activa
+  const dashboardHeaderHtml = `
+    <div class="plan-dashboard-card">
+      <div class="plan-dash-top">
+        <div>
+          <h3 class="plan-dash-title">${escapeHtml(plan.titulo)}</h3>
+          <div class="plan-dash-meta">
+            <span class="plan-meta-chip">📅 ${plan.dias.length} días/sem</span>
+            <span class="plan-meta-chip">⏱ ~${minEstimados} min hoy</span>
+            <span class="plan-meta-chip">🎯 ${statActiva.hechosEx}/${statActiva.totalEx} ejercicios listos</span>
+          </div>
+        </div>
+      </div>
+      ${statActiva.totalS > 0 ? `
+      <div class="entreno-progreso-bar" id="entreno-progreso-bar" style="margin:12px 0 0;">
+        <div class="entreno-progreso-top">
+          <span>🏋️ Progreso en <strong>${escapeHtml(diaActivoObj.dia.split(" (")[0])}</strong>: <strong>${statActiva.hechasS} / ${statActiva.totalS} series</strong></span>
+          <span class="entreno-progreso-pct">${pctProgreso}%</span>
+        </div>
+        <div class="entreno-progreso-track">
+          <div class="entreno-progreso-fill" style="width: ${pctProgreso}%"></div>
+        </div>
+      </div>` : ""}
+      ${semaforoHtml}
+    </div>`;
 
-  const html = nota + semaforoHtml + barraProgreso + plan.dias.map((dia, diaIdx) => {
+  const html = dashboardHeaderHtml + selectorDiasHtml + plan.dias.map((dia, diaIdx) => {
+    if (vistaDia !== "todos" && vistaDia !== diaIdx) return "";
     const hecho = entrenos[hoy] && entrenos[hoy].plan === planActual && entrenos[hoy].diaIdx === diaIdx;
-    const abierto = diaIdx === primerDiaPendiente;
+    const abierto = vistaDia !== "todos" || diaIdx === primerDiaPendiente;
+    const stDia = statsPorDia[diaIdx];
     return `
-    <div class="plan-day">
+    <div class="plan-day${hecho ? " plan-day-hecho" : ""}">
       <details class="plan-day-details"${abierto ? " open" : ""}>
         <summary class="day-head">
-          <h4>${abierto ? "▾" : "▸"} ${escapeHtml(dia.dia)}</h4>
-          <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${escapeHtml(dia.dia)}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Marcar hecho"}</button>
+          <div class="day-head-left">
+            <h4>${abierto ? "▾" : "▸"} ${escapeHtml(dia.dia)}</h4>
+            <span class="day-head-sub">${stDia.hechosEx}/${stDia.totalEx} ejercicios · ${stDia.hechasS}/${stDia.totalS} series</span>
+          </div>
+          <button class="btn-small day-done${hecho ? " hecho" : ""}" data-hecho="${diaIdx}" data-dia="${escapeHtml(dia.dia)}" aria-label="Marcar día completado">${hecho ? "✅ Hecho hoy" : "✓ Terminar sesión"}</button>
         </summary>
       ${dia.ejercicios
         .map((ej, ejIdx) => {
@@ -753,29 +871,50 @@ function renderPlan(clave) {
           for (let i = 0; i < nSeries; i++) {
             setsArr.push(setsGuardados[i] || { done: false, peso: ultimo ? ultimo.peso : "", reps: "" });
           }
+          const seriesCompletadasEx = setsArr.filter(s => s && s.done).length;
+          const exCompletado = conPeso && nSeries > 0 && seriesCompletadasEx >= nSeries;
 
           const esSuperserie = Boolean(sesionHoy.superseries && sesionHoy.superseries[nombre]);
           const rpeActual = (sesionHoy.rpe && sesionHoy.rpe[nombre]) || "";
+          const colorGrp = colorGrupoMuscular(grupo);
 
           return `
-          <div class="ex-wrap${esSuperserie ? " ex-superserie" : ""}">
+          <div class="ex-wrap${esSuperserie ? " ex-superserie" : ""}${exCompletado ? " ex-completado" : ""}">
             <div class="exercise">
-              ${rutaImg ? `<img class="ex-img" src="${rutaImg}" alt="Máquina: ${escapeHtml(nombre)}" loading="lazy" onerror="imgError(this)">` : ""}
-              <div class="ex-name">
-                <div>${escapeHtml(nombre)}${esSuperserie ? ` <span class="pkg-badge" style="font-size:0.7rem;">🔗 Superserie</span>` : ""}</div>
-                <small>${escapeHtml(grupo)}${ultimo ? ` · Última vez: <strong>${ultimo.peso} kg</strong>${ultimo.reps ? ` (${escapeHtml(ultimo.reps)})` : ""} · ${fmtFecha(ultimo.fecha)}` : ""}</small>
-                <div class="ex-badges">
-                  <span class="rir-badge" title="Reps en recámara recomendadas">${escapeHtml(rir)}</span>
-                  ${sugerido && (!ultimo || sugerido > ultimo.peso) ? `<button type="button" class="overload-badge" data-aplicarsug="${escapeHtml(nombre)}" data-sug="${sugerido}" title="Aplicar sobrecarga progresiva sugerida">📈 Subir a ${sugerido} kg</button>` : ""}
-                  ${descanso > 0 ? `<button type="button" class="timer-badge" data-iniciartimer="${descanso}" title="Iniciar descanso">⏱ ${descanso}s descanso</button>` : ""}
+              <div class="ex-top-row">
+                <div class="ex-media-col">
+                  <span class="ex-order-num">${exCompletado ? "✅" : `#${ejIdx + 1}`}</span>
+                  ${rutaImg ? `<img class="ex-img" src="${rutaImg}" alt="Máquina: ${escapeHtml(nombre)}" loading="lazy" onerror="imgError(this)">` : `<span class="ex-img-ph">🏋️</span>`}
                 </div>
-                ${cue ? `<span class="ex-cue">💡 ${escapeHtml(cue)}</span>` : ""}
-                ${conPeso ? `
+                <div class="ex-name">
+                  <div class="ex-title-line">
+                    <span class="ex-title-text">${escapeHtml(nombre)}</span>
+                    ${esSuperserie ? `<span class="pkg-badge" style="font-size:0.7rem;">🔗 Superserie</span>` : ""}
+                    ${exCompletado ? `<span class="ex-done-pill">✓ Completado</span>` : ""}
+                  </div>
+                  <div class="ex-badges">
+                    <span class="grp-pill grp-${colorGrp}">${escapeHtml(grupo)}</span>
+                    <span class="ex-sets-pill" title="Series × repeticiones objetivo">🎯 ${escapeHtml(series)}</span>
+                    <span class="rir-badge" title="Reps en recámara recomendadas">${escapeHtml(rir)}</span>
+                    ${descanso > 0 ? `<button type="button" class="timer-badge" data-iniciartimer="${descanso}" title="Iniciar descanso">⏱ ${descanso}s</button>` : ""}
+                  </div>
+                  ${ultimo ? `
+                  <div class="ex-last-row">
+                    <span>Última carga: <strong>${ultimo.peso} kg</strong>${ultimo.reps ? ` (${escapeHtml(ultimo.reps)})` : ""} · <span class="muted">${fmtFecha(ultimo.fecha)}</span></span>
+                    ${sugerido && sugerido > ultimo.peso ? `<button type="button" class="overload-badge" data-aplicarsug="${escapeHtml(nombre)}" data-sug="${sugerido}" title="Aplicar sobrecarga progresiva sugerida">📈 Subir a ${sugerido} kg</button>` : ""}
+                  </div>` : ""}
+                  ${cue ? `<span class="ex-cue">💡 ${escapeHtml(cue)}</span>` : ""}
+                  ${notaEx ? `<div class="ex-user-note">📝 <strong>Mi ajuste:</strong> ${escapeHtml(notaEx)}</div>` : ""}
+                </div>
+              </div>
+
+              ${conPeso ? `
+              <div class="ex-Interactive-zone">
                 <div class="set-tracker" data-ex="${escapeHtml(nombre)}" data-descanso="${descanso}">
                   ${setsArr.map((st, sIdx) => `
                     <button type="button" class="set-chip${st.done ? " done" : ""}" data-setchip="${sIdx}" title="${st.done ? "Serie completada · Clic para desmarcar" : "Completar serie e iniciar descanso"}">
-                      <span class="set-chip-num">S${sIdx + 1}</span>
-                      <span class="set-chip-val">${st.done ? `✅ ${st.peso || (ultimo ? ultimo.peso : "—")}kg` : "〇"}</span>
+                      <span class="set-chip-num">Serie ${sIdx + 1}</span>
+                      <span class="set-chip-val">${st.done ? `✅ ${st.peso || (ultimo ? ultimo.peso : "—")} kg` : "〇 Marcar"}</span>
                     </button>
                   `).join("")}
                   <span class="rpe-pills" title="Sensación real de la serie">
@@ -783,40 +922,41 @@ function renderPlan(clave) {
                     <button type="button" class="rpe-pill${rpeActual === "justa" ? " active" : ""}" data-rpe-ex="${escapeHtml(nombre)}" data-rpe="justa">💪 Justa</button>
                     <button type="button" class="rpe-pill${rpeActual === "limite" ? " active" : ""}" data-rpe-ex="${escapeHtml(nombre)}" data-rpe="limite">🔥 Límite</button>
                   </span>
-                </div>` : ""}
-                <div class="ex-nota-wrap">
-                  <button type="button" class="btn-link-subtle" data-escaner-ex="${escapeHtml(nombre)}">📷 Ajuste</button> ·
-                  <button type="button" class="btn-link-subtle" data-video-check="${escapeHtml(nombre)}">📹 Grabarme</button>
-                  <details class="ex-tools-menu">
-                    <summary>⋯ Más</summary>
-                    <div class="ex-tools-panel">
-                      ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${escapeHtml(nombre)}">🏋️ Discos</button><button type="button" class="btn-link-subtle" data-aprox="${escapeHtml(nombre)}">🔥 Aprox.</button>` : ""}
-                      <button type="button" class="btn-link-subtle" data-superserie="${escapeHtml(nombre)}">${esSuperserie ? "🔗 Quitar SS" : "🔗 Superserie"}</button>
-                      <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar</a>
-                      <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Vídeo</a>
-                      <button type="button" class="btn-link-subtle" data-notaex="${escapeHtml(nombre)}">${notaEx ? `📝 Nota: "${escapeHtml(notaEx)}"` : "＋ Nota"}</button>
-                    </div>
-                  </details>
                 </div>
-                <div class="inline-tool-box" style="display:none;"></div>
+
+                <div class="ex-actions">
+                  <div class="ex-log">
+                    <button type="button" class="btn-step-kg" data-stepkg="-2.5" title="Restar 2,5 kg">−2.5</button>
+                    <input type="number" step="0.5" min="0" max="500" class="log-peso" data-ex="${escapeHtml(nombre)}" value="${ultimo ? ultimo.peso : ""}" placeholder="kg" aria-label="Peso usado en ${escapeHtml(nombre)}">
+                    <button type="button" class="btn-step-kg" data-stepkg="2.5" title="Sumar 2,5 kg">+2.5</button>
+                    <input type="text" class="log-reps" data-ex="${escapeHtml(nombre)}" value="${ultimo && ultimo.reps ? escapeHtml(ultimo.reps) : ""}" placeholder="${escapeHtml(series)}" aria-label="Series y repeticiones de ${escapeHtml(nombre)}">
+                    <button type="button" class="btn-voice-log" data-mic-ex="${escapeHtml(nombre)}" title="Dictar peso y repes por voz (ej. '60 kilos 10 repes')">🎙️</button>
+                    <button class="btn-small btn-save-carga" data-guardar="${escapeHtml(nombre)}" title="Guardar peso usado">💾 Guardar</button>
+                  </div>
+                </div>
+              </div>` : ""}
+
+              <div class="ex-nota-wrap ex-toolbar-pills">
+                <button type="button" class="ex-tool-pill" data-escaner-ex="${escapeHtml(nombre)}">📷 Ajuste máquina</button>
+                <button type="button" class="ex-tool-pill" data-video-check="${escapeHtml(nombre)}">📹 Grabar técnica</button>
+                ${conPeso ? `<button type="button" class="ex-tool-pill" data-aprox="${escapeHtml(nombre)}">🔥 Calentamiento</button>` : ""}
+                <button type="button" class="ex-tool-pill" data-notaex="${escapeHtml(nombre)}">${notaEx ? "📝 Editar nota" : "＋ Nota asiento"}</button>
+                <details class="ex-tools-menu">
+                  <summary class="ex-tool-pill">⋯ Más</summary>
+                  <div class="ex-tools-panel">
+                    ${conPeso ? `<button type="button" class="btn-link-subtle" data-discos="${escapeHtml(nombre)}">🏋️ Calcular discos</button>` : ""}
+                    <button type="button" class="btn-link-subtle" data-superserie="${escapeHtml(nombre)}">${esSuperserie ? "🔗 Quitar Superserie" : "🔗 Marcar Superserie"}</button>
+                    <a class="btn-link-subtle" href="https://www.google.com/search?q=${encodeURIComponent(nombre + " tecnica ejercicio")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">🔎 Buscar guía</a>
+                    <a class="btn-link-subtle" href="https://www.youtube.com/results?search_query=${encodeURIComponent(nombre + " tecnica")}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">▶ Ver en YouTube</a>
+                  </div>
+                </details>
               </div>
-              <div class="ex-actions">
-                <div class="ex-sets">${series}</div>
-                ${conPeso ? `
-                <div class="ex-log">
-                  <button type="button" class="btn-step-kg" data-stepkg="-2.5" title="Restar 2,5 kg">−2.5</button>
-                  <input type="number" step="0.5" min="0" max="500" class="log-peso" data-ex="${nombre}" value="${ultimo ? ultimo.peso : ""}" placeholder="kg" aria-label="Peso usado en ${nombre}">
-                  <button type="button" class="btn-step-kg" data-stepkg="2.5" title="Sumar 2,5 kg">+2.5</button>
-                  <input type="text" class="log-reps" data-ex="${nombre}" value="${ultimo && ultimo.reps ? ultimo.reps : ""}" placeholder="${series}" aria-label="Series y repeticiones de ${nombre}">
-                  <button type="button" class="btn-voice-log" data-mic-ex="${nombre}" title="Dictar peso y repes por voz (ej. '60 kilos 10 repes')">🎙️</button>
-                  <button class="btn-small" data-guardar="${nombre}" title="Guardar peso usado">✓</button>
-                </div>` : ""}
-              </div>
+              <div class="inline-tool-box" style="display:none;"></div>
             </div>
             ${alts ? `
             <details class="ex-alt">
-              <summary>⇄ Cambiar ejercicio / Alternativas</summary>
-              <ul>${alts.map(a => `<li><button type="button" class="btn-alt-swap" data-swap-day="${diaIdx}" data-swap-idx="${ejIdx}" data-swap-to="${a}">⇄ Usar ${a}</button></li>`).join("")}</ul>
+              <summary>⇄ Máquina ocupada: ver ${alts.length} alternativas</summary>
+              <ul>${alts.map(a => `<li><button type="button" class="btn-alt-swap" data-swap-day="${diaIdx}" data-swap-idx="${ejIdx}" data-swap-to="${escapeHtml(a)}">⇄ Cambiar por ${escapeHtml(a)}</button></li>`).join("")}</ul>
             </details>` : ""}
           </div>`;
         })
@@ -827,8 +967,16 @@ function renderPlan(clave) {
   $("plan-content").innerHTML = html;
 }
 
-/* Delegación de eventos en el plan: timer, series, notas, cargas, día hecho */
+/* Delegación de eventos en el plan: selector de día, timer, series, notas, cargas, día hecho */
 $("plan-content").addEventListener("click", e => {
+  const btnDaySel = e.target.closest("[data-select-day]");
+  if (btnDaySel) {
+    const val = btnDaySel.dataset.selectDay;
+    diaSeleccionadoPorPlan[planActual] = val === "todos" ? "todos" : +val;
+    renderPlan(planActual);
+    return;
+  }
+
   if (e.target.classList.contains("ex-img")) {
     abrirLightbox(e.target.src, e.target.alt);
     return;
@@ -1177,6 +1325,8 @@ function timerPintar(texto) {
   const txt = texto || timerTexto(timerRest);
   if ($("timer-display")) $("timer-display").textContent = txt;
   if ($("ft-time")) $("ft-time").textContent = txt;
+  const topCard = $("timer-card-top");
+  if (topCard) topCard.classList.toggle("timer-active", Boolean(timerId && timerRest > 0));
 }
 
 function timerBeep() {

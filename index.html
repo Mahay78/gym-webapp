@@ -191,17 +191,19 @@
         </div>
       </div>
 
-      <div class="card">
-        <h3>⏱ Temporizador de descanso</h3>
+      <div class="card timer-card-compact" id="timer-card-top">
+        <div class="timer-compact-head">
+          <span class="timer-compact-title">⏱ <strong>Descanso</strong></span>
+          <div id="timer-display" class="timer-display-compact" role="timer" aria-live="polite">00:00</div>
+        </div>
         <div class="timer-row">
           <button class="tab" data-timer="60">60 s</button>
           <button class="tab" data-timer="90">90 s</button>
           <button class="tab" data-timer="120">120 s</button>
           <button class="tab" data-timer="180">180 s</button>
-          <input type="number" id="timer-custom" min="10" max="600" placeholder="personalizado (s)" aria-label="Segundos personalizados">
-          <button class="btn-small" id="btn-timer-stop">⏹ Detener</button>
+          <input type="number" id="timer-custom" min="10" max="600" placeholder="seg..." aria-label="Segundos personalizados">
+          <button class="btn-small" id="btn-timer-stop" title="Detener temporizador">⏹ Parar</button>
         </div>
-        <div id="timer-display" class="timer-display" role="timer" aria-live="polite">00:00</div>
       </div>
 
       <div class="tabs" id="plan-tabs">
