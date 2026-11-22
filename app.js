@@ -1006,6 +1006,7 @@ $("plan-content").addEventListener("click", e => {
     renderEntrenos();
     renderHoyToca();
     renderResumenSemanal();
+    renderCoachDiario();
   }
 });
 
@@ -1184,6 +1185,22 @@ function detenerTimer() {
 document.querySelectorAll("[data-timer]").forEach(b =>
   b.addEventListener("click", () => iniciarTimer(+b.dataset.timer))
 );
+
+if ($("timer-custom")) {
+  const lanzarTimerCustom = () => {
+    const seg = parseInt($("timer-custom").value, 10);
+    if (seg && seg >= 10 && seg <= 600) {
+      iniciarTimer(seg, "Descanso personalizado");
+    }
+  };
+  $("timer-custom").addEventListener("change", lanzarTimerCustom);
+  $("timer-custom").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      lanzarTimerCustom();
+    }
+  });
+}
 
 $("btn-timer-stop").addEventListener("click", detenerTimer);
 
@@ -4224,8 +4241,10 @@ function renderCatalogoPaquetes() {
   });
 }
 
-async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario) {
+async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario, jsonMode = true) {
   const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+  const generationConfig = { temperature: 0.3 };
+  if (jsonMode) generationConfig.response_mime_type = "application/json";
   const payload = {
     contents: [
       {
@@ -4234,10 +4253,7 @@ async function llamarGeminiTexto(apiKey, promptSistema, promptUsuario) {
         ]
       }
     ],
-    generationConfig: {
-      temperature: 0.3,
-      response_mime_type: "application/json"
-    }
+    generationConfig
   };
 
   const res = await fetch(url, {
@@ -4782,13 +4798,17 @@ function ejecutarAuditoriaIA() {
   Object.entries(cargas).forEach(([ej, hist]) => {
     if (Array.isArray(hist) && hist.length >= 3) {
       const u3 = hist.slice(-3);
-      const w0 = u3[0].peso || 0;
-      const w2 = u3[2].peso || 0;
-      const r0 = u3[0].reps || 0;
-      const r2 = u3[2].reps || 0;
+      const w0 = parseFloat(u3[0].peso) || 0;
+      const w2 = parseFloat(u3[2].peso) || 0;
+      const parseRepsNum = (str) => {
+        const m = String(str || "").match(/(\d+)/g);
+        return m ? parseInt(m[m.length - 1], 10) : 0;
+      };
+      const r0 = parseRepsNum(u3[0].reps);
+      const r2 = parseRepsNum(u3[2].reps);
 
       if (w2 <= w0 && r2 <= r0) {
-        estancados.push({ ejercicio: ej, peso: w2, reps: r2, sesiones: hist.length });
+        estancados.push({ ejercicio: ej, peso: w2, reps: u3[2].reps || r2, sesiones: hist.length });
       } else {
         progresando.push({ ejercicio: ej, ganancia: (w2 - w0).toFixed(1) });
       }
@@ -5075,7 +5095,8 @@ async function auditarSemanaConIA() {
       const resp = await llamarGeminiTexto(
         apiKey,
         "Eres el Coach Semanal de FitnessCut. Analiza la semana del usuario y da 3 recomendaciones concretas y accionables (en texto breve con viñetas) para la próxima semana.",
-        resumen
+        resumen,
+        false
       );
       cont.innerHTML = `<div class="plan-note"><strong>🤖 Coach Semanal IA:</strong><div style="margin-top:6px; white-space:pre-line;">${escapeHtml(resp)}</div></div>`;
       return;
@@ -5091,6 +5112,21 @@ async function auditarSemanaConIA() {
 /* =====================================================
    CALCULADORAS
    ===================================================== */
+const PERFIL_KEY = "fitnesscut_perfil";
+
+function cargarPerfilGuardado() {
+  const p = cargarLS(PERFIL_KEY, null);
+  if (!p || typeof p !== "object") return;
+  if (p.sexo && $("cal-sexo")) $("cal-sexo").value = p.sexo;
+  if (p.edad && $("cal-edad")) $("cal-edad").value = p.edad;
+  if (p.peso && $("cal-peso")) $("cal-peso").value = p.peso;
+  if (p.altura && $("cal-altura")) $("cal-altura").value = p.altura;
+  if (p.actividad && $("cal-actividad")) $("cal-actividad").value = p.actividad;
+  if (p.deficit !== undefined && $("cal-deficit")) $("cal-deficit").value = p.deficit;
+  if (p.peso && $("imc-peso")) $("imc-peso").value = p.peso;
+  if (p.altura && $("imc-altura")) $("imc-altura").value = p.altura;
+}
+
 function leerPerfil() {
   return {
     sexo: $("cal-sexo").value,
@@ -5100,6 +5136,13 @@ function leerPerfil() {
     actividad: +$("cal-actividad").value,
     deficit: +$("cal-deficit").value,
   };
+}
+
+function guardarPerfilActual() {
+  const p = leerPerfil();
+  if (p.edad && p.peso && p.altura) {
+    guardarLS(PERFIL_KEY, p);
+  }
 }
 
 function objetivoKcalDiario() {
@@ -5131,7 +5174,10 @@ function actualizarCalorias() {
 }
 
 ["cal-sexo", "cal-edad", "cal-peso", "cal-altura", "cal-actividad", "cal-deficit"].forEach(id =>
-  $(id).addEventListener("input", actualizarCalorias)
+  $(id).addEventListener("input", () => {
+    guardarPerfilActual();
+    actualizarCalorias();
+  })
 );
 
 $("btn-macros").addEventListener("click", () => {
@@ -5750,6 +5796,7 @@ $("btn-guardar-dia").addEventListener("click", () => {
   $("dia-kcal").value = "";
   renderDiario();
   renderResumenSemanal();
+  renderCoachDiario();
 });
 
 function eliminarDia(idx) {
@@ -5759,6 +5806,7 @@ function eliminarDia(idx) {
   guardarDiario(diario);
   renderDiario();
   renderResumenSemanal();
+  renderCoachDiario();
 }
 
 function mediaUltimosNDias(datos, campo, n) {
@@ -6042,6 +6090,7 @@ function guardarPlatoEnDiario(plato) {
   sumarKcalDia(hoy, total);
   renderComidas();
   renderDiario();
+  renderCoachDiario();
 
   decirVoz(`Plato guardado con éxito. Sumadas ${total} calorías a tu diario.`);
   alert(`✅ ¡"${nombre}" (${total} kcal) añadido a tus comidas de hoy!`);
@@ -6395,6 +6444,7 @@ $("btn-add-comida").addEventListener("click", () => {
   $("comida-cant").value = 1;
   renderComidas();
   renderDiario();
+  renderCoachDiario();
 });
 
 function renderComidas() {
@@ -6459,14 +6509,26 @@ $("btn-exportar-diario").addEventListener("click", () => {
 /* =====================================================
    BACKUP COMPLETO (JSON)
    ===================================================== */
+const CLAVES_BACKUP_EXTRA = [
+  "fitnesscut_agua",
+  "fitnesscut_paquetes_guardados",
+  "fitnesscut_comidas_custom",
+  "fitnesscut_vision_logs",
+  PERFIL_KEY,
+];
+
 $("btn-backup-export").addEventListener("click", () => {
   const datos = {};
-  [KEY.progreso, KEY.diario, KEY.fotos, KEY.cargas, KEY.entrenos, KEY.meta, KEY.comidas, KEY.planesCustom, KEY.notasEjercicios].forEach(k => {
+  [KEY.progreso, KEY.diario, KEY.cargas, KEY.entrenos, KEY.meta, KEY.comidas, KEY.planesCustom, KEY.notasEjercicios, ...CLAVES_BACKUP_EXTRA].forEach(k => {
     const raw = localStorage.getItem(k);
     if (raw) {
       try { datos[k] = JSON.parse(raw); } catch { /* ignorar */ }
     }
   });
+  const fotosActuales = cargarFotos();
+  if (Array.isArray(fotosActuales) && fotosActuales.length > 0) {
+    datos[KEY.fotos] = fotosActuales;
+  }
   const planAct = localStorage.getItem(KEY.planActual);
   if (planAct) datos.planActual = planAct;
   descargarArchivo("fitnesscut_backup.json", JSON.stringify(datos, null, 2), "application/json");
@@ -6476,7 +6538,7 @@ $("backup-import").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     let datos;
     try {
       datos = JSON.parse(reader.result);
@@ -6490,8 +6552,13 @@ $("backup-import").addEventListener("change", e => {
     }
     if (!confirm("Esto sustituirá tus datos actuales por los del backup. ¿Continuar?")) return;
 
-    Object.values(KEY).forEach(k => {
-      if (k === KEY.tema) return;
+    if (Array.isArray(datos[KEY.fotos])) {
+      fotosCacheIDB = datos[KEY.fotos];
+      await guardarFotosIDB(datos[KEY.fotos]);
+    }
+
+    [...Object.values(KEY), ...CLAVES_BACKUP_EXTRA].forEach(k => {
+      if (k === KEY.tema || k === KEY.fotos) return;
       if (datos[k] !== undefined) guardarLS(k, datos[k]);
     });
     if (datos.planActual) localStorage.setItem(KEY.planActual, datos.planActual);
@@ -6620,6 +6687,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 
 /* ---------- Init ---------- */
 aplicarTema();
+cargarPerfilGuardado();
 pintarDatalist();
 actualizarCalorias();
 actualizarImc();
@@ -6700,6 +6768,7 @@ async function buscarProductoOpenFoodFacts(codigo) {
           sumarKcalDia(hoy, kcal100);
           renderComidas();
           renderDiario();
+          renderCoachDiario();
           b.textContent = "✅";
         });
       });
@@ -6748,6 +6817,7 @@ async function buscarProductoOpenFoodFacts(codigo) {
         sumarKcalDia(hoy, totalKcal);
         renderComidas();
         renderDiario();
+        renderCoachDiario();
         resDiv.innerHTML = `<div style="color:var(--green); font-size:0.85rem;">✅ Añadido: ${escapeHtml(nombre)} (${totalKcal} kcal).</div>`;
       });
     }
@@ -6839,8 +6909,7 @@ function renderCoachDiario() {
   const hoy = hoyISO();
   const entrenos = cargarLS(KEY.entrenos, {});
   const hechoHoy = Boolean(entrenos[hoy]);
-  const diario = cargarLS(KEY.diario, {});
-  const regHoy = diario[hoy] || {};
+  const regHoy = cargarDiario().find(d => d.fecha === hoy) || {};
   const pasos = regHoy.pasos || 0;
   const kcal = regHoy.kcal || 0;
   const agua = (cargarLS("fitnesscut_agua", {})[hoy]) || 0;
@@ -6870,19 +6939,21 @@ function initOnboarding() {
   });
 
   $("btn-onb-guardar")?.addEventListener("click", () => {
-    const sexo = $("onb-sexo").value;
+    const rawSexo = $("onb-sexo").value;
+    const sexo = (rawSexo === "h" || rawSexo === "m") ? (rawSexo === "h" ? "h" : (rawSexo === "m" && $("onb-sexo").options[0]?.value === "m" ? "h" : "m")) : (rawSexo === "f" ? "m" : "h");
     const edad = +$("onb-edad").value || 30;
     const altura = +$("onb-altura").value || 175;
     const peso = parseFloat($("onb-peso").value) || 80;
     const metaPeso = parseFloat($("onb-meta").value) || 74;
     const dias = $("onb-dias").value || "4dias";
 
-    if ($("calc-sexo")) $("calc-sexo").value = sexo;
-    if ($("calc-edad")) $("calc-edad").value = edad;
-    if ($("calc-altura")) $("calc-altura").value = altura;
-    if ($("calc-peso")) $("calc-peso").value = peso;
+    if ($("cal-sexo")) $("cal-sexo").value = sexo;
+    if ($("cal-edad")) $("cal-edad").value = edad;
+    if ($("cal-altura")) $("cal-altura").value = altura;
+    if ($("cal-peso")) $("cal-peso").value = peso;
     if ($("imc-peso")) $("imc-peso").value = peso;
     if ($("imc-altura")) $("imc-altura").value = altura;
+    guardarPerfilActual();
 
     const regs = cargarRegistros();
     regs.push({ fecha: hoyISO(), peso, cintura: null });
@@ -6892,9 +6963,16 @@ function initOnboarding() {
 
     actualizarCalorias();
     actualizarImc();
-    renderPlan(dias);
+    if (dias === "2dias") {
+      generarPlanAMedida("2", "intermedio", "maquinas", "grasa");
+    } else {
+      renderPlan(dias);
+      renderHoyToca();
+    }
     renderProgreso();
     renderMeta();
+    renderHomeStats();
+    renderResumenSemanal();
     renderCoachDiario();
     modal.style.display = "none";
   });
@@ -7025,7 +7103,8 @@ function initCoachChatbot() {
         const resp = await llamarGeminiTexto(
           apiKey,
           `Eres el Coach personal de FitnessCut. Responde en español, breve (máx 4 frases) y práctico.\nContexto del usuario:\n${ctx}`,
-          q
+          q,
+          false
         );
         lastBot.textContent = resp;
         return;
